@@ -1,0 +1,23 @@
+export default {
+  "home.funpwd": "Đổi mật khẩu",
+  "home.funlogout": "Đăng xuất",
+  "home.userinfo": "Thông tin người dùng",
+  "home.pwdold": "Mật khẩu cũ",
+  "home.pwdnew": "Mật khẩu mới",
+  "home.pwdrpt": "Nhập lại mật khẩu",
+  "home.oldisnull": "Hãy điền mật khẩu cũ",
+  "home.newisnull": "Hãy điền mật khẩu mới",
+  "home.repeatnew": "Hãy điền mật khẩu mới thêm lần nữa",
+  "home.notsame": "Hai lần nhập mật khẩu không khớp nhau",
+  "home.issame": "Mật khẩu mới phải khác mật khẩu cũ",
+  "home.funpwdsuc": "Thay đổi mật khẩu thành công",
+  "home.funpwdfal": "Thay đổi mật khẩu thất bại! Nguyên nhân: ",
+  "home.logoutmessage": "Xác nhận đăng xuất?",
+  "home.confirmTip": "Lời nhắc",
+  "home.title": "Trình quản lý",
+  "home.authentication": "Xác thực mật khẩu thất bại!",
+  "home.change-pwd-confirm": "Bạn chắc chắn muốn đổi mật khẩu? Tài khoản sẽ tự động đăng xuất sau khi đổi mật khẩu!",
+  "Search":"Tìm kiếm",
+  "reportCheckIn/CheckOut":"Thống kê khách ra / vào",
+  "reportVisitor":"Thông tin khách"
+}

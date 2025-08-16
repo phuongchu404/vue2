@@ -1,0 +1,79 @@
+.handText {
+    display: flex;
+    /* -webkit-transform: rotate(-90deg);*/
+    /*  -moz-transform: rotate(-90deg);*/
+    height: 100%;
+    text-align: left;
+    float: left;
+    font-weight: bold;
+
+}
+
+.detail-finger-image {
+    width: auto;
+    height: 80px;
+}
+
+.finger-image-div {
+    /*width: 100px;*/
+    background: #f3f5f7;
+    /*border: 1px solid black;*/
+    height: 85px;
+}
+
+.div-face-image {
+    display: flex;
+    height: 250px;
+    width: 320px;
+    align-items: center;
+}
+
+.faceImgDisplay {
+    display: inline-block;
+    width: auto;
+    height: 100%;
+    /*border: 1px solid;*/
+    margin: auto;
+    /*border-width: 1px;*/
+    /*height: 50%;*/
+    /*-webkit-filter: invert(1);*/
+    /*filter: invert(1);*/
+}
+
+.div-id-image {
+    display: inline-block;
+    height: 180px;
+    width: 240px;
+    /*align-items: center;*/
+}
+
+.idImgDisplay {
+    /*display: inline-block;*/
+    width: auto;
+    height: 100%;
+    border: 1px solid;
+
+    /*margin: auto;*/
+    /*border-width: 1px;*/
+    /*height: 50%;*/
+    /*-webkit-filter: invert(1);*/
+    /*filter: invert(1);*/
+}
+
+.big-image-viewer {
+    /*width: 480px;*/
+    height: 400px;
+    display: block;
+    margin: 0 auto;
+}
+.subject-finger-text {
+    font-size: 13px;
+}
+
+
+.button-div {
+    /*height: 50px;*/
+    /*background: #9ea7b4;*/
+    cursor: pointer;
+
+}

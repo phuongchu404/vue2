@@ -1,0 +1,15 @@
+{
+  "presets": [
+    "env",
+    "stage-0",
+    "stage-1",
+    "stage-2",
+    "stage-3"
+  ],
+  "plugins": [
+    "transform-decorators-legacy"
+  ],
+  "comments": false,
+  "sourceMaps": true,
+  "retainLines": true
+}

@@ -1,0 +1,15 @@
+.query-form-input {
+  width: 200px;
+}
+
+.edit-form-input {
+  width: 350px;
+}
+
+.danger {
+  color: red;
+}
+
+.danger:disabled {
+  color: #bfcbd9;
+}
