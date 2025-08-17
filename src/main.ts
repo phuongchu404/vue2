@@ -1,151 +1,150 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import Vuex from 'vuex';
-import Axios from 'axios';
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createStore } from 'vuex'
+import axios from 'axios'
 
-import * as Utils from './utils';
-import './assets/css/font-awesome.scss';
-import './assets/css/global.scss';
-import './assets/css/icon-font.scss';
+// Element Plus
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-import ElementUI from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
-import i18n from './components/i18n';
-import VCharts from 'v-charts'
-// import './assets/style/index.scss'
 
-import AppFooter from '@/components/common/Footer.vue';
-import AppLanguage from '@/components/common/Language.vue';
-import App from './App.vue';
-import router from './router';
-import '../src/assets/style/index.scss';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {fas} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+// Styles
+import './assets/css/global.scss'
+import './assets/css/icon-font.scss'
+import './assets/style/index.scss'
 
-library.add(fas);
+// Components
+import App from './App.vue'
+import AppFooter from '@/components/common/Footer.vue'
+import AppLanguage from '@/components/common/Language.vue'
 
-Vue.component('font-awesome-icon', FontAwesomeIcon);
+// Routes and Store
+import { routes } from './router'
+import { i18n } from './components/i18n'
 
-Vue.use(ElementUI, {
-    i18n: (key: string, value: any) => i18n.t(key, value)
-});
-Vue.use(VueRouter);
-Vue.use(Vuex);
-Vue.use(VCharts)
+// Create Vue app
+const app = createApp(App)
 
-Axios.interceptors.request.use(function (config) {
-    config.headers['lang'] = localStorage.getItem("LANG") || window.navigator.language
-    //access-token
-    let oldToken = localStorage.getItem("TOKEN");
-    if (oldToken) {
-        config.headers['x-access-token'] = oldToken;
-    }
-    return config;
-});
-Axios.interceptors.response.use(function (config) {
-    // access-token
-    let oldToken = localStorage.getItem("TOKEN");
-    let token = config.headers['x-access-token'];
-    if (token && token != oldToken)
-        localStorage.setItem("TOKEN", token);
-    return config;
-});
+// Create router
+const router = createRouter({
+  history: createWebHistory(),
+  routes: routes
+})
 
-Vue.component('AppFooter', AppFooter);
-Vue.component('AppLanguage', AppLanguage);
-Vue.config.productionTip = true;
-
-var availButtons = new Set();
-const store = new Vuex.Store({
-    state: {
-        buttons: availButtons,
-        fingerData: {},
-        faceData: {},
-        idCardData: {},
-        subjectDetailDialog: false,
-        image: '',
-        template: '',
-        titleRegister: ''
+// Create store
+const store = createStore({
+  state: {
+    buttons: new Set(),
+    fingerData: {},
+    faceData: {},
+    idCardData: {},
+    subjectDetailDialog: false,
+    image: '',
+    template: '',
+    titleRegister: ''
+  },
+  mutations: {
+    setButtons(state, payload) {
+      state.buttons = payload.buttons
     },
-    mutations: {
-        setButtons(state, payload) {
-            state.buttons = payload.buttons;
-        },
-        setImage(state, payload) {
-            state.image = payload.image;
-        },
-        setTemplate(state, payload) {
-            state.template = payload.template;
-        },
-        setTitleRegister(state, payload) {
-            state.titleRegister = payload.titleRegister;
-        },
-        setFingerData(state, fingerData) {
-            state.fingerData = fingerData;
-        },
-        setFaceData(state, faceData) {
-            state.faceData = faceData;
-        },
-        toggleSubjectDetailDialog(state, value) {
-            state.subjectDetailDialog = value;
-        },
-        setIdCardData(state, idCardData) {
-            state.idCardData = idCardData;
-        },
-        clearBioData(state, data) {
-            state.idCardData = {};
-            state.faceData = {};
-            state.fingerData = {};
-        }
+    setImage(state, payload) {
+      state.image = payload.image
     },
-    getters: {
-        getFingerData: state => state.fingerData,
-        getFaceData: state => state.faceData,
-        getSubjectDetailDialogStatus: state => state.subjectDetailDialog,
-        getIdCardData: state => state.idCardData,
-        getImageData: state => state.image,
-        getTemplateData: state => state.template,
-        getTitleRegister: state => state.titleRegister,
+    setTemplate(state, payload) {
+      state.template = payload.template
+    },
+    setTitleRegister(state, payload) {
+      state.titleRegister = payload.titleRegister
+    },
+    setFingerData(state, fingerData) {
+      state.fingerData = fingerData
+    },
+    setFaceData(state, faceData) {
+      state.faceData = faceData
+    },
+    toggleSubjectDetailDialog(state, value) {
+      state.subjectDetailDialog = value
+    },
+    setIdCardData(state, idCardData) {
+      state.idCardData = idCardData
+    },
+    clearBioData(state) {
+      state.idCardData = {}
+      state.faceData = {}
+      state.fingerData = {}
     }
-});
+  },
+  getters: {
+    getFingerData: state => state.fingerData,
+    getFaceData: state => state.faceData,
+    getSubjectDetailDialogStatus: state => state.subjectDetailDialog,
+    getIdCardData: state => state.idCardData,
+    getImageData: state => state.image,
+    getTemplateData: state => state.template,
+    getTitleRegister: state => state.titleRegister,
+  }
+})
 
-// use sessionStorage to keep current user object. If there is no user object, redirect to login
+// Axios interceptors
+axios.interceptors.request.use(function (config) {
+  config.headers['lang'] = localStorage.getItem("LANG") || window.navigator.language
+  const token = localStorage.getItem("TOKEN")
+  if (token) {
+    config.headers['x-access-token'] = token
+  }
+  return config
+})
+
+axios.interceptors.response.use(function (response) {
+  const token = response.headers['x-access-token']
+  const oldToken = localStorage.getItem("TOKEN")
+  if (token && token !== oldToken) {
+    localStorage.setItem("TOKEN", token)
+  }
+  return response
+})
+
+// Router guards
 router.beforeEach((to, from, next) => {
-    if (to.path == '/login') {
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('TOKEN');
-    }
-    let tempString = sessionStorage.getItem('user');
-    if (tempString) {
-        let user = JSON.parse(tempString);
-        if (!user && to.path != '/login') { // login
-            next(); //{path: '/profile'});
-        } else {
-            next();
-        }
+  if (to.path === '/login') {
+    sessionStorage.removeItem('user')
+    sessionStorage.removeItem('TOKEN')
+  }
+  
+  const userString = sessionStorage.getItem('user')
+  if (userString) {
+    const user = JSON.parse(userString)
+    if (!user && to.path !== '/login') {
+      next()
     } else {
-        if (to.path != '/login')
-            next({path: '/login'});
-        else
-            next();
+      next()
     }
-});
+  } else {
+    if (to.path !== '/login') {
+      next({ path: '/login' })
+    } else {
+      next()
+    }
+  }
+})
 
-// const app = new Vue({
-//   router: router,
-//   store: store,
-//   render: h => h(App),
-// }).$mount("#app");
+// Use plugins
+app.use(ElementPlus)
+app.use(router)
+app.use(store)
+app.use(i18n)
 
-/* eslint-disable no-new */
-new Vue({
-    el: '#app',
-    store: store,
-    router,
-    i18n,
-    template: '<App/>',
-    components: {App}
-});
+// Register Element Plus Icons
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+
+
+// Register global components
+app.component('AppFooter', AppFooter)
+app.component('AppLanguage', AppLanguage)
+
+// Mount app
+app.mount('#app')

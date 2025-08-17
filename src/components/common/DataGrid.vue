@@ -1,64 +1,121 @@
 <template>
-    <div>
-        <!--Table Area-->
-        <el-table :data="pageData" style="width: 100%">
-            <el-table-column type="index" label="序号" width="80" v-if="showIndex"></el-table-column>
-            <el-table-column v-for="item in columnData" :key="item.prop" :prop="item.prop" :formatter="item.format" :label="item.label" :width="item.width" v-if="item.show==null?true:item.show==null"></el-table-column>
-            <el-table-column label="Vận hành" inline-template :context="_self" fixed="right" :width="btnWidth" v-if="showButton">
-                <div>
-                    <el-button v-for="item in buttonData" :key="item.name" :type="item.type" :size="item.size" class="compact-button" @click="item.click(row,item.params)">{{item.label}}</el-button>
-                </div>
-            </el-table-column>
-        </el-table>
-        <el-pagination v-if="showPager" @size-change="handleSizeChange" :page-sizes="pageSizes" :layout="layout" :page-size.sync="pageSizeMirror" :current-page.sync="pageNumMirror" :total="total"></el-pagination>
-    </div>
+  <div>
+    <!--Table Area-->
+    <el-table :data="pageData" style="width: 100%">
+      <el-table-column type="index" label="序号" width="80" v-if="showIndex"></el-table-column>
+      <el-table-column 
+        v-for="item in columnData" 
+        :key="item.prop" 
+        :prop="item.prop" 
+        :formatter="item.format" 
+        :label="item.label" 
+        :width="item.width" 
+        v-if="item.show == null ? true : item.show">
+      </el-table-column>
+      <el-table-column 
+        label="Vận hành" 
+        fixed="right" 
+        :width="btnWidth" 
+        v-if="showButton">
+        <template #default="{ row }">
+          <el-button 
+            v-for="item in buttonData" 
+            :key="item.name" 
+            :type="item.type" 
+            :size="item.size" 
+            class="compact-button" 
+            @click="item.click(row, item.params)">
+            {{ item.label }}
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    
+    <el-pagination 
+      v-if="showPager" 
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :page-sizes="pageSizes" 
+      :layout="layout" 
+      :page-size="pageSizeMirror" 
+      :current-page="pageNumMirror" 
+      :total="total">
+    </el-pagination>
+  </div>
 </template>
-<script lang="ts">
-import Vue from 'vue';
-import Component from 'vue-class-component';
 
-@Component({
-        props: {
-            btnWidth: String,
-            pageData: Array,
-            columnData: Array,
-            buttonData: Array,
-            //
-            pageNum:{type: Number,default: 1},
-            pageSize:{type: Number,default: 5},
-            total: {type: Number,default: 0},
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 
-            showButton: {type: Boolean,default: true},//true
-            showIndex: {type: Boolean,default: true},//true
-            showPager: {type: Boolean,default: true},//true
-            pageSizes: {type: Array,default: ()=> [5,10,20,50]},//[5,10,20,50]
-            layout: {type: String,default: 'total, prev, pager, next'},//"total, prev, pager, next" ："total, sizes, prev, pager, next, jumper"
-        },
-        watch: {
-            //pageNum
-            pageNum:function(value){this.$data.pageNumMirror=this.$props.pageNum},
-            pageNumMirror:function(newValue){
-                    this.$emit("update:pageNum",newValue);
-                    this.$emit("current-change",newValue)
-                    },
-            //pageSize
-            pageSize:function(value){this.$data.pageSizeMirror=this.$props.pageSize}
-        }
-    })
-    export default class DataGrid extends Vue {
-        pageNumMirror:number = 1;
-        pageSizeMirror:number = 5;
+// Props
+interface Props {
+  btnWidth?: string
+  pageData?: any[]
+  columnData?: any[]
+  buttonData?: any[]
+  pageNum?: number
+  pageSize?: number
+  total?: number
+  showButton?: boolean
+  showIndex?: boolean
+  showPager?: boolean
+  pageSizes?: number[]
+  layout?: string
+}
 
-        mounted() {
-            this.pageNumMirror = this.$props.pageNum;
-            this.pageSizeMirror = this.$props.pageSize;
-        }
-        handleSizeChange(newSize:any){
-            this.$emit("update:pageSize",newSize);
-            this.$emit("size-change",newSize);
-        }
-    }
+const props = withDefaults(defineProps<Props>(), {
+  btnWidth: '200',
+  pageData: () => [],
+  columnData: () => [],
+  buttonData: () => [],
+  pageNum: 1,
+  pageSize: 5,
+  total: 0,
+  showButton: true,
+  showIndex: true,
+  showPager: true,
+  pageSizes: () => [5, 10, 20, 50],
+  layout: 'total, prev, pager, next'
+})
+
+// Emits
+const emit = defineEmits<{
+  'update:pageNum': [value: number]
+  'update:pageSize': [value: number]
+  'current-change': [value: number]
+  'size-change': [value: number]
+}>()
+
+// Reactive data
+const pageNumMirror = ref(props.pageNum)
+const pageSizeMirror = ref(props.pageSize)
+
+// Methods
+const handleSizeChange = (newSize: number) => {
+  emit('update:pageSize', newSize)
+  emit('size-change', newSize)
+}
+
+const handleCurrentChange = (newPage: number) => {
+  emit('update:pageNum', newPage)
+  emit('current-change', newPage)
+}
+
+// Watchers
+watch(() => props.pageNum, (value) => {
+  pageNumMirror.value = value
+})
+
+watch(() => props.pageSize, (value) => {
+  pageSizeMirror.value = value
+})
+
+watch(pageNumMirror, (newValue) => {
+  emit('update:pageNum', newValue)
+  emit('current-change', newValue)
+})
 </script>
-<style>
 
+<style>
+/* Add your styles here */
 </style>

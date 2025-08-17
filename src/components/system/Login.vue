@@ -3,7 +3,7 @@
     <div class="login-box">
       <div class="lcname">MK Visitor - Admin</div>
       <div class="lcintro">Visitor Management</div>
-      <el-form :model="loginForm" :rules="loginFormRules" ref="loginForm">
+      <el-form :model="loginForm" :rules="loginFormRules" ref="loginFormRef">
         <el-form-item label="" style="margin-bottom: 6px">
           <div class="input-box" :class="{ hover: isUsername }" @click.stop="hoverShow('username')">
             <img src="../../assets/icon/login-user-select-icon.png" class="input-box-icon"/>
@@ -13,19 +13,102 @@
         <el-form-item label="" style="margin-bottom: 6px" prop="password">
           <div class="input-box" :class="{ hover: isPassword }" @click.stop="hoverShow('password')">
             <img src="../../assets/icon/login-pwd-select-icon.png" class="input-box-icon"/>
-            <input :type="!isEyes ? 'password' : 'text'" v-on:keyup.enter="doLogin()" v-model="loginForm.password" :placeholder="$t('Password')"
+            <input :type="!isEyes ? 'password' : 'text'" @keyup.enter="doLogin()" v-model="loginForm.password" :placeholder="$t('Password')"
                    class="input-box-text"/>
             <img @click="showPassword" v-if="!isEyes" src="../../assets/icon/login-eyes-icon.png" class="eyes" alt=""/>
             <img @click="showPassword" v-else src="../../assets/icon/login-eyes-select-icon.png" class="eyes" alt=""/>
           </div>
         </el-form-item>
-        <el-button type="submit" class="login-btn" @click.native="doLogin()">{{ $t('login.login') }}</el-button>
+        <el-button type="primary" class="login-btn" @click="doLogin()">{{ $t('login.login') }}</el-button>
       </el-form>
       <app-language style="margin:0;"/>
     </div>
   </el-row>
-
 </template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { ElMessage, type FormInstance } from 'element-plus'
+import * as Utils from '../../utils'
+
+const { t } = useI18n()
+const router = useRouter()
+
+// Refs
+const loginFormRef = ref<FormInstance>()
+
+// Reactive data
+const ui = reactive({
+  otpVisible: false
+})
+
+const loginForm = reactive({
+  username: '',
+  password: ''
+})
+
+const isPassword = ref(false)
+const isUsername = ref(false)
+const isEyes = ref(false)
+
+const loginFormRules = reactive({
+  username: [{
+    required: true,
+    message: t('login.userisnull'),
+    trigger: 'blur'
+  }],
+  password: [{
+    required: true,
+    message: t('login.pwdisnull'),
+    trigger: 'blur'
+  }],
+})
+
+// Methods
+const hoverShow = (type: string) => {
+  isPassword.value = false
+  isUsername.value = false
+  if (type === 'username') {
+    isUsername.value = true
+  } else {
+    isPassword.value = true
+  }
+}
+
+const showPassword = () => {
+  isEyes.value = !isEyes.value
+}
+
+const doLogin = async () => {
+  try {
+    await loginFormRef.value?.validate()
+    const record = loginForm
+    const ret = await Utils.doPost({ $router: router }, '/api/sessions/login', record)
+    if (ret.success) {
+      if (ret.code === 0) {
+        sessionStorage.setItem('user', JSON.stringify(ret.data))
+        router.push({ path: '/' })
+      } else {
+        ui.otpVisible = true
+        ElMessage.info(t('login.otptip'))
+      }
+    } else {
+      ElMessage.warning(t('Login info is incorrect'))
+    }
+  } catch {
+    // Validation failed
+  }
+}
+
+// Lifecycle
+onMounted(async () => {
+  localStorage.removeItem("TOKEN")
+  localStorage.removeItem("user")
+})
+</script>
+
 <style scoped lang="scss">
 input:-webkit-autofill {
   transition: background-color 5000s ease-in-out 0s;
@@ -52,7 +135,7 @@ input:-webkit-autofill {
     height: 40px;
   }
 
-  /deep/ .el-input__inner {
+  :deep(.el-input__inner) {
     height: 40px;
     border: 1px solid #e2e2e4;
     color: #333333;
@@ -60,11 +143,11 @@ input:-webkit-autofill {
     font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
   }
 
-  /deep/ .el-input__suffix {
+  :deep(.el-input__suffix) {
     height: 40px;
   }
 
-  /deep/ input::-webkit-input-placeholder {
+  :deep(input::-webkit-input-placeholder) {
     color: #333;
   }
 }
@@ -131,8 +214,6 @@ input:-webkit-autofill {
   cursor: pointer;
   width: 20px;
   height: 20px;
-  //   margin: 0 8px 0 10px;
-  //   object-fit: contain;
 }
 
 .input-box input::-webkit-input-placeholder {
@@ -151,7 +232,6 @@ input:-webkit-autofill {
   left: 50%;
   width: 450px;
   transform: translate(-50%, -50%);
-  // box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
   padding: 25px;
   border-radius: 10px;
   background: #fff;
@@ -171,7 +251,6 @@ input:-webkit-autofill {
   color: #fff;
   border-radius: 4px;
   text-align: center;
-  //line-height: 40px;
   cursor: pointer;
   margin-top: 50px;
 
@@ -213,91 +292,9 @@ input:-webkit-autofill {
 .logo-login-img {
   width: 200px;
   height: 30px;
-  //margin: 40px;
   padding-top: 30px;
   object-fit: contain;
   display: block;
   margin: auto;
 }
 </style>
-
-<script lang='ts'>
-import Vue from 'vue';
-import Component from 'vue-class-component';
-import i18n from '../i18n';
-import Language from '../common/Language.vue'
-import * as Utils from '../../utils'
-
-@Component({
-  components: {
-    'app-language': Language
-  }
-})
-export default class Login extends Vue {
-  ui = {
-    otpVisible: false
-  };
-  loginForm = {
-    username: '',
-    password: ''
-  };
-  isPassword: boolean = false;
-  isUsername: boolean = false;
-
-  loginFormRules = {
-    username: [{
-      required: true,
-      message: i18n.t('login.userisnull'),
-      trigger: 'blur'
-    }],
-    password: [{
-      required: true,
-      message: i18n.t('login.pwdisnull'),
-      trigger: 'blur'
-    }],
-  };
-
-  hoverShow(type: string) {
-    this.isPassword = false;
-    this.isUsername = false;
-    if (type === 'username') {
-      this.isUsername = true;
-    } else {
-      this.isPassword = true;
-    }
-  }
-
-  isEyes: boolean = false;
-
-  showPassword() {
-    this.isEyes = !this.isEyes;
-  }
-
-  async mounted() {
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("user");
-  };
-
-  async doLogin() {
-    var result = await Utils.validateForm(this.$refs.loginForm);
-    console.log(result)
-    if (!result) return;
-    let record = this.loginForm;
-    let ret = await Utils.doPost(this, '/api/sessions/login', record);
-    if (ret.success) {
-      if (ret.code == 0) {
-        sessionStorage.setItem('user', JSON.stringify(ret.data));
-        this.$router.push({
-          path: '/'
-        });
-      } else {
-        this.ui.otpVisible = true;
-        Utils.showInfo(String(i18n.t('login.otptip')));
-      }
-    } else {
-      Utils.showWarning(String(i18n.t('Login info is incorrect')));
-    }
-  }
-
-};
-</script>

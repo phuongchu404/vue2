@@ -1,15 +1,21 @@
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import Icon from '../assets/icon/Icon'
 
-import { Component, Vue } from 'vue-property-decorator';
-import Icon from '../assets/icon/Icon';
-import moment from 'moment';
+export function useBaseMixin() {
+  const store = useStore()
+  
+  const name = ref('')
+  const locals = localStorage.getItem('LANG')
 
-@Component({})
-export class BaseMixin extends Vue {
-    name: string = '';
-    Icon = Icon;
-    locals = localStorage.getItem('LANG');
+  const isButtonEnabled = (buttonName: string) => {
+    return !store.state.buttons.has(buttonName)
+  }
 
-    isButtonEnabled(buttonName: string) {
-        return !this.$store.state.buttons.has(buttonName);
-    }
+  return {
+    name,
+    Icon,
+    locals,
+    isButtonEnabled
+  }
 }

@@ -1,19 +1,20 @@
 // @ts-ignore
 import i18n from '@/components/i18n';
+const { t } = i18n.global;
 export default {
   tag: "system:role",
   leaf: true,
   path: "/roles",
   type: "menu",
   whiteList: false,
-  name: i18n.t("menu.role"),
+  name: t("menu.role"),
   // icon: "el-icon-fa-users",
   options: [
     {
       tag: "system:role:select",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.query"),
+      name: t("option.query"),
       pattern: "/api/admin/roles",
       method: "GET"
     },
@@ -21,7 +22,7 @@ export default {
       tag: "system:role:insert",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.add"),
+      name: t("option.add"),
       pattern: "/api/admin/roles",
       method: "POST"
     },
@@ -29,7 +30,7 @@ export default {
       tag: "system:role:update",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.update"),
+      name: t("option.update"),
       pattern: "/api/admin/roles/{roleId}",
       method: "PUT"
     },
@@ -37,7 +38,7 @@ export default {
       tag: "system:role:delete",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.delete"),
+      name: t("option.delete"),
       pattern: "/api/admin/roles/{roleId}",
       method: "DELETE"
     },
@@ -45,7 +46,7 @@ export default {
       tag: "system:role:assign-permission",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.assignPermission"),
+      name: t("option.assignPermission"),
       pattern: "/api/admin/roleperms/{roleId}",
       method: "PUT"
     },
@@ -53,7 +54,7 @@ export default {
       tag: "system:role:select-role-permission",
       type: "button",
       whiteList: false,
-      name: i18n.t("role.selectRolePermission"),
+      name: t("role.selectRolePermission"),
       pattern: "/api/admin/roleperms/{roleId}",
       method: "GET"
     }
@@ -61,7 +62,7 @@ export default {
     //   tag: "system:role:sync-permission",
     //   type: "button",
     //   whiteList: false,
-    //   name: i18n.t("role.syncPermission"),
+    //   name: t("role.syncPermission"),
     //   pattern: "/api/admin/permissions",
     //   method: "POST"
     // }

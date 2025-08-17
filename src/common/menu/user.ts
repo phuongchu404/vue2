@@ -1,19 +1,20 @@
 // @ts-ignore
 import i18n from '@/components/i18n';
+const { t } = i18n.global;
 export default {
   tag: "system:user",
   leaf: true,
   path: "/users",
   type: "menu",
   whiteList: false,
-  name: i18n.t("menu.user"),
+  name: t("menu.user"),
   // icon: "el-icon-fa-user",
   options: [
     {
       tag: "system:user:select",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.query"),
+      name: t("option.query"),
       pattern: "/api/admin/users",
       method: "GET"
     },
@@ -21,7 +22,7 @@ export default {
       tag: "system:user:insert",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.add"),
+      name: t("option.add"),
       pattern: "/api/admin/users",
       method: "POST"
     },
@@ -29,7 +30,7 @@ export default {
       tag: "system:user:update",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.update"),
+      name: t("option.update"),
       pattern: "/api/admin/users/{userId}",
       method: "PUT"
     },
@@ -37,7 +38,7 @@ export default {
       tag: "system:user:delete",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.delete"),
+      name: t("option.delete"),
       pattern: "/api/admin/users/{userId}",
       method: "DELETE"
     },
@@ -45,7 +46,7 @@ export default {
       tag: "system:user:assign-roles",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.assignRole"),
+      name: t("option.assignRole"),
       pattern: "/api/admin/userroles/{userId}",
       method: "POST"
     },
@@ -53,7 +54,7 @@ export default {
       tag: "system:user:reset-password",
       type: "button",
       whiteList: false,
-      name: i18n.t("option.resetPassword"),
+      name: t("option.resetPassword"),
       pattern: "/api/admin/users/{userId}/passwordreset",
       method: "POST"
     }
