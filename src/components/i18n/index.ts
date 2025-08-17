@@ -1,4 +1,4 @@
-import { createI18n } from 'vue-i18n'
+import { createI18n, type Composer } from 'vue-i18n'
 import * as _ from 'lodash'
 import enLocale from './eleLang/en'
 import viLocale from './eleLang/vi'
@@ -25,5 +25,9 @@ export const i18n = createI18n({
   fallbackLocale: 'en-US',
   messages: locales,
 })
+
+const composer = i18n.global as unknown as Composer
+export const t = composer.t.bind(composer)
+
 
 export default i18n

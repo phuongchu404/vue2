@@ -18,7 +18,8 @@
  * ** ** whiteList: [boolean]
  */
 // @ts-ignore
-import i18n from "@/components/i18n";
+// import i18n from "@/components/i18n";
+import {t} from "@/components/i18n";
 import user from "./menu/user";
 import role from "./menu/role";
 
@@ -29,7 +30,7 @@ export const getNavData = () => [
         path: "/",
         type: "menu",
         whiteList: true,
-        name: i18n.t("menu.index"),
+        name: t("menu.index"),
         icon: "el-icon-fa-home",
         children: [],
         disabled: true,
@@ -37,7 +38,7 @@ export const getNavData = () => [
             tag: "session:all",
             type: "button",
             whiteList: true,
-            name: i18n.t("option.query"),
+            name: t("option.query"),
             pattern: "/api/sessions/**",
             method: null,
             disabled: true,
@@ -49,7 +50,7 @@ export const getNavData = () => [
         path: "",
         type: "menu",
         whiteList: false,
-        name: i18n.t("menu.system"),
+        name: t("menu.system"),
         icon: "el-icon-fa-cogs",
         options: [],
         children: [user, role]
