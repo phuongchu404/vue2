@@ -21,13 +21,6 @@
 import i18n from "@/components/i18n";
 import user from "./menu/user";
 import role from "./menu/role";
-import provider from "./menu/provider";
-import checkvisitor from "./menu/check-visitor";
-import register from "./menu/register";
-import returncard from "./menu/return-card";
-import report from "./menu/report-in-out";
-import accesscard from "./menu/access-card";
-import visitor from "./menu/report-visitor";
 
 export const getNavData = () => [
     {
@@ -61,30 +54,6 @@ export const getNavData = () => [
         options: [],
         children: [user, role]
     },
-    {
-        tag: "visitor",
-        leaf: false,
-        path: "",
-        type: "menu",
-        whiteList: false,
-        name: i18n.t("Visitor"),
-        icon: "el-icon-s-custom",
-        options: [],
-        children: [checkvisitor, returncard]
-    },
-    accesscard,
-    // provider,
-    {
-        tag: "report",
-        leaf: false,
-        path: "",
-        type: "menu",
-        whiteList: false,
-        name: i18n.t("menu.report"),
-        icon: "el-icon-s-data",
-        options: [],
-        children: [report, visitor]
-    }
 
 ];
 
