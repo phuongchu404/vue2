@@ -56,7 +56,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { TreeNode } from 'element-plus/es/components/tree/src/tree.type'
 import axios from 'axios'
 
 /**

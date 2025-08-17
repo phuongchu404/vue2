@@ -108,14 +108,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import * as Utils from '../../utils'
 
 const { t } = useI18n()
-const store = useStore()
+const appStore = useAppStore()
 
 // Refs
 const editFormRef = ref<FormInstance>()
@@ -150,7 +150,7 @@ const queryForm = reactive({ userName: '' })
 const tableData = ref<any[]>([])
 const allRoles = ref<any[]>([])
 const defaultTreeProps = { label: 'roleName', children: 'children' }
-const rolesEditForm = reactive({ id: '', roles: [], userId: '', oldRoles: [''] })
+const rolesEditForm = reactive({ id: '', roles: [], userId: '', oldRoles: [''], selectedRoles: [] })
 const authentication = reactive({ password: '' })
 const active = ref<number>(0)
 const row = ref<any>(null)
@@ -173,7 +173,7 @@ const resetPassword = async (rowData: any) => {
 }
 
 const isButtonEnabled = (buttonName: string) => {
-  const state = store.state.buttons.has(buttonName)
+  const state = appStore.buttons.has(buttonName)
   return !state
 }
 

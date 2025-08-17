@@ -1,21 +1,27 @@
+// src/composables/useBaseMixin.ts
 import { ref } from 'vue'
-import { useStore } from 'vuex'
+import { storeToRefs } from 'pinia'
+import { useAppStore } from '@/stores/app'   // <-- store Pinia bạn đã tạo
 import Icon from '../assets/icon/Icon'
 
 export function useBaseMixin() {
-  const store = useStore()
-  
+  const appStore = useAppStore()
+
+  // Nếu bạn muốn truy cập state có reactivity tách rời:
+  const {  } = storeToRefs(appStore)
+
   const name = ref('')
   const locals = localStorage.getItem('LANG')
 
+  // buttons là Set<string> trong state Pinia
   const isButtonEnabled = (buttonName: string) => {
-    return !store.state.buttons.has(buttonName)
+    return !appStore.buttons.has(buttonName)
   }
 
   return {
     name,
     Icon,
     locals,
-    isButtonEnabled
+    isButtonEnabled,
   }
 }

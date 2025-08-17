@@ -109,17 +109,17 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStore } from 'vuex'
+import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-// import { Edit, SwitchButton, Home, User, Setting, Document } from '@element-plus/icons-vue'
+import { Edit, SwitchButton, HomeFilled, User, Setting, Document } from '@element-plus/icons-vue'
 import * as utils from "../../utils"
 import * as nav from "../../common/nav"
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const store = useStore()
+const appStore = useAppStore()
 
 // Refs
 const editFormRef = ref<FormInstance>()
@@ -175,7 +175,7 @@ function validatePasswordAgain(rule: any, value: any, callback: any) {
 const getIconComponent = (iconClass: string) => {
   // Map Element UI icon classes to Element Plus icons
   const iconMap: { [key: string]: any } = {
-    'el-icon-fa-home': Home,
+    'el-icon-fa-home': HomeFilled,
     'el-icon-fa-user': User,
     'el-icon-fa-users': User,
     'el-icon-fa-cogs': Setting,
@@ -290,10 +290,7 @@ const loadAllMenus = async () => {
       }
     }
   }
-  
-  store.commit("setButtons", {
-    buttons: new Set(availButtons)
-  })
+  appStore.setButtons(new Set(availButtons))
 }
 
 const availButtons = async () => {
@@ -307,9 +304,7 @@ const availButtons = async () => {
     allMenus.value = menus
   }
   
-  store.commit("setButtons", {
-    buttons: new Set(availableTags)
-  })
+  appStore.setButtons(new Set(availableTags))
 }
 
 const hiddenMenus = (menus: any[], tags: string[]) => {

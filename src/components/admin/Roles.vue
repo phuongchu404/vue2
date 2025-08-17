@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -118,7 +118,7 @@ import * as Utils from '../../utils'
 import * as nav from '../../common/nav'
 
 const { t } = useI18n()
-const store = useStore()
+const appStore = useAppStore()
 
 // Refs
 const editFormRef = ref<FormInstance>()
@@ -164,23 +164,17 @@ const tableRowClassName = ({ rowIndex }: { rowIndex: number }) => {
   return 'warning-row'
 }
 
-const isButtonEnabledByUser = (row: any, buttonName: string) => {
-  if (!row.removable && buttonName === 'system:role:delete') {
-    return true
-  }
-  if (!row.removable && buttonName === 'system:role:assign-permission') {
-    return true
-  }
-  if (!row.removable && buttonName === 'system:role:update') {
-    return true
-  }
-  const state = store.state.buttons.has(buttonName)
-  return !state
+const isButtonEnabledByUser = (rowData: any, buttonName: string) => {
+  if (!rowData.removable && buttonName === 'system:role:delete') return true
+  if (!rowData.removable && buttonName === 'system:role:assign-permission') return true
+  if (!rowData.removable && buttonName === 'system:role:update') return true
+  const disabled = appStore.buttons.has(buttonName)
+  return !disabled
 }
 
 const isButtonEnabled = (buttonName: string) => {
-  const state = store.state.buttons.has(buttonName)
-  return !state
+  const disabled = appStore.buttons.has(buttonName)
+  return !disabled
 }
 
 const selectAll = () => {

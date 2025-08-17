@@ -1,13 +1,11 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { createStore } from 'vuex'
 import axios from 'axios'
 
 // Element Plus
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
 
 // Styles
 import './assets/css/global.scss'
@@ -19,9 +17,12 @@ import App from './App.vue'
 import AppFooter from '@/components/common/Footer.vue'
 import AppLanguage from '@/components/common/Language.vue'
 
-// Routes and Store
+// Routes and i18n
 import { routes } from './router'
 import { i18n } from './components/i18n'
+
+// ✅ Pinia
+import { createPinia } from 'pinia'
 
 // Create Vue app
 const app = createApp(App)
@@ -29,89 +30,38 @@ const app = createApp(App)
 // Create router
 const router = createRouter({
   history: createWebHistory(),
-  routes: routes
+  routes
 })
 
-// Create store
-const store = createStore({
-  state: {
-    buttons: new Set(),
-    fingerData: {},
-    faceData: {},
-    idCardData: {},
-    subjectDetailDialog: false,
-    image: '',
-    template: '',
-    titleRegister: ''
-  },
-  mutations: {
-    setButtons(state, payload) {
-      state.buttons = payload.buttons
-    },
-    setImage(state, payload) {
-      state.image = payload.image
-    },
-    setTemplate(state, payload) {
-      state.template = payload.template
-    },
-    setTitleRegister(state, payload) {
-      state.titleRegister = payload.titleRegister
-    },
-    setFingerData(state, fingerData) {
-      state.fingerData = fingerData
-    },
-    setFaceData(state, faceData) {
-      state.faceData = faceData
-    },
-    toggleSubjectDetailDialog(state, value) {
-      state.subjectDetailDialog = value
-    },
-    setIdCardData(state, idCardData) {
-      state.idCardData = idCardData
-    },
-    clearBioData(state) {
-      state.idCardData = {}
-      state.faceData = {}
-      state.fingerData = {}
-    }
-  },
-  getters: {
-    getFingerData: state => state.fingerData,
-    getFaceData: state => state.faceData,
-    getSubjectDetailDialogStatus: state => state.subjectDetailDialog,
-    getIdCardData: state => state.idCardData,
-    getImageData: state => state.image,
-    getTemplateData: state => state.template,
-    getTitleRegister: state => state.titleRegister,
-  }
-})
+// ✅ Create Pinia (thay cho Vuex)
+const pinia = createPinia()
 
 // Axios interceptors
-axios.interceptors.request.use(function (config) {
-  config.headers['lang'] = localStorage.getItem("LANG") || window.navigator.language
-  const token = localStorage.getItem("TOKEN")
+axios.interceptors.request.use((config: any) => {
+  config.headers['lang'] = localStorage.getItem('LANG') || window.navigator.language
+  const token = localStorage.getItem('TOKEN')
   if (token) {
     config.headers['x-access-token'] = token
   }
   return config
 })
 
-axios.interceptors.response.use(function (response) {
+axios.interceptors.response.use((response) => {
   const token = response.headers['x-access-token']
-  const oldToken = localStorage.getItem("TOKEN")
+  const oldToken = localStorage.getItem('TOKEN')
   if (token && token !== oldToken) {
-    localStorage.setItem("TOKEN", token)
+    localStorage.setItem('TOKEN', token)
   }
   return response
 })
 
-// Router guards
+// Router guards (giữ nguyên)
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') {
     sessionStorage.removeItem('user')
     sessionStorage.removeItem('TOKEN')
   }
-  
+
   const userString = sessionStorage.getItem('user')
   if (userString) {
     const user = JSON.parse(userString)
@@ -132,15 +82,13 @@ router.beforeEach((to, from, next) => {
 // Use plugins
 app.use(ElementPlus)
 app.use(router)
-app.use(store)
+app.use(pinia)      // ✅ dùng Pinia thay vì store Vuex
 app.use(i18n)
 
 // Register Element Plus Icons
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
+  app.component(key, component as any)
 }
-
-
 
 // Register global components
 app.component('AppFooter', AppFooter)
