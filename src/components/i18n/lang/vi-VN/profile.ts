@@ -1,0 +1,18 @@
+export default {
+  "profile.infotitle": "Thông tin người dùng",
+  "profile.username": "Tên đăng nhập",
+  "profile.realname": "Tên người dùng",
+  "profile.roles": "Vai trò",
+  "profile.lastlogin": "Lần đăng nhập gần nhất",
+  "profile.twostepstatus": "Xác thực 2 bước",
+  "profile.twosteptitle": "Kích hoạt xác thực 2 bước",
+  "profile.tiprow1": "Sử dụng Authy quét mã để kích hoạt",
+  "profile.tiprow2": "Authy sẽ trả về một mã OTP, hãy điền vào đây: ",
+  "profile.otp": "Mã OTP: ",
+  "profile.otpisnull": "Hãy điền OTP",
+  "profile.activatetip": "Chưa kích hoạt xác thực 2 lần!",
+  "profile.confirmactivatetip": "Nếu trước đây đã kích hoạt tính năng này thì lần kích hoạt mới này sẽ vô hiệu hoá tài khoản Authy cũ! Xác nhận kích hoạt lại?",
+  "profile.activatefaliedtip": "Kích hoạt thất bại!",
+  "profile.activatefalieddetailtip": "Kích hoạt thất bại! Nguyên nhân: ",
+  "profile.activatesuccesstip": "Kích hoạt thành công!",
+}

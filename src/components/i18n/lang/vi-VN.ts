@@ -6,6 +6,7 @@ import login from "./vi-VN/login";
 import common from "./vi-VN/common";
 import option from "./vi-VN/option";
 import menu from "./vi-VN/menu";
+import profile from "./vi-VN/profile";
 
 export default {
   ...menu,
@@ -16,4 +17,5 @@ export default {
   ...user,
   ...role,
   ...permission,
-}
+  ...profile,
+};

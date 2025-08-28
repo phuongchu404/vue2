@@ -1,177 +1,287 @@
 <template>
-  <div>
-    <el-card class="box-card title" style="width: 100%; margin-top: 10px;padding-bottom: 100px">
-      <template #header>
-        <div class="clearfix">
-          <span style="line-height: 36px;font-size:20px;color: black;font-weight: 500;margin-left: 10px">
-            {{ $t('home.userinfo') }}
-          </span>
-        </div>
+  <div class="dashboard">
+    <el-page-header @back="$router.go(-1)">
+      <template #content>
+        <span class="text-large font-600 mr-3"
+          >Trang chủ - Tổng quan hệ thống</span
+        >
       </template>
-      <el-row>
-        <el-col :span="8">
-          <img src="../../assets/user2.png" :width="178" height="178"/>
-        </el-col>
-        <el-col :span="16">
-          <el-row class="text item" style="font-size: 16px">
-            <el-col :span="6">{{ $t("profile.username") }}</el-col>
-            <el-col :span="18">{{ sysUserName }}</el-col>
-          </el-row>
-          <el-row class="text item" style="font-size: 16px">
-            <el-col :span="6">{{ $t("profile.realname") }}</el-col>
-            <el-col :span="18">{{ sysRealName }}</el-col>
-          </el-row>
-          <el-row class="text item" style="font-size: 16px">
-            <el-col :span="6">{{ $t("profile.roles") }}</el-col>
-            <el-col :span="18">{{ sysUserRolesString }}</el-col>
-          </el-row>
-          <el-row class="text item" style="font-size: 16px">
-            <el-col :span="6">{{ $t("profile.lastlogin") }}</el-col>
-            <el-col :span="18">{{ sysUserLastLogin }}</el-col>
-          </el-row>
-        </el-col>
-      </el-row>
-    </el-card>
+    </el-page-header>
 
-    <el-dialog :title="$t('profile.twosteptitle')" v-model="ui.activateDialogVisible">
-      <el-row>
-        <el-col :span="10">
-          <img :src="sysUserQRImage" alt="QR Code"/>
-        </el-col>
-        <el-col :span="14">
-          <el-row>
-            <el-col :span="24">{{ $t("profile.tiprow1") }}</el-col>
-            <el-col :span="24">{{ $t("profile.tiprow2") }}</el-col>
-            <el-col :span="24">&nbsp;</el-col>
-            <el-col :span="24">&nbsp;</el-col>
-            <el-col :span="24">&nbsp;</el-col>
-            <el-col :span="24">{{ $t("profile.otp") }}</el-col>
-            <el-col :span="24">
-              <el-form :model="activateForm" :rules="activateFormRules" label-width="100px" ref="activateFormRef" inline>
-                <el-form-item label="" prop="otp">
-                  <el-input v-model="activateForm.otp"></el-input>
-                </el-form-item>
-              </el-form>
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="ui.activateDialogVisible = false">{{ $t("common.cancel") }}</el-button>
-          <el-button type="primary" @click="handleEnableTwoStep">{{ $t("common.ok") }}</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    <!-- Statistics Cards -->
+    <el-row :gutter="20" class="stats-row">
+      <el-col :xs="24" :sm="12" :md="6">
+        <el-card class="stats-card prison-card">
+          <div class="stats-content">
+            <div class="stats-icon">
+              <el-icon size="32"><OfficeBuilding /></el-icon>
+            </div>
+            <div class="stats-info">
+              <div class="stats-number">{{ prisonStore.prisons.length }}</div>
+              <div class="stats-label">Trại giam</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :sm="12" :md="6">
+        <el-card class="stats-card detainee-card">
+          <div class="stats-content">
+            <div class="stats-icon">
+              <el-icon size="32"><User /></el-icon>
+            </div>
+            <div class="stats-info">
+              <div class="stats-number">
+                {{ detaineeStore.detainees.length }}
+              </div>
+              <div class="stats-label">Phạm nhân</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :sm="12" :md="6">
+        <el-card class="stats-card staff-card">
+          <div class="stats-content">
+            <div class="stats-icon">
+              <el-icon size="32"><Avatar /></el-icon>
+            </div>
+            <div class="stats-info">
+              <div class="stats-number">{{ staffStore.staff.length }}</div>
+              <div class="stats-label">Cán bộ</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+
+      <el-col :xs="24" :sm="12" :md="6">
+        <el-card class="stats-card identity-card">
+          <div class="stats-content">
+            <div class="stats-icon">
+              <el-icon size="32"><Document /></el-icon>
+            </div>
+            <div class="stats-info">
+              <div class="stats-number">
+                {{ identityStore.identityRecords.length }}
+              </div>
+              <div class="stats-label">Danh bản</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- Prison Overview -->
+    <el-row :gutter="20">
+      <el-col :span="24">
+        <el-card class="mt-4">
+          <template #header>
+            <div class="card-header">
+              <span>Tình hình các trại giam</span>
+              <el-button type="primary" @click="$router.push('/prisons')">
+                Xem tất cả
+              </el-button>
+            </div>
+          </template>
+
+          <el-table :data="prisonStore.prisons" style="width: 100%">
+            <el-table-column prop="code" label="Mã trại giam" width="120" />
+            <el-table-column prop="name" label="Tên trại giam" />
+            <el-table-column prop="warden" label="Giám thị" />
+            <el-table-column label="Sức chứa">
+              <template #default="scope">
+                {{ scope.row.current_inmates }}/{{ scope.row.capacity }}
+              </template>
+            </el-table-column>
+            <el-table-column label="Tỷ lệ lấp đầy">
+              <template #default="scope">
+                <el-progress
+                  :percentage="
+                    Math.round(
+                      (scope.row.current_inmates / scope.row.capacity) * 100
+                    )
+                  "
+                  :color="
+                    getProgressColor(
+                      scope.row.current_inmates / scope.row.capacity
+                    )
+                  "
+                />
+              </template>
+            </el-table-column>
+            <el-table-column label="Trạng thái">
+              <template #default="scope">
+                <el-tag
+                  :type="scope.row.status === 'ACTIVE' ? 'success' : 'danger'"
+                >
+                  {{ scope.row.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng" }}
+                </el-tag>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- Recent Activities -->
+    <el-row :gutter="20" class="mt-4">
+      <el-col :md="12" :span="24">
+        <el-card>
+          <template #header>
+            <span>Phạm nhân mới nhập</span>
+          </template>
+          <el-timeline>
+            <el-timeline-item
+              v-for="detainee in recentDetainees"
+              :key="detainee.id"
+              :timestamp="formatDate(detainee.detention_date)"
+              placement="top"
+            >
+              <el-card>
+                <h4>{{ detainee.full_name }}</h4>
+                <p>Mã: {{ detainee.detainee_code }}</p>
+                <p>Tội danh: {{ detainee.charges }}</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-card>
+      </el-col>
+
+      <el-col :md="12" :span="24">
+        <el-card>
+          <template #header>
+            <span>Cán bộ mới</span>
+          </template>
+          <el-timeline>
+            <el-timeline-item
+              v-for="member in recentStaff"
+              :key="member.id"
+              :timestamp="formatDate(member.created_at)"
+              placement="top"
+            >
+              <el-card>
+                <h4>{{ member.full_name }}</h4>
+                <p>Mã: {{ member.staff_code }}</p>
+                <p>Cấp bậc: {{ member.rank }}</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
-import * as Utils from '../../utils'
+<script setup>
+import { computed } from "vue";
+import {
+  OfficeBuilding,
+  User,
+  Avatar,
+  Document,
+} from "@element-plus/icons-vue";
+import {
+  usePrisonStore,
+  useDetaineeStore,
+  useStaffStore,
+  useIdentityStore,
+} from "@/stores";
 
-const { t } = useI18n()
+const prisonStore = usePrisonStore();
+const detaineeStore = useDetaineeStore();
+const staffStore = useStaffStore();
+const identityStore = useIdentityStore();
 
-// Refs
-const activateFormRef = ref<FormInstance>()
+const recentDetainees = computed(() => {
+  return detaineeStore.detainees
+    .slice()
+    .sort((a, b) => new Date(b.detention_date) - new Date(a.detention_date))
+    .slice(0, 3);
+});
 
-// Reactive data
-const ui = reactive({ 
-  activateDialogVisible: false 
-})
+const recentStaff = computed(() => {
+  return staffStore.staff
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.created_at || "2024-01-01") -
+        new Date(a.created_at || "2024-01-01")
+    )
+    .slice(0, 3);
+});
 
-const sysUserName = ref('')
-const sysRealName = ref('')
-const sysUserAvatar = ref('')
-const sysUserRoles = ref<any[]>([])
-const sysUserLastLogin = ref('')
-const twoStepEnabled = ref(false)
-const twoStepStatus = ref('')
-const sysUserQRImage = ref('')
-const totalDevice = ref(0)
-const totalReader = ref(0)
+const getProgressColor = (ratio) => {
+  if (ratio < 0.7) return "#67C23A";
+  if (ratio < 0.9) return "#E6A23C";
+  return "#F56C6C";
+};
 
-const activateForm = reactive({ 
-  otp: '' 
-})
-
-const activateFormRules = reactive({
-  otp: [{ required: true, message: t('profile.otpisnull'), trigger: 'blur' }]
-})
-
-// Computed
-const sysUserRolesString = computed(() => {
-  const names: string[] = []
-  sysUserRoles.value.map((item: any) => {
-    names.push(item.roleName)
-  })
-  return names.join(",")
-})
-
-// Methods
-const countDevice = async () => {
-  const result = await Utils.doGet({ $router: null }, '/api/device/count')
-  if (result?.data) {
-    totalDevice.value = result.data
-  }
-}
-
-const countReader = async () => {
-  const result = await Utils.doGet({ $router: null }, '/api/reader/count')
-  if (result?.data) {
-    totalReader.value = result.data
-  }
-}
-
-const handleEnableTwoStep = async () => {
-  try {
-    await activateFormRef.value?.validate()
-    const otp = activateForm.otp
-    const result = await Utils.doPost({ $router: null }, '/api/sessions/twostep/' + otp)
-    
-    if (!result.success) {
-      ElMessage.warning(t('profile.activatefalieddetailtip') + result.message)
-      return
-    } else {
-      ElMessage.success(t('profile.activatesuccesstip'))
-      twoStepEnabled.value = true
-      twoStepStatus.value = '已激活'
-      const user = JSON.parse(sessionStorage.getItem('user') as string)
-      user.twoStepEnabled = true
-      sessionStorage.setItem('user', JSON.stringify(user))
-    }
-    ui.activateDialogVisible = false
-  } catch {
-    // Validation failed
-  }
-}
-
-// Lifecycle
-onMounted(() => {
-  const userString = sessionStorage.getItem('user')
-  if (userString) {
-    const user = JSON.parse(userString)
-    sysUserName.value = user.userName
-    sysRealName.value = user.realName
-    sysUserAvatar.value = user.avatar || ''
-    sysUserRoles.value = user.roles
-    sysUserLastLogin.value = Utils.formatDateString(user.lastLogin)
-    twoStepEnabled.value = user.twoStepEnabled
-    twoStepStatus.value = user.twoStepEnabled ? t('common.enabled') : t('common.disabled')
-  }
-  countDevice()
-  countReader()
-})
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("vi-VN");
+};
 </script>
 
-<style>
-.text {
+<style scoped>
+.dashboard {
+  padding: 20px;
+}
+
+.stats-row {
+  margin-top: 20px;
+}
+
+.stats-card {
+  height: 120px;
+}
+
+.stats-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.stats-icon {
+  margin-right: 20px;
+  padding: 15px;
+  border-radius: 50%;
+  color: white;
+}
+
+.prison-card .stats-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.detainee-card .stats-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.staff-card .stats-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.identity-card .stats-icon {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.stats-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stats-label {
+  color: #7f8c8d;
   font-size: 14px;
 }
 
-.item {
-  padding: 12px 0;
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mt-4 {
+  margin-top: 20px;
 }
 </style>

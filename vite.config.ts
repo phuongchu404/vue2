@@ -1,36 +1,36 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      "@": resolve(__dirname, "src"),
     },
   },
   server: {
     port: 8080,
     open: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000', // Thay đổi theo API server của bạn
+      "/api": {
+        target: "http://localhost:16003", // Thay đổi theo API server của bạn
         changeOrigin: true,
         secure: false,
       },
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['vue', 'vue-router', 'vuex'],
-          elementPlus: ['element-plus'],
+          vendor: ["vue", "vue-router", "vuex"],
+          elementPlus: ["element-plus"],
         },
       },
     },
   },
-})
+});

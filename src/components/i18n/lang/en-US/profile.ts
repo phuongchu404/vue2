@@ -1,0 +1,18 @@
+export default {
+  "profile.infotitle": "User Information",
+  "profile.username": "User Name",
+  "profile.realname": "Real Name",
+  "profile.roles": "Roles",
+  "profile.lastlogin": "Last login",
+  "profile.twostepstatus": "2-step authentication",
+  "profile.twosteptitle": "Activate 2-step authentication",
+  "profile.tiprow1": "User Authy to scan activation code.",
+  "profile.tiprow2": "Enter the Authy OTP：",
+  "profile.otp": "OTP：",
+  "profile.otpisnull": "Please enter OTP",
+  "profile.activatetip": "2-step authentication is not activated！",
+  "profile.confirmactivatetip": "Activate 2-step authentication will remove old Authy account, if 2-step authentication was activated previously. Do you want to reactivate？",
+  "profile.activatefaliedtip": "Failed to activate！",
+  "profile.activatefalieddetailtip": "Failed to activate！Reason：",
+  "profile.activatesuccesstip": "Activate successfully。OTP will be required in next login.",
+}

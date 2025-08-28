@@ -1,112 +1,158 @@
 <template>
-  <el-row style="background:#ecf2f9;overflow:auto" class="login-window infinite-list-wrapper">
+  <el-row
+    style="background: #ecf2f9; overflow: auto"
+    class="login-window infinite-list-wrapper"
+  >
     <div class="login-box">
       <div class="lcname">MK Visitor - Admin</div>
       <div class="lcintro">Visitor Management</div>
       <el-form :model="loginForm" :rules="loginFormRules" ref="loginFormRef">
         <el-form-item label="" style="margin-bottom: 6px">
-          <div class="input-box" :class="{ hover: isUsername }" @click.stop="hoverShow('username')">
-            <img src="../../assets/icon/login-user-select-icon.png" class="input-box-icon"/>
-            <input type="text" v-model="loginForm.username" :placeholder="$t('UserName')" class="input-box-text"/>
+          <div
+            class="input-box"
+            :class="{ hover: isUsername }"
+            @click.stop="hoverShow('username')"
+          >
+            <img
+              src="../../assets/icon/login-user-select-icon.png"
+              class="input-box-icon"
+            />
+            <input
+              type="text"
+              v-model="loginForm.username"
+              :placeholder="$t('UserName')"
+              class="input-box-text"
+            />
           </div>
         </el-form-item>
         <el-form-item label="" style="margin-bottom: 6px" prop="password">
-          <div class="input-box" :class="{ hover: isPassword }" @click.stop="hoverShow('password')">
-            <img src="../../assets/icon/login-pwd-select-icon.png" class="input-box-icon"/>
-            <input :type="!isEyes ? 'password' : 'text'" @keyup.enter="doLogin()" v-model="loginForm.password" :placeholder="$t('Password')"
-                   class="input-box-text"/>
-            <img @click="showPassword" v-if="!isEyes" src="../../assets/icon/login-eyes-icon.png" class="eyes" alt=""/>
-            <img @click="showPassword" v-else src="../../assets/icon/login-eyes-select-icon.png" class="eyes" alt=""/>
+          <div
+            class="input-box"
+            :class="{ hover: isPassword }"
+            @click.stop="hoverShow('password')"
+          >
+            <img
+              src="../../assets/icon/login-pwd-select-icon.png"
+              class="input-box-icon"
+            />
+            <input
+              :type="!isEyes ? 'password' : 'text'"
+              @keyup.enter="doLogin()"
+              v-model="loginForm.password"
+              :placeholder="$t('Password')"
+              class="input-box-text"
+            />
+            <img
+              @click="showPassword"
+              v-if="!isEyes"
+              src="../../assets/icon/login-eyes-icon.png"
+              class="eyes"
+              alt=""
+            />
+            <img
+              @click="showPassword"
+              v-else
+              src="../../assets/icon/login-eyes-select-icon.png"
+              class="eyes"
+              alt=""
+            />
           </div>
         </el-form-item>
-        <el-button type="primary" class="login-btn" @click="doLogin()">{{ $t('login.login') }}</el-button>
+        <el-button type="primary" class="login-btn" @click="doLogin()">{{
+          $t("login.login")
+        }}</el-button>
       </el-form>
-      <app-language style="margin:0;"/>
+      <app-language style="margin: 0" />
     </div>
   </el-row>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
-import * as Utils from '../../utils'
+import { ref, reactive, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { ElMessage, type FormInstance } from "element-plus";
+import * as Utils from "../../utils";
 
-const { t } = useI18n()
-const router = useRouter()
+const { t } = useI18n();
+const router = useRouter();
 
 // Refs
-const loginFormRef = ref<FormInstance>()
+const loginFormRef = ref<FormInstance>();
 
 // Reactive data
 const ui = reactive({
-  otpVisible: false
-})
+  otpVisible: false,
+});
 
 const loginForm = reactive({
-  username: '',
-  password: ''
-})
+  username: "",
+  password: "",
+});
 
-const isPassword = ref(false)
-const isUsername = ref(false)
-const isEyes = ref(false)
+const isPassword = ref(false);
+const isUsername = ref(false);
+const isEyes = ref(false);
 
 const loginFormRules = reactive({
-  username: [{
-    required: true,
-    message: t('login.userisnull'),
-    trigger: 'blur'
-  }],
-  password: [{
-    required: true,
-    message: t('login.pwdisnull'),
-    trigger: 'blur'
-  }],
-})
+  username: [
+    {
+      required: true,
+      message: t("login.userisnull"),
+      trigger: "blur",
+    },
+  ],
+  password: [
+    {
+      required: true,
+      message: t("login.pwdisnull"),
+      trigger: "blur",
+    },
+  ],
+});
 
 // Methods
 const hoverShow = (type: string) => {
-  isPassword.value = false
-  isUsername.value = false
-  if (type === 'username') {
-    isUsername.value = true
+  isPassword.value = false;
+  isUsername.value = false;
+  if (type === "username") {
+    isUsername.value = true;
   } else {
-    isPassword.value = true
+    isPassword.value = true;
   }
-}
+};
 
 const showPassword = () => {
-  isEyes.value = !isEyes.value
-}
+  isEyes.value = !isEyes.value;
+};
 
 const doLogin = async () => {
   try {
-    await loginFormRef.value?.validate()
-    const record = loginForm
-    const ret = await Utils.doPost({ $router: router }, '/api/sessions/login', record)
+    await loginFormRef.value?.validate();
+    const record = loginForm;
+    const ret = await Utils.doPost("/api/sessions/login", record);
+    console.log(ret);
     if (ret.success) {
-      if (ret.code === 0) {
-        sessionStorage.setItem('user', JSON.stringify(ret.data))
-        router.push({ path: '/' })
+      if (ret.code === "0") {
+        sessionStorage.setItem("user", JSON.stringify(ret.data));
+        router.push({ path: "/" });
       } else {
-        ui.otpVisible = true
-        ElMessage.info(t('login.otptip'))
+        ui.otpVisible = true;
+        ElMessage.info(t("login.otptip"));
       }
     } else {
-      ElMessage.warning(t('Login info is incorrect'))
+      ElMessage.warning(t("Login info is incorrect"));
     }
   } catch {
     // Validation failed
   }
-}
+};
 
 // Lifecycle
 onMounted(async () => {
-  localStorage.removeItem("TOKEN")
-  localStorage.removeItem("user")
-})
+  localStorage.removeItem("TOKEN");
+  localStorage.removeItem("user");
+});
 </script>
 
 <style scoped lang="scss">
@@ -140,7 +186,8 @@ input:-webkit-autofill {
     border: 1px solid #e2e2e4;
     color: #333333;
     background: rgba(0, 0, 0, 0);
-    font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+    font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
+      PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
   }
 
   :deep(.el-input__suffix) {
@@ -207,7 +254,8 @@ input:-webkit-autofill {
   margin-left: 10px;
   border: 0;
   outline: 0;
-  font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+  font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
+    PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
 }
 
 .input-box .eyes {
@@ -222,7 +270,8 @@ input:-webkit-autofill {
 }
 
 .input-box input::-moz-placeholder {
-  font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+  font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
+    PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
   color: #686868;
 }
 
@@ -265,12 +314,14 @@ input:-webkit-autofill {
   font-size: 50px;
   line-height: 50px;
   font-weight: bold;
-  font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+  font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
+    PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
 }
 
 .lcintro {
   font-size: 16px;
-  font-family: SourceHanSansCN-Regular,Helvetica Neue,Helvetica,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+  font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
+    PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
   color: #014371;
   font-weight: 400;
   letter-spacing: 1px;

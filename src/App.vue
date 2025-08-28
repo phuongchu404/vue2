@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view />
+    <RouterView />
   </div>
 </template>
 
@@ -8,12 +8,13 @@
 // No additional logic needed in setup
 </script>
 
-<style>
+<style lang="scss">
 body {
   margin: 0px;
   padding: 0px;
-  background: #1F2D3D;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  background: #f5f5f5;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
+    Microsoft YaHei, SimSun, sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
@@ -21,7 +22,7 @@ body {
 .appnav {
   padding: 10px 0px 2px 0px;
   margin-bottom: 5px;
-  border-bottom: 1px solid #EEEEEE;
+  border-bottom: 1px solid #eeeeee;
 }
 
 .appheader {
