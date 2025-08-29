@@ -1,19 +1,19 @@
 import { defineStore } from "pinia";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useI18n } from "vue-i18n";
-import { PrisonService } from "@/services/prison";
+import { StaffService } from "@/services/staff";
 import type {
-  PrisonState,
-  Prison,
+  StaffState,
+  Staff,
   PageQuery,
-  CreatePrisonRequest,
-  UpdatePrisonRequest,
-} from "@/types/prison";
+  CreateStaffRequest,
+  UpdateStaffRequest,
+} from "@/types/staff";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
-export const usePrisonStore = defineStore("prison", {
-  state: (): PrisonState => ({
-    prisons: undefined,
+export const useStaffStore = defineStore("staff", {
+  state: (): StaffState => ({
+    staffs: undefined,
     total: 0,
     pageNo: 1,
     pageSize: 10,
@@ -23,7 +23,7 @@ export const usePrisonStore = defineStore("prison", {
   }),
 
   getters: {
-    getPrisons: (state): Prison[] | undefined => state.prisons,
+    getStaffs: (state): Staff[] | undefined => state.staffs,
     getTotal: (state): number => state.total,
     getPage: (state): number => state.pageNo,
     getSize: (state): number => state.pageSize,
@@ -33,7 +33,6 @@ export const usePrisonStore = defineStore("prison", {
 
   actions: {
     async fetchList(query: PageQuery) {
-      console.log("fetchList");
       this.loading = true;
       this.error = undefined;
       try {
@@ -44,9 +43,10 @@ export const usePrisonStore = defineStore("prison", {
         };
 
         // Call API
-        const res: ServiceResult<PagingResult<Prison>> =
-          await PrisonService.list(params);
-        console.log(res);
+        const res: ServiceResult<PagingResult<Staff>> = await StaffService.list(
+          params
+        );
+
         // Kiểm tra success
         if (!res.success) {
           throw new Error(res.message || "Fetch prisons failed");
@@ -59,7 +59,7 @@ export const usePrisonStore = defineStore("prison", {
           size: pageSize,
         } = res.data;
 
-        this.prisons = content;
+        this.staffs = content;
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
@@ -78,7 +78,7 @@ export const usePrisonStore = defineStore("prison", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison> = await PrisonService.getById(id);
+        const res: ServiceResult<Staff> = await StaffService.getById(id);
 
         if (!res.success) {
           throw new Error(res.message || "Fetch prison failed");
@@ -97,11 +97,11 @@ export const usePrisonStore = defineStore("prison", {
       }
     },
 
-    async createPrison(payload: CreatePrisonRequest) {
+    async createStaff(payload: CreateStaffRequest) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison> = await PrisonService.create(payload);
+        const res: ServiceResult<Staff> = await StaffService.create(payload);
 
         if (!res.success) {
           throw new Error(res.message || "Create prison failed");
@@ -121,11 +121,11 @@ export const usePrisonStore = defineStore("prison", {
       }
     },
 
-    async updatePrison(id: number, payload: UpdatePrisonRequest) {
+    async updateStaff(id: number, payload: UpdateStaffRequest) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison> = await PrisonService.update(
+        const res: ServiceResult<Staff> = await StaffService.update(
           id,
           payload
         );
@@ -135,10 +135,6 @@ export const usePrisonStore = defineStore("prison", {
         }
 
         const updated = res.data;
-        // const idx = this.items?.findIndex((x) => x.id === id) ?? -1;
-        // if (idx >= 0 && this.items) {
-        //   this.items[idx] = { ...this.items[idx], ...updated };
-        // }
         ElMessage.success("Updated successfully");
         return updated;
       } catch (e: any) {
@@ -152,7 +148,7 @@ export const usePrisonStore = defineStore("prison", {
       }
     },
 
-    async deletePrison(id: number) {
+    async deleteStaff(id: number) {
       const { t } = useI18n();
       try {
         await ElMessageBox.confirm(
@@ -167,16 +163,12 @@ export const usePrisonStore = defineStore("prison", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<boolean> = await PrisonService.delete(id);
+        const res: ServiceResult<boolean> = await StaffService.delete(id);
 
         if (!res.success) {
           throw new Error(res.message || "Delete prison failed");
         }
-
-        // this.items = (this.items ?? []).filter((x) => x.id !== id);
-        // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
-        // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";
@@ -189,7 +181,7 @@ export const usePrisonStore = defineStore("prison", {
     },
 
     resetAndBackToList() {
-      this.prisons = undefined;
+      this.staffs = undefined;
       this.total = 0;
       this.pageNo = 1;
       this.pageSize = 10;

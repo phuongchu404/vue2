@@ -287,6 +287,15 @@ export function queryFormWrapper(queryForm: any): string {
   }
   return param;
 }
+// export function queryFormWrapper(queryForm: any): string {
+//   let param = "";
+//   for (const key in queryForm) {
+//     if (queryForm[key] !== undefined && queryForm[key] !== null) {
+//       param += `&${key}=${encodeURIComponent(queryForm[key])}`;
+//     }
+//   }
+//   return param.substring(1);
+// }
 export function urlEncode(param: any): string {
   if (param == null) return "";
   let paramStr = "";

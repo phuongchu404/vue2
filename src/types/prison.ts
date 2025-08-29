@@ -1,3 +1,12 @@
+export interface PrisonState {
+  prisons?: Prison[];
+  total: number;
+  pageNo: number;
+  pageSize: number;
+  loading: boolean;
+  error?: string;
+  lastQuery?: PageQuery;
+}
 export interface Prison {
   id: number;
   name: string;

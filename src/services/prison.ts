@@ -1,6 +1,5 @@
 import * as Utils from "../utils";
 import type {
-  Prison,
   CreatePrisonRequest,
   UpdatePrisonRequest,
   PageQuery,

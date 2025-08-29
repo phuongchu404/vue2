@@ -1,7 +1,7 @@
 // stores/fingerprint.js
 import { defineStore } from "pinia";
 
-export const useFingerprintStore = defineStore("fingerprint", {
+export const useFingerprintStore = defineStore("report", {
   state: () => ({
     cards: [],
     filteredCards: [],

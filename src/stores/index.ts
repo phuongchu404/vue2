@@ -53,7 +53,7 @@ export const useAppStore = defineStore("app", {
   },
 });
 // Prison Store
-export const usePrisonStore = defineStore("prison", () => {
+export const usePrisonStore = defineStore("prison1", () => {
   const prisons = ref([
     {
       id: 1,
@@ -187,7 +187,7 @@ export const useDetaineeStore = defineStore("detainee", () => {
 });
 
 // Staff Store
-export const useStaffStore = defineStore("staff", () => {
+export const useStaffStore = defineStore("staff1", () => {
   const staff = ref([
     {
       id: 1,

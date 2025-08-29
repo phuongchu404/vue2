@@ -1,3 +1,14 @@
+:root {
+  --primary-color: #667eea;
+  --dark-primary-color: #764ba2;
+  --light-primary-color: rgba(255, 255, 255, 0.95);
+  --linear-primary-color: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%);
+  --label-color: #2c3e50;
+  --text-color: #7f8c8d;
+  --white: #fff;
+  --text-color-light: #fff;
+}
+
 tr.el-table__row.warning-row {
   background-color: #e6f1f8;
 }
@@ -145,6 +156,34 @@ tr.el-table__row:hover {
     font-family: SourceHanSansCN-Regular, Helvetica Neue, Helvetica, Arial,
       PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
     color: #686868;
+  }
+}
+
+.el-dialog {
+  padding: 0!important;
+}
+.dialog {
+
+  .el-dialog__header {
+    padding: 15px 20px !important;
+    background: var(--primary-color) !important;
+
+    .el-dialog__title {
+      color: var(--text-color-light);
+    }
+
+    .el-dialog__headerbtn .el-dialog__close {
+      color: var(--text-color-light);
+      font-weight: bold;
+    }
+  }
+
+  .el-dialog__body  {
+    padding: 20px;
+  }
+
+  .el-dialog__footer {
+    padding: 0 20px 20px 20px;
   }
 }
 

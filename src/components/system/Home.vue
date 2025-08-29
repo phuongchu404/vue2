@@ -47,13 +47,11 @@
 
       <el-container class="main-container">
         <!-- Sidebar -->
-        <el-aside width="250px" class="sidebar">
+        <el-aside width="auto" class="sidebar">
           <el-menu
             :default-active="$route.path"
-            unique-opened
-            background-color="#09446d"
-            text-color="#D6E4E5"
-            active-text-color="#fd6d21"
+            unique-opene
+            text-color="#7f8c8d"
             router
             class="sidebar-menu"
           >
@@ -101,9 +99,13 @@
             <!-- <div class="breadcrumb-section">
               {{ $route.name }}
             </div> -->
-
             <!-- Router View -->
             <div class="router-view-container">
+              <el-page-header @back="$router.go(-1)">
+                <template #content>
+                  <span class="text-large font-600 mr-3">{{ $route.name }}</span>
+                </template>
+              </el-page-header>
               <RouterView v-slot="{ Component }">
                 <Transition name="fade" mode="out-in">
                   <component :is="Component" />
@@ -463,21 +465,51 @@ onMounted(() => {
 /* Main Container */
 .main-container {
   height: calc(100vh - 60px);
+  background: var(--linear-primary-color);
 }
 
 /* Sidebar */
-.sidebar {
-  background: #09446d;
+.el-menu {
+  background: var(--light-primary-color) !important;
+  color: var(--text-color);
+  padding: 10px;
+  border-right: none;
+  margin: 20px 0 0 10px;
+  border-radius: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar-menu {
-  height: 100%;
-  border: none;
+/* Normal menu items & submenu titles */
+.el-menu-item,
+.el-sub-menu {
+  color: var(--text-color) !important;
+  border-radius: 10px;  
+  font-weight: 600!important;
 }
+
+/* Active state */
+.el-menu-item.is-active,
+.el-submenu__title.is-active {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%) !important;
+  color: var(--white) !important;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Icon colors */
+.el-menu-item i,
+.el-submenu__title i {
+  color: var(--text-color) !important;
+}
+
+.el-menu-item.is-active i,
+.el-submenu__title.is-active i {
+  color: var(--white) !important;
+}
+
 
 /* Main Content */
 .main-content {
-  background: #f3f5f7;
+  background: transparent;
   padding: 0;
   overflow-y: auto;
 }
@@ -485,7 +517,7 @@ onMounted(() => {
 .content-wrapper {
   padding: 20px;
   min-height: calc(100vh - 60px);
-  background: #f3f5f7;
+  background: transparent;
 }
 
 .breadcrumb-section {
@@ -501,10 +533,10 @@ onMounted(() => {
 
 .router-view-container {
   background: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   min-height: 60vh;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .footer-section {

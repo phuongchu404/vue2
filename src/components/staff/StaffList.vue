@@ -7,54 +7,42 @@
     </el-page-header>
 
     <!-- Search Section -->
-    <el-card class="search-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="Mã cán bộ">
-          <el-input
-            v-model="searchForm.code"
-            placeholder="Nhập mã cán bộ..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Họ và tên">
-          <el-input
-            v-model="searchForm.name"
-            placeholder="Nhập họ và tên..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Cấp bậc">
-          <el-input
-            v-model="searchForm.rank"
-            placeholder="Nhập cấp bậc..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Trạng thái">
-          <el-select
-            v-model="searchForm.status"
-            placeholder="Chọn trạng thái"
-            clearable
-          >
-            <el-option label="Đang làm việc" value="ACTIVE" />
-            <el-option label="Nghỉ phép" value="INACTIVE" />
-            <el-option label="Nghỉ hưu" value="RETIRED" />
-            <el-option label="Chuyển công tác" value="TRANSFERRED" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    <el-card class="search-section">
+      <el-form :model="searchForm" label-width="100px" label-position="left">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="Mã cán bộ">
+              <el-input v-model="searchForm.staffCode" placeholder="Nhập mã cán bộ..." clearable />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="Họ và tên">
+              <el-input v-model="searchForm.fullName" placeholder="Nhập họ và tên..." clearable />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-    <!-- Action Bar -->
-    <el-card class="action-card">
-      <div class="action-bar">
-        <div>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="Cấp bậc">
+              <el-input v-model="searchForm.rank" placeholder="Nhập cấp bậc..." clearable />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="Trạng thái">
+              <el-select v-model="searchForm.status" placeholder="Chọn trạng thái" clearable>
+                <el-option label="Đang làm việc" value="ACTIVE" />
+                <el-option label="Nghỉ phép" value="INACTIVE" />
+                <el-option label="Nghỉ hưu" value="RETIRED" />
+                <el-option label="Chuyển công tác" value="TRANSFERRED" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item>
+          <el-button type="primary" @click="onSearch" :icon="Search">Tìm kiếm</el-button>
+          <el-button @click="onReset" :icon="Refresh">Làm mới</el-button>
           <el-button
             type="primary"
             @click="$router.push('/staff/add')"
@@ -65,135 +53,136 @@
           <el-button type="success" @click="handleExport" :icon="Download">
             Xuất Excel
           </el-button>
-        </div>
-        <div class="result-info">
-          Tổng số: {{ filteredStaff.length }} cán bộ
-        </div>
-      </div>
+        </el-form-item>
+      </el-form>
     </el-card>
-
     <!-- Data Table -->
-    <el-card>
-      <el-table
-        :data="paginatedStaff"
-        style="width: 100%"
-        v-loading="loading"
-        stripe
-        border
-      >
-        <el-table-column
-          prop="staff_code"
-          label="Mã cán bộ"
-          width="120"
-          sortable
-        />
-        <el-table-column prop="full_name" label="Họ và tên" min-width="150" />
-        <el-table-column prop="gender" label="Giới tính" width="80" />
-        <el-table-column prop="rank" label="Cấp bậc" width="120" />
-        <el-table-column prop="phone" label="Điện thoại" width="130" />
-        <el-table-column prop="email" label="Email" min-width="180" />
-        <el-table-column label="Trạng thái" width="120" align="center">
-          <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Thao tác" width="200" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="handleView(scope.row)" :icon="View">
-              Xem
-            </el-button>
-            <el-button
-              size="small"
-              type="primary"
-              @click="handleEdit(scope.row)"
-              :icon="Edit"
-            >
-              Sửa
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(scope.row)"
-              :icon="Delete"
-            >
-              Xóa
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- Pagination -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="filteredStaff.length"
-        layout="total, sizes, prev, pager, next, jumper"
-        class="pagination"
+    <el-table
+      :data="staffs"
+      style="width: 100%"
+      v-loading="loading"
+      stripe
+      border
+    >
+      <el-table-column
+        prop="staffCode"
+        label="Mã cán bộ"
+        width="130"
+        sortable
+        fixed="left"
       />
-    </el-card>
+      <el-table-column prop="fullName" label="Họ và tên" min-width="150" />
+      <el-table-column
+        prop="idNumber"
+        label="Số thẻ căn cước"
+        min-width="120"
+      />
+      <el-table-column prop="gender" label="Giới tính" width="80" />
+      <el-table-column prop="rank" label="Cấp bậc" width="120" />
+      <el-table-column prop="phone" label="Điện thoại" width="130" />
+      <el-table-column prop="email" label="Email" min-width="120" />
+      <el-table-column label="Trạng thái" width="120" align="center">
+        <template #default="scope">
+          <el-tag :type="getStatusType(scope.row.status)">
+            {{ getStatusText(scope.row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="Thao tác" min-width="120" fixed="right">
+        <template #default="scope">
+          <el-button size="small" @click="handleView(scope.row)" :icon="View">
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            @click="handleEdit(scope.row)"
+            :icon="Edit"
+          >
+          </el-button>
+          <el-button
+            size="small"
+            type="danger"
+            @click="onDelete(scope.row)"
+            :icon="Delete"
+          >
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- Pagination -->
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="staffStore.getTotal"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 50, 100]"
+      @size-change="onSizeChange"
+      @current-change="onPageChange"
+      class="pagination"
+    />
 
     <!-- Detail Dialog -->
     <el-dialog
       v-model="detailDialogVisible"
       title="Chi tiết cán bộ"
       width="60%"
-      :before-close="handleDetailClose"
+      class="dialog"
     >
-      <div v-if="selectedStaff" class="detail-content">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="Mã cán bộ">{{
-            selectedStaff.staff_code
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Số hồ sơ">{{
-            selectedStaff.profile_number || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Họ và tên" :span="2">{{
-            selectedStaff.full_name
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Giới tính">{{
-            selectedStaff.gender || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Ngày sinh">{{
-            formatDate(selectedStaff.date_of_birth)
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Số CCCD/CMND">{{
-            selectedStaff.id_number || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Điện thoại">{{
-            selectedStaff.phone || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Email" :span="2">{{
-            selectedStaff.email || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Cấp bậc">{{
-            selectedStaff.rank || "-"
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Trạng thái">
-            <el-tag :type="getStatusType(selectedStaff.status)">
-              {{ getStatusText(selectedStaff.status) }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="Địa chỉ thường trú" :span="2">
-            {{ selectedStaff.permanent_address || "-" }}
-          </el-descriptions-item>
-        </el-descriptions>
+      <div v-if="selectedStaff" class="space-y-6">
+        <!-- Section 1: Thông tin cơ bản -->
+        <el-card class="rounded-xl mb-2">
+          <template #header>
+            <h5 class="m-0">Thông tin cơ bản</h5>
+          </template>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="Họ và tên" :span="2">{{ selectedStaff.fullName }}</el-descriptions-item>
+            <el-descriptions-item label="Mã cán bộ">{{ selectedStaff.staffCode }}</el-descriptions-item>
+            <el-descriptions-item label="Số hồ sơ">{{ selectedStaff.profileNumber || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Giới tính">{{ selectedStaff.gender ? "Nu" : "Nam" || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Ngày sinh">{{ formatDate(selectedStaff.dateOfBirth) }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+
+        <!-- Section 2: Liên lạc -->
+        <el-card class="rounded-xl mb-2">
+          <template #header>
+            <h5 class="m-0">Liên lạc</h5>
+          </template>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="Email" :span="2">{{ selectedStaff.email || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Số CCCD/CMND">{{ selectedStaff.idNumber || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Điện thoại">{{ selectedStaff.phone || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Địa chỉ thường trú" :span="2">{{ selectedStaff.temporaryProvinceId || "-" }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+
+        <!-- Section 3: Công việc -->
+        <el-card class="rounded-xl mb-2">
+          <template #header>
+            <h5 class="m-0">Công việc</h5>
+          </template>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="Cấp bậc">{{ selectedStaff.rank || "-" }}</el-descriptions-item>
+            <el-descriptions-item label="Trạng thái">
+              <el-tag :type="getStatusType(selectedStaff.status)">
+                {{ getStatusText(selectedStaff.status) }}
+              </el-tag>
+            </el-descriptions-item>
+          </el-descriptions>
+        </el-card>
       </div>
 
       <template #footer>
         <el-button @click="detailDialogVisible = false">Đóng</el-button>
-        <el-button type="primary" @click="handleEdit(selectedStaff)"
-          >Chỉnh sửa</el-button
-        >
+        <el-button type="primary" @click="handleEdit(selectedStaff)">Chỉnh sửa</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted, reactive, nextTick, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Search,
@@ -204,98 +193,39 @@ import {
   Edit,
   Delete,
 } from "@element-plus/icons-vue";
-import { useStaffStore } from "@/stores";
+import { useStaffStore } from "@/stores/staff";
 import { useRouter } from "vue-router";
+import type { Staff, PageQuery } from "@/types/staff";
 
 const router = useRouter();
 const staffStore = useStaffStore();
+const staffs = ref<Staff[]>([]);
 
 // Reactive data
 const loading = ref(false);
-const searchForm = ref({
-  code: "",
-  name: "",
+const searchForm = reactive<{
+  staffCode?: string;
+  fullName?: string;
+  rank?: string;
+  status?: string;
+}>({
+  staffCode: "",
+  fullName: "",
   rank: "",
   status: "",
 });
-const currentPage = ref(1);
-const pageSize = ref(10);
+const page = ref(1);
+const size = ref(10);
 const detailDialogVisible = ref(false);
-const selectedStaff = ref(null);
-
-// Computed
-const filteredStaff = computed(() => {
-  return staffStore.staff.filter((staff) => {
-    return (
-      (!searchForm.value.code ||
-        staff.staff_code
-          .toLowerCase()
-          .includes(searchForm.value.code.toLowerCase())) &&
-      (!searchForm.value.name ||
-        staff.full_name
-          .toLowerCase()
-          .includes(searchForm.value.name.toLowerCase())) &&
-      (!searchForm.value.rank ||
-        (staff.rank &&
-          staff.rank
-            .toLowerCase()
-            .includes(searchForm.value.rank.toLowerCase()))) &&
-      (!searchForm.value.status || staff.status === searchForm.value.status)
-    );
-  });
-});
-
-const paginatedStaff = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredStaff.value.slice(start, end);
-});
+const selectedStaff = ref<Staff | null>(null);
 
 // Methods
-const handleSearch = () => {
-  currentPage.value = 1;
+const formatDate = (dateStr: any) => {
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("vi-VN");
 };
-
-const handleReset = () => {
-  searchForm.value = {
-    code: "",
-    name: "",
-    rank: "",
-    status: "",
-  };
-  currentPage.value = 1;
-};
-
-const handleView = (staff) => {
-  selectedStaff.value = staff;
-  detailDialogVisible.value = true;
-};
-
-const handleEdit = (staff) => {
+const handleEdit = (staff: Staff) => {
   router.push(`/staff/edit/${staff.id}`);
-};
-
-const handleDelete = async (staff) => {
-  try {
-    await ElMessageBox.confirm(
-      `Bạn có chắc chắn muốn xóa cán bộ "${staff.full_name}" không?`,
-      "Xác nhận xóa",
-      {
-        confirmButtonText: "Xóa",
-        cancelButtonText: "Hủy",
-        type: "warning",
-      }
-    );
-
-    staffStore.deleteStaff(staff.id);
-    ElMessage.success("Xóa cán bộ thành công!");
-  } catch {
-    ElMessage.info("Đã hủy thao tác xóa");
-  }
-};
-
-const handleExport = () => {
-  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
 };
 
 const handleDetailClose = () => {
@@ -303,34 +233,103 @@ const handleDetailClose = () => {
   selectedStaff.value = null;
 };
 
-const getStatusType = (status) => {
+const handleExport = () => {
+  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
+};
+const handleView = (staff: Staff) => {
+  selectedStaff.value = staff;
+  detailDialogVisible.value = true;
+};
+
+const search = async (extra?: Partial<PageQuery>) => {
+  try {
+    loading.value = true;
+
+    await staffStore.fetchList({
+      pageNo: page.value,
+      pageSize: size.value,
+      staffCode: searchForm.staffCode ?? null,
+      fullName: searchForm.fullName ?? null,
+      rank: searchForm.rank ?? null,
+      status: searchForm.status ?? null,
+      ...extra,
+    } as PageQuery);
+
+    staffs.value = staffStore.getStaffs || [];
+  } catch (error) {
+    console.error("Error fetching prison list:", error);
+    ElMessage.error("Có lỗi xảy ra khi tải danh sách trại giam!");
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
+  if (staffStore.pageNo) page.value = staffStore.pageNo;
+  if (staffStore.pageSize) size.value = staffStore.pageSize;
+  await search();
+});
+
+const getStatusType = (status: any) => {
   const typeMap = {
     ACTIVE: "success",
     INACTIVE: "warning",
     RETIRED: "info",
     TRANSFERRED: "danger",
   };
-  return typeMap[status] || "info";
+  return typeMap[status as keyof typeof typeMap] || "info";
 };
 
-const getStatusText = (status) => {
+const getStatusText = (status: any) => {
   const textMap = {
     ACTIVE: "Đang làm việc",
     INACTIVE: "Nghỉ phép",
     RETIRED: "Nghỉ hưu",
     TRANSFERRED: "Chuyển công tác",
   };
-  return textMap[status] || status;
-};
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+  return textMap[status as keyof typeof textMap] || status;
 };
 
 onMounted(() => {
   // Load data if needed
 });
+
+watch(page, (p) => {
+  staffStore.pageNo = p;
+  search();
+});
+watch(size, (s) => {
+  staffStore.pageSize = s;
+  search();
+});
+
+const onSearch = () => {
+  page.value = 1;
+  search({ pageNo: 1 });
+};
+const onReset = () => {
+  searchForm.staffCode = "";
+  searchForm.fullName = "";
+  searchForm.rank = "";
+  searchForm.status = "";
+  page.value = 1;
+  search({ pageNo: 1 });
+};
+
+const onPageChange = (p: number) => {
+  page.value = p;
+  search();
+};
+const onSizeChange = (s: number) => {
+  size.value = s;
+  search();
+};
+
+const onDelete = async (id: number) => {
+  await staffStore.deleteStaff(id);
+  search();
+};
 </script>
 
 <style scoped>

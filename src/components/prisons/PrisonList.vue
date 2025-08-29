@@ -1,10 +1,10 @@
 <template>
   <div class="prison-list">
-    <el-page-header @back="$router.go(-1)">
+    <!-- <el-page-header @back="$router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3">Quản lý trại giam</span>
       </template>
-    </el-page-header>
+    </el-page-header> -->
 
     <!-- Search Section -->
     <div class="search-section">
@@ -79,7 +79,7 @@
     <!-- Data Table -->
 
     <el-table
-      :data="prisonStore.getContent || []"
+      :data="prisons"
       style="width: 100%"
       v-loading="prisonStore.getLoading"
       stripe
@@ -241,7 +241,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive, watch, nextTick } from "vue";
+import { ref, onMounted, reactive, watch, nextTick } from "vue";
 import { ElMessage } from "element-plus";
 import { usePrisonStore } from "@/stores/prison";
 import { useRouter } from "vue-router";
@@ -261,6 +261,7 @@ const router = useRouter();
 
 // Reactive data
 const loading = ref(false);
+const prisons = ref<Prison[]>([]);
 const searchForm = reactive<{
   code?: string;
   name?: string;
@@ -270,8 +271,8 @@ const searchForm = reactive<{
   name: "",
   isActive: "",
 });
-const page = ref(prisonStore.pageNo || 1);
-const size = ref(prisonStore.pageSize || 10);
+const page = ref(1);
+const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedPrison = ref<Prison | null>(null);
 const getProgressColor = (ratio: any) => {
@@ -305,16 +306,20 @@ const search = async (extra?: Partial<PageQuery>) => {
   try {
     loading.value = true;
 
-    await prisonStore.fetchList({
+    const request = {
       pageNo: page.value,
       pageSize: size.value,
-      code: searchForm.code || null,
-      name: searchForm.name || null,
-      isActive: searchForm.isActive || null,
+      code: searchForm.code?.trim() ?? null,
+      name: searchForm.name?.trim() ?? null,
+      isActive: searchForm.isActive ?? undefined,
       ...extra,
-    } as PageQuery);
+    } as PageQuery;
+    console.log(request);
+    await prisonStore.fetchList(request);
+
+    prisons.value = prisonStore.getPrisons || [];
   } catch (error) {
-    console.error("Error fetching prison list:", error);
+    // console.error("Error fetching prison list:", error);
     ElMessage.error("Có lỗi xảy ra khi tải danh sách trại giam!");
   } finally {
     loading.value = false;
@@ -323,14 +328,19 @@ const search = async (extra?: Partial<PageQuery>) => {
 
 onMounted(async () => {
   await nextTick();
-
-  setTimeout(async () => {
-    await search();
-  }, 1000);
+  if (prisonStore.pageNo) page.value = prisonStore.pageNo;
+  if (prisonStore.pageSize) size.value = prisonStore.pageSize;
+  await search();
 });
 
-watch(page, () => (prisonStore.pageNo = page.value));
-watch(size, () => (prisonStore.pageSize = size.value));
+watch(page, (p) => {
+  prisonStore.pageNo = p;
+  search();
+});
+watch(size, (s) => {
+  prisonStore.pageSize = s;
+  search();
+});
 
 const onSearch = () => {
   page.value = 1;

@@ -22,26 +22,15 @@ import { i18n } from "./components/i18n";
 
 // ✅ Pinia
 import { createPinia, setActivePinia } from "pinia";
+// import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 // import { set } from "lodash";
 
 // Create Vue app
 const app = createApp(App);
 
-// Create router
-// const router = createRouter({
-//   history: createWebHistory(),
-//   routes: routes,
-// });
-
 // ✅ Create Pinia (thay cho Vuex)
 const pinia = createPinia();
-
-// Use plugins
-
-app.use(ElementPlus);
-app.use(pinia); // ✅ dùng Pinia thay vì store Vuex
-app.use(router);
-app.use(i18n);
+// pinia.use(piniaPluginPersistedstate);
 
 // Axios interceptors
 axios.interceptors.request.use((config: any) => {
@@ -98,5 +87,10 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.component("AppFooter", AppFooter);
 app.component("AppLanguage", AppLanguage);
 
+// Use plugins
+app.use(ElementPlus);
+app.use(pinia); // ✅ dùng Pinia thay vì store Vuex
+app.use(router);
+app.use(i18n);
 // Mount app
 app.mount("#app");
