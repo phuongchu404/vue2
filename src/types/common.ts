@@ -2,7 +2,7 @@ export interface ServiceResult<T> {
   success: boolean;
   code: string;
   message: string;
-  data: T;
+  data?: T;
 }
 
 export interface PagingResult<T> {
@@ -11,7 +11,4 @@ export interface PagingResult<T> {
   totalPages: number;
   number: number;
   size: number;
-  // total: number;
-  // pageNo: number;
-  // pageSize: number;
 }

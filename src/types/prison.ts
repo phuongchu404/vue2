@@ -23,15 +23,17 @@ export interface Prison {
   email?: string;
   establishedDate?: string;
   provinceId?: string;
+  provinceFullName?: string;
   updatedAt?: string;
   wardId?: string;
+  wardFullName?: string;
 }
 
 export interface CreatePrisonRequest
-  extends Omit<Prison, "id" | "created_at"> {}
+  extends Omit<Prison, "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName"> {}
 
 export interface UpdatePrisonRequest
-  extends Partial<Omit<Prison, "id" | "created_at">> {}
+  extends Partial<Omit<Prison, "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName">> {}
 
 export interface PageQuery {
   pageNo: number;

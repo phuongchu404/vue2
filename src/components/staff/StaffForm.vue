@@ -13,19 +13,19 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
+            <el-form-item label="Số hồ sơ" prop="profileNumber">
+              <el-input
+                v-model="form.profileNumber"
+                placeholder="Nhập số hồ sơ..."
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :md="12" :span="24">
             <el-form-item v-if="isEdit" label="Mã cán bộ">
               <el-input
                 v-model="form.staffCode"
                 :disabled="isEdit"
                 placeholder="Nhập mã cán bộ..."
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :md="12" :span="24">
-            <el-form-item label="Số hồ sơ" prop="profileNumber">
-              <el-input
-                v-model="form.profileNumber"
-                placeholder="Nhập số hồ sơ..."
               />
             </el-form-item>
           </el-col>
@@ -146,7 +146,7 @@
           </el-col>
         </el-row>
 
-        <el-row :gutter="20">
+        <!-- <el-row :gutter="20">
           <el-col :md="12" :span="24">
             <el-form-item label="Địa chỉ thường trú">
               <el-input
@@ -167,8 +167,117 @@
               />
             </el-form-item>
           </el-col>
+        </el-row> -->
+
+        <el-divider content-position="left">Địa chỉ thường trú</el-divider>
+        <el-row :gutter="12">
+          <!-- Chọn Tỉnh -->
+          <el-col :span="7">
+            <el-form-item label="Tỉnh/Thành" prop="permanentProvinceId">
+              <el-select
+                v-model="form.permanentProvinceId"
+                placeholder="Chọn tỉnh"
+                filterable
+                clearable
+                style="width: 100%"
+                @change="onPermanentProvinceChange"
+              >
+                <el-option
+                  v-for="p in permanentProvinces"
+                  :key="p.code"
+                  :label="p.name"
+                  :value="p.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <!-- Chọn Xã -->
+          <el-col :span="7">
+            <el-form-item label="Xã/Phường" prop="permanentWardId">
+              <el-select
+                v-model="form.permanentWardId"
+                placeholder="Chọn xã/phường"
+                filterable
+                clearable
+                style="width: 100%"
+                :disabled="!form.permanentProvinceId"
+              >
+                <el-option
+                  v-for="w in permanentWards"
+                  :key="w.code"
+                  :label="w.name"
+                  :value="w.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <!-- Địa chỉ cụ thể -->
+          <el-col :span="10">
+            <el-form-item label="Địa chỉ" prop="address">
+              <el-input
+                v-model="form.permanentAddress"
+                placeholder="Số nhà, đường, thôn/xóm..."
+                clearable
+              />
+            </el-form-item>
+          </el-col>
         </el-row>
 
+        <el-divider content-position="left">Địa chỉ tạm trú</el-divider>
+        <el-row :gutter="12">
+          <!-- Chọn Tỉnh -->
+          <el-col :span="7">
+            <el-form-item label="Tỉnh/Thành" prop="temporaryProvinceId">
+              <el-select
+                v-model="form.temporaryProvinceId"
+                placeholder="Chọn tỉnh"
+                filterable
+                clearable
+                style="width: 100%"
+                @change="onTemporaryProvinceChange"
+              >
+                <el-option
+                  v-for="p in temporaryProvinces"
+                  :key="p.code"
+                  :label="p.name"
+                  :value="p.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <!-- Chọn Xã -->
+          <el-col :span="7">
+            <el-form-item label="Xã/Phường" prop="temporaryWardId">
+              <el-select
+                v-model="form.temporaryWardId"
+                placeholder="Chọn xã/phường"
+                filterable
+                clearable
+                style="width: 100%"
+                :disabled="!form.temporaryProvinceId"
+              >
+                <el-option
+                  v-for="w in temporaryWards"
+                  :key="w.code"
+                  :label="w.name"
+                  :value="w.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <!-- Địa chỉ cụ thể -->
+          <el-col :span="10">
+            <el-form-item label="Địa chỉ" prop="address">
+              <el-input
+                v-model="form.temporaryAddress"
+                placeholder="Số nhà, đường, thôn/xóm..."
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <!-- Thông tin công việc -->
         <el-divider content-position="left">Thông tin công việc</el-divider>
 
@@ -266,18 +375,25 @@ import { usePrisonStore } from "@/stores/prison";
 import { statusOptions, Gender, Status, genderOptions } from "@/constants";
 import type { FormInstance, FormRules } from "element-plus";
 import { Staff, CreateStaffRequest, UpdateStaffRequest } from "@/types/staff";
+import { useProvinceStore } from "@/stores/province";
+import { useWardStore } from "@/stores/ward";
+import { storeToRefs } from "pinia";
+import type { Province } from "@/types/province";
+import type { Ward } from "@/types/ward";
+
 const route = useRoute();
 const router = useRouter();
 const staffStore = useStaffStore();
 const prisonStore = usePrisonStore();
+const provinceStore = useProvinceStore();
+const wardStore = useWardStore();
 
 // Reactive data
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const isEdit = computed(() => !!route.params.id);
-
 const form = reactive<Partial<Staff>>({
-  // staffCode: "",
+  staffCode: "",
   profileNumber: "",
   fullName: "",
   gender: "",
@@ -292,6 +408,11 @@ const form = reactive<Partial<Staff>>({
   detentionCenterId: undefined,
   status: "ACTIVE",
 });
+const permanentProvinces = ref<Province[]>([]);
+const permanentWards = ref<Ward[]>([]);
+
+const temporaryProvinces = ref<Province[]>([]);
+const temporaryWards = ref<Ward[]>([]);
 
 // Validation rules
 const rules: FormRules = {
@@ -329,6 +450,41 @@ const rules: FormRules = {
   ],
 };
 
+const onPermanentProvinceChange = async (code: string) => {
+  form.permanentWardId = "";
+  if (!code) {
+    wardStore.clear();
+    return;
+  }
+  try {
+    await wardStore.getByProvinceCode(code);
+    if (wardStore.wards) {
+      permanentWards.value = wardStore.wards;
+    }
+  } catch {}
+};
+
+const getAllProvinces = async () => {
+  await provinceStore.getAll();
+  if (provinceStore.getProvinces) {
+    permanentProvinces.value = provinceStore.getProvinces;
+    temporaryProvinces.value = provinceStore.getProvinces;
+  }
+};
+
+const onTemporaryProvinceChange = async (code: string) => {
+  form.temporaryWardId = "";
+  if (!code) {
+    wardStore.clear();
+    return;
+  }
+  try {
+    await wardStore.getByProvinceCode(code);
+    if (wardStore.wards) {
+      temporaryWards.value = wardStore.wards;
+    }
+  } catch {}
+};
 // Methods
 const loadData = async () => {
   if (isEdit.value) {
@@ -418,7 +574,8 @@ const handleReset = () => {
     });
   }
 };
-onMounted(() => {
+onMounted(async () => {
+  await getAllProvinces();
   loadData();
 });
 </script>

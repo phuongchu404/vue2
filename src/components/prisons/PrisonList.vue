@@ -86,19 +86,19 @@
       border
     >
       <el-table-column
-        fixed="left"
         prop="code"
         label="Mã trại giam"
-        width="120"
+        width="145"
         sortable
-      />
-      <el-table-column prop="name" label="Tên trại giam" min-width="200" />
-      <el-table-column
-        prop="address"
-        label="Địa chỉ"
-        min-width="250"
         show-overflow-tooltip
       />
+      <el-table-column prop="name" label="Tên trại giam" width="200" />
+      <el-table-column label="Địa chỉ" min-width="250" show-overflow-tooltip>
+        <template #default="scope">
+          {{ scope.row.address }}, {{ scope.row.wardFullName }},
+          {{ scope.row.provinceFullName }}
+        </template>
+      </el-table-column>
       <el-table-column prop="director" label="Giám thị" width="150" />
       <el-table-column label="Sức chứa" width="130" align="center">
         <template #default="scope">
@@ -125,14 +125,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="phone" label="Điện thoại" width="130" />
-      <el-table-column label="Trạng thái" width="100" align="center">
+      <el-table-column label="Trạng thái" width="110" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
             {{ scope.row.isActive === true ? "Hoạt động" : "Tạm dừng" }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Thao tác" min-width="200" fixed="right">
+      <el-table-column label="Thao tác" width="160" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View">
           </el-button>
@@ -146,7 +146,7 @@
           <el-button
             size="small"
             type="danger"
-            @click="onDelete(scope.row)"
+            @click="onDelete(scope.row.id)"
             :icon="Delete"
           >
           </el-button>
@@ -184,9 +184,10 @@
           <el-descriptions-item label="Giám thị" :span="2">{{
             selectedPrison.director
           }}</el-descriptions-item>
-          <el-descriptions-item label="Địa chỉ" :span="2">{{
-            selectedPrison.address
-          }}</el-descriptions-item>
+          <el-descriptions-item label="Địa chỉ" :span="2"
+            >{{ selectedPrison.address }}, {{ selectedPrison.wardFullName }},
+            {{ selectedPrison.provinceFullName }}</el-descriptions-item
+          >
           <el-descriptions-item label="Điện thoại">{{
             selectedPrison.phone
           }}</el-descriptions-item>
@@ -242,7 +243,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, nextTick } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { usePrisonStore } from "@/stores/prison";
 import { useRouter } from "vue-router";
 import type { PageQuery, Prison } from "@/types/prison";
@@ -255,6 +256,9 @@ import {
   View,
   Download,
 } from "@element-plus/icons-vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const prisonStore = usePrisonStore();
 const router = useRouter();
@@ -364,8 +368,18 @@ const onSizeChange = (s: number) => {
 };
 
 const onDelete = async (id: number) => {
+  const ok = await ElMessageBox.confirm(
+    t("common.deleteConfirm"),
+    t("common.reminder"),
+    { type: "warning" }
+  )
+    .then(() => true)
+    .catch(() => false);
+
+  if (!ok) return;
+
   await prisonStore.deletePrison(id);
-  search();
+  await search(); // <- hàm search của bạn
 };
 </script>
 
@@ -390,10 +404,10 @@ const onDelete = async (id: number) => {
   align-items: center;
 }
 
-.result-info {
+/* .result-info {
   color: #666;
   font-size: 14px;
-}
+} */
 
 .pagination {
   margin-top: 20px;

@@ -1,12 +1,12 @@
 <template>
   <div class="prison-form">
-    <el-page-header @back="$router.go(-1)">
+    <!-- <el-page-header @back="$router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3">
           {{ isEdit ? "Chỉnh sửa trại giam" : "Thêm trại giam mới" }}
         </span>
       </template>
-    </el-page-header>
+    </el-page-header> -->
 
     <el-card class="form-card">
       <el-form
@@ -44,14 +44,59 @@
           </el-col>
         </el-row>
 
-        <el-form-item label="Địa chỉ" prop="address">
-          <el-input
-            v-model="form.address"
-            type="textarea"
-            :rows="3"
-            placeholder="Nhập địa chỉ trại giam..."
-          />
-        </el-form-item>
+        <el-row :gutter="12">
+          <!-- Chọn Tỉnh -->
+          <el-col :span="7">
+            <el-form-item label="Tỉnh/Thành" prop="provinceId">
+              <el-select
+                v-model="form.provinceId"
+                placeholder="Chọn tỉnh"
+                filterable
+                clearable
+                style="width: 100%"
+                @change="onProvinceChange"
+              >
+                <el-option
+                  v-for="p in provinces"
+                  :key="p.code"
+                  :label="p.name"
+                  :value="p.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <!-- Chọn Xã -->
+          <el-col :span="7">
+            <el-form-item label="Xã/Phường" prop="wardId">
+              <el-select
+                v-model="form.wardId"
+                placeholder="Chọn xã/phường"
+                filterable
+                clearable
+                style="width: 100%"
+                :disabled="!form.provinceId"
+              >
+                <el-option
+                  v-for="w in wards"
+                  :key="w.code"
+                  :label="w.name"
+                  :value="w.code"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <!-- Địa chỉ cụ thể -->
+          <el-col :span="10">
+            <el-form-item label="Địa chỉ" prop="address">
+              <el-input
+                v-model="form.address"
+                placeholder="Số nhà, đường, thôn/xóm..."
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
@@ -129,7 +174,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { usePrisonStore } from "@/stores/prison";
@@ -139,16 +185,27 @@ import type {
   CreatePrisonRequest,
   UpdatePrisonRequest,
 } from "@/types/prison";
+import { useProvinceStore } from "@/stores/province";
+import { useWardStore } from "@/stores/ward";
 
 const route = useRoute();
 const router = useRouter();
 const prisonStore = usePrisonStore();
+const provinceStore = useProvinceStore();
+const wardStore = useWardStore();
 
 // Reactive data
 const formRef = ref<FormInstance>();
 const submitting = ref(false);
 const isEdit = computed(() => !!route.params.id);
 
+// const provinces = ref<Province[]>([]);
+// const wards = ref<Ward[]>([]);
+
+const { provinces, loading: loadingProvinces } = storeToRefs(provinceStore);
+const { wards, loading: loadingWards } = storeToRefs(wardStore);
+
+// const provinces = computed(() => provinceStore.provinces || []);
 const form = reactive<Partial<Prison>>({
   code: "",
   name: "",
@@ -188,6 +245,12 @@ const rules: FormRules = {
   ],
   address: [
     { required: true, message: "Vui lòng nhập địa chỉ", trigger: "blur" },
+  ],
+  provinceId: [
+    { required: true, message: "Vui lòng chọn tỉnh/thành", trigger: "change" },
+  ],
+  wardId: [
+    { required: true, message: "Vui lòng chọn xã/phường", trigger: "change" },
   ],
   director: [
     { required: true, message: "Vui lòng nhập tên giám thị", trigger: "blur" },
@@ -234,6 +297,17 @@ const rules: FormRules = {
   ],
 };
 
+const onProvinceChange = async (code: string) => {
+  form.wardId = "";
+  if (!code) {
+    wardStore.clear();
+    return;
+  }
+  try {
+    await wardStore.getByProvinceCode(code);
+  } catch {}
+};
+
 // Methods
 const loadData = async () => {
   if (isEdit.value) {
@@ -242,6 +316,7 @@ const loadData = async () => {
     console.log(prison);
     if (prison) {
       Object.assign(form, prison);
+      console.log(form);
     } else {
       ElMessage.error("Không tìm thấy thông tin trại giam!");
       router.push("/prisons");
@@ -254,6 +329,10 @@ const loadData = async () => {
   //   const detail = await store.fetchDetail(id)
   //   Object.assign(form, detail)
   // }
+};
+
+const getAllProvinces = async () => {
+  await provinceStore.getAll();
 };
 
 const handleSubmit = async () => {
@@ -277,6 +356,8 @@ const handleSubmit = async () => {
           director: form.director,
           phone: form.phone,
           isActive: form.isActive as any,
+          provinceId: form.provinceId,
+          wardId: form.wardId,
         };
         await prisonStore.updatePrison(form.id as number, payload);
       } else {
@@ -290,6 +371,8 @@ const handleSubmit = async () => {
           director: form.director,
           phone: form.phone,
           isActive: form.isActive as any,
+          provinceId: form.provinceId,
+          wardId: form.wardId,
         };
         console.log(payload);
         await prisonStore.createPrison(payload);
@@ -318,12 +401,57 @@ const handleReset = () => {
       capacity: null,
       currentPopulation: 0,
       isActive: true,
+      provinceId: "",
+      wardId: "",
     });
   }
 };
 
-onMounted(() => {
-  loadData();
+// watch(
+//   () => form.provinceId,
+//   async (code) => {
+//     form.wardId = "";
+//     if (!code) {
+//       wardStore.clear();
+//       return;
+//     }
+//     try {
+//       await wardStore.getByProvinceCode(code);
+//     } catch {}
+//   }
+// );
+// watch(
+//   () => form.provinceId,
+//   async (code) => {
+//     const prevWard = form.wardId;
+//     form.wardId = "";
+
+//     if (!code) {
+//       wardStore.clear();
+//       return;
+//     }
+
+//     try {
+//       await wardStore.getByProvinceCode(code);
+//       // Nếu đang edit và ward cũ hợp lệ trong danh sách mới → khôi phục
+//       if (prevWard) {
+//         const found = wardStore.wards?.find((w) => w.code === prevWard);
+//         if (found) form.wardId = prevWard;
+//       }
+//     } catch {}
+//   }
+// );
+
+onMounted(async () => {
+  await getAllProvinces();
+
+  await loadData();
+  if (isEdit.value) {
+    // Load wards for the selected province
+    if (form.provinceId) {
+      await wardStore.getByProvinceCode(form.provinceId);
+    }
+  }
 });
 </script>
 

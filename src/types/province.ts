@@ -4,3 +4,9 @@ export interface Province {
   fullName?: string;
   codeName?: string;
 }
+
+export interface ProvinceState {
+  provinces?: Province[];
+  loading: boolean;
+  error?: string;
+}

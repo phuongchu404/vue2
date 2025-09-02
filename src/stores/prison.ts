@@ -33,7 +33,6 @@ export const usePrisonStore = defineStore("prison", {
 
   actions: {
     async fetchList(query: PageQuery) {
-      console.log("fetchList");
       this.loading = true;
       this.error = undefined;
       try {
@@ -46,7 +45,6 @@ export const usePrisonStore = defineStore("prison", {
         // Call API
         const res: ServiceResult<PagingResult<Prison>> =
           await PrisonService.list(params);
-        console.log(res);
         // Kiểm tra success
         if (!res.success) {
           throw new Error(res.message || "Fetch prisons failed");
@@ -153,22 +151,11 @@ export const usePrisonStore = defineStore("prison", {
     },
 
     async deletePrison(id: number) {
-      const { t } = useI18n();
-      try {
-        await ElMessageBox.confirm(
-          t?.("common.deleteConfirm") ?? "Are you sure to delete?",
-          t?.("common.reminder") ?? "Reminder",
-          { type: "warning" }
-        );
-      } catch {
-        return;
-      }
-
+      console.log(id);
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<boolean> = await PrisonService.delete(id);
-
+        const res: ServiceResult<number> = await PrisonService.delete(id);
         if (!res.success) {
           throw new Error(res.message || "Delete prison failed");
         }
@@ -176,6 +163,9 @@ export const usePrisonStore = defineStore("prison", {
         // this.items = (this.items ?? []).filter((x) => x.id !== id);
         // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
+        if (this.lastQuery) {
+        await this.fetchList(this.lastQuery);
+      }
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =

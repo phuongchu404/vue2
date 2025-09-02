@@ -4,3 +4,8 @@ export interface Ward {
   fullName?: string;
   codeName?: string;
 }
+export interface WardState {
+  wards?: Ward[];
+  loading: boolean;
+  error?: string;
+}

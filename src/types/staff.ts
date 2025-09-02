@@ -12,7 +12,7 @@ export interface Staff {
   staffCode?: string;
   profileNumber?: string;
   fullName?: string;
-  gender?: string; // có thể siết: 'MALE' | 'FEMALE' | 'OTHER'
+  gender?: string; // 'MALE' | 'FEMALE' | 'OTHER'
 
   dateOfBirth?: string; // 'yyyy-MM-dd'
   placeOfBirth?: string;
@@ -28,11 +28,15 @@ export interface Staff {
 
   permanentAddress?: string;
   permanentWardId?: string;
+  permanentWardName?: string;
   permanentProvinceId?: string;
+  permanentProvinceName?: string;
 
   temporaryAddress?: string;
   temporaryWardId?: string;
+  temporaryWardName?: string;
   temporaryProvinceId?: string;
+  temporaryProvinceName?: string;
 
   phone?: string;
   email?: string;
@@ -55,7 +59,7 @@ export interface Staff {
   educationLevelId?: number;
   educationLevelName?: string;
 
-  status?: string; // có thể siết: 'ACTIVE' | 'INACTIVE' | ...
+  status?: string; //'ACTIVE' | 'INACTIVE'
   isActive?: boolean;
 
   createdAt?: string; // 'yyyy-MM-dd HH:mm:ss'
@@ -63,10 +67,10 @@ export interface Staff {
 }
 
 export interface CreateStaffRequest
-  extends Omit<Staff, "id" | "created_at" | "updated_at"> {}
+  extends Omit<Staff, "id" | "createdAt" | "updatedAt" | "permanentWardFullName" | "temporaryWardFullName" | "permanentProvinceFullName" | "temporaryProvinceFullName"> {}
 
 export interface UpdateStaffRequest
-  extends Partial<Omit<Staff, "id" | "created_at" | "updated_at">> {} // tao kieu moi, (bỏ id, created_at) → mọi field còn lại đều không bắt buộc.
+  extends Partial<Omit<Staff, "id" | "createdAt" | "updatedAt" | "permanentWardFullName" | "temporaryWardFullName" | "permanentProvinceFullName" | "temporaryProvinceFullName">> {} // tao kieu moi, (bỏ id, created_at) → mọi field còn lại đều không bắt buộc.
 
 export interface PageQuery {
   pageNo: number;
