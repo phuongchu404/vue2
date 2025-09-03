@@ -1,19 +1,18 @@
 import { defineStore } from "pinia";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
-import { PrisonService } from "@/services/prison";
+import { ElMessage } from "element-plus";
+import { RoleService } from "@/services/role";
 import type {
-  PrisonState,
-  Prison,
+  RoleState,
+  Role,
   PageQuery,
-  CreatePrisonRequest,
-  UpdatePrisonRequest,
-} from "@/types/prison";
+  CreateRoleRequest,
+  UpdateRoleRequest,
+} from "@/types/role";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
-export const usePrisonStore = defineStore("prison", {
-  state: (): PrisonState => ({
-    prisons: undefined,
+export const useUserStore = defineStore("user", {
+  state: (): RoleState => ({
+    roles: undefined,
     total: 0,
     pageNo: 1,
     pageSize: 10,
@@ -23,16 +22,16 @@ export const usePrisonStore = defineStore("prison", {
   }),
 
   getters: {
-    getPrisons: (state): Prison[] | undefined => state.prisons,
-    getTotal: (state): number => state.total,
-    getPage: (state): number => state.pageNo,
-    getSize: (state): number => state.pageSize,
-    getLoading: (state): boolean => state.loading,
+    getPrisons: (state): Role[] | undefined => state.roles,
+    getTotal: (state): number => state.total ?? 0,
+    getPage: (state): number => state.pageNo ?? 1,
+    getSize: (state): number => state.pageSize ?? 10,
+    getLoading: (state): boolean => state.loading ?? false,
     getError: (state): string | undefined => state.error,
   },
 
   actions: {
-    async fetchList(query: PageQuery) {
+    async listPage(query: PageQuery) {
       this.loading = true;
       this.error = undefined;
       try {
@@ -43,8 +42,8 @@ export const usePrisonStore = defineStore("prison", {
         };
 
         // Call API
-        const res: ServiceResult<PagingResult<Prison>> =
-          await PrisonService.list(params);
+        const res: ServiceResult<PagingResult<Role>> =
+          await RoleService.listPage(params);
         // Kiểm tra success
         if (!res.success) {
           throw new Error(res.message || "Fetch prisons failed");
@@ -60,7 +59,7 @@ export const usePrisonStore = defineStore("prison", {
           size: pageSize,
         } = res.data;
 
-        this.prisons = content;
+        this.roles = content;
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
@@ -74,17 +73,18 @@ export const usePrisonStore = defineStore("prison", {
         this.loading = false;
       }
     },
+
     async getAll() {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison[]> = await PrisonService.getAll();
+        const res: ServiceResult<Role[]> = await RoleService.getAll();
 
         if (!res.success) {
           throw new Error(res.message || "Fetch prison failed");
         }
 
-        this.prisons = res.data;
+        this.roles = res.data;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Fetch prison failed";
@@ -96,42 +96,17 @@ export const usePrisonStore = defineStore("prison", {
       }
     },
 
-    async fetchDetail(id: number) {
+    async createRole(payload: CreateRoleRequest) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison> = await PrisonService.getById(id);
-
-        if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
-        }
-
-        const detail = res.data;
-        return detail;
-      } catch (e: any) {
-        const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
-        this.error = msg;
-        ElMessage.error(msg);
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async createPrison(payload: CreatePrisonRequest) {
-      this.loading = true;
-      this.error = undefined;
-      try {
-        const res: ServiceResult<Prison> = await PrisonService.create(payload);
+        const res: ServiceResult<boolean> = await RoleService.create(payload);
 
         if (!res.success) {
           throw new Error(res.message || "Create prison failed");
         }
 
-        const created = res.data;
         ElMessage.success("Created successfully");
-        return created;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Create prison failed";
@@ -143,11 +118,11 @@ export const usePrisonStore = defineStore("prison", {
       }
     },
 
-    async updatePrison(id: number, payload: UpdatePrisonRequest) {
+    async updateRole(id: number, payload: UpdateRoleRequest) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Prison> = await PrisonService.update(
+        const res: ServiceResult<boolean> = await RoleService.update(
           id,
           payload
         );
@@ -156,13 +131,7 @@ export const usePrisonStore = defineStore("prison", {
           throw new Error(res.message || "Update prison failed");
         }
 
-        const updated = res.data;
-        // const idx = this.items?.findIndex((x) => x.id === id) ?? -1;
-        // if (idx >= 0 && this.items) {
-        //   this.items[idx] = { ...this.items[idx], ...updated };
-        // }
         ElMessage.success("Updated successfully");
-        return updated;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Update prison failed";
@@ -178,7 +147,7 @@ export const usePrisonStore = defineStore("prison", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<number> = await PrisonService.delete(id);
+        const res: ServiceResult<boolean> = await RoleService.delete(id);
         if (!res.success) {
           throw new Error(res.message || "Delete prison failed");
         }
@@ -187,7 +156,7 @@ export const usePrisonStore = defineStore("prison", {
         // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
         if (this.lastQuery) {
-          await this.fetchList(this.lastQuery);
+          await this.listPage(this.lastQuery);
         }
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
@@ -202,7 +171,7 @@ export const usePrisonStore = defineStore("prison", {
     },
 
     resetAndBackToList() {
-      this.prisons = undefined;
+      this.roles = undefined;
       this.total = 0;
       this.pageNo = 1;
       this.pageSize = 10;

@@ -2,26 +2,27 @@ import * as Utils from "../utils";
 import type {
   CreateUserRequest,
   UpdateUserRequest,
+  ResetPassword,
   PageQuery,
 } from "../types/user";
-export const PrisonService = {
+export const UserService = {
   async list(params?: PageQuery) {
     let param = Utils.queryFormWrapper(params);
     const res = Utils.doGet(`/api/admin/users?${param}`);
     return res;
   },
 
-  async resetPassword
-  async getById(id: number) {
-    const res = Utils.doGet(`/api/admin/users/${id}`);
+  async resetPassword(payload: ResetPassword) {
+    const res = await Utils.doPost(`/api/admin/users/password`, payload);
     return res;
   },
+  // async getById(id: number) {
+  //   const res = Utils.doGet(`/api/admin/users/${id}`);
+  //   return res;
+  // },
 
   async create(payload: CreateUserRequest) {
-    const res = await Utils.doPost(
-      "/api/admin/users",
-      payload
-    );
+    const res = await Utils.doPost("/api/admin/users", payload);
     return res;
   },
 
@@ -34,14 +35,4 @@ export const PrisonService = {
     const res = await Utils.doDelete(`/api/admin/users/${id}`);
     return res;
   },
-
-  // async list(params?: PagingQuery): Promise<PagingResult<Prison>> {
-  //   const { data } = await http.get('/admin/prisons', { params });
-  //   return data; // kỳ vọng backend trả { items, total, page, size }
-  // },
-
-  // async getById(id: number): Promise<Prison> {
-  //   const { data } = await http.get(`/admin/prisons/${id}`);
-  //   return data;
-  // },
 };
