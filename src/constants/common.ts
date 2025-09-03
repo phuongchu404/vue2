@@ -17,13 +17,13 @@ export enum Status {
 
 export const genderOptions: Option[] = [
   { label: "Nam", value: Gender.MALE },
-  { label: "Nu", value: Gender.FEMALE },
+  { label: "Nữ", value: Gender.FEMALE },
   { label: "Khác", value: Gender.OTHER },
 ];
 
 export const statusOptions: Option[] = [
   { label: "Đang làm việc", value: Status.ACTIVE },
-  { label: "Ngừng hoạt động", value: Status.INACTIVE },
-  { label: "Nghị hưu", value: Status.RETIRED },
-  { label: "Điều chuyển", value: Status.TRANSFERRED },
+  { label: "Nghỉ phép", value: Status.INACTIVE },
+  { label: "Nghỉ hưu", value: Status.RETIRED },
+  { label: "Chuyển công tác", value: Status.TRANSFERRED },
 ];

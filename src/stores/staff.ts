@@ -149,17 +149,6 @@ export const useStaffStore = defineStore("staff", {
     },
 
     async deleteStaff(id: number) {
-      const { t } = useI18n();
-      try {
-        await ElMessageBox.confirm(
-          t?.("common.deleteConfirm") ?? "Are you sure to delete?",
-          t?.("common.reminder") ?? "Reminder",
-          { type: "warning" }
-        );
-      } catch {
-        return;
-      }
-
       this.loading = true;
       this.error = undefined;
       try {
@@ -169,6 +158,9 @@ export const useStaffStore = defineStore("staff", {
           throw new Error(res.message || "Delete prison failed");
         }
         ElMessage.success("Deleted successfully");
+        if (this.lastQuery) {
+          await this.fetchList(this.lastQuery);
+        }
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";

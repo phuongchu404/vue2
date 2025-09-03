@@ -1,53 +1,64 @@
 <template>
   <div class="detainee-list">
-    <el-page-header @back="$router.go(-1)">
+    <!-- <el-page-header @back="$router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3">Quản lý phạm nhân</span>
       </template>
-    </el-page-header>
+    </el-page-header> -->
 
     <!-- Search Section -->
-    <el-card class="search-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="Mã phạm nhân">
-          <el-input
-            v-model="searchForm.code"
-            placeholder="Nhập mã phạm nhân..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Họ và tên">
-          <el-input
-            v-model="searchForm.name"
-            placeholder="Nhập họ và tên..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Số CCCD/CMND">
-          <el-input
-            v-model="searchForm.idNumber"
-            placeholder="Nhập số CCCD/CMND..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Trạng thái">
-          <el-select
-            v-model="searchForm.status"
-            placeholder="Chọn trạng thái"
-            clearable
-          >
-            <el-option label="Đang giam giữ" value="DETAINED" />
-            <el-option label="Đã thả" value="RELEASED" />
-            <el-option label="Chuyển trại" value="TRANSFERRED" />
-            <el-option label="Đã chết" value="DECEASED" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
-        </el-form-item>
+    <el-card class="search-section">
+      <el-form :model="searchForm"label-width="130px" label-position="left">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="Mã phạm nhân">
+              <el-input
+                v-model="searchForm.code"
+                placeholder="Nhập mã phạm nhân..."
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="Họ và tên">
+              <el-input
+                v-model="searchForm.name"
+                placeholder="Nhập họ và tên..."
+                clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8"
+            ><el-form-item label="Số CCCD/CMND">
+              <el-input
+                v-model="searchForm.idNumber"
+                placeholder="Nhập số CCCD/CMND..."
+                clearable
+              /> </el-form-item
+          ></el-col>
+          <el-col :span="8"
+            ><el-form-item label="Trạng thái">
+              <el-select
+                v-model="searchForm.status"
+                placeholder="Chọn trạng thái"
+                clearable
+              >
+                <el-option label="Đang giam giữ" value="DETAINED" />
+                <el-option label="Đã thả" value="RELEASED" />
+                <el-option label="Chuyển trại" value="TRANSFERRED" />
+                <el-option label="Đã chết" value="DECEASED" />
+              </el-select> </el-form-item
+          ></el-col>
+        </el-row>
+
+          <el-form-item>
+            <el-button type="primary" @click="handleSearch" :icon="Search"
+              >Tìm kiếm</el-button
+            >
+            <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
+          </el-form-item>
       </el-form>
     </el-card>
 
@@ -73,82 +84,77 @@
     </el-card>
 
     <!-- Data Table -->
-    <el-card>
-      <el-table
-        :data="paginatedDetainees"
-        style="width: 100%"
-        v-loading="loading"
-        stripe
-        border
-      >
-        <el-table-column
-          prop="detainee_code"
-          label="Mã phạm nhân"
-          width="120"
-          sortable
-        />
-        <el-table-column prop="full_name" label="Họ và tên" min-width="150" />
-        <el-table-column prop="gender" label="Giới tính" width="80" />
-        <el-table-column prop="date_of_birth" label="Ngày sinh" width="120">
-          <template #default="scope">
-            {{ formatDate(scope.row.date_of_birth) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="id_number" label="CCCD/CMND" width="130" />
-        <el-table-column prop="detention_date" label="Ngày bắt" width="120">
-          <template #default="scope">
-            {{ formatDate(scope.row.detention_date) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="cell_number" label="Buồng giam" width="100" />
-        <el-table-column
-          prop="charges"
-          label="Tội danh"
-          min-width="200"
-          show-overflow-tooltip
-        />
-        <el-table-column label="Trạng thái" width="120" align="center">
-          <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Thao tác" width="200" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="handleView(scope.row)" :icon="View">
-              Xem
-            </el-button>
-            <el-button
-              size="small"
-              type="primary"
-              @click="handleEdit(scope.row)"
-              :icon="Edit"
-            >
-              Sửa
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(scope.row)"
-              :icon="Delete"
-            >
-              Xóa
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- Pagination -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="filteredDetainees.length"
-        layout="total, sizes, prev, pager, next, jumper"
-        class="pagination"
+    <el-table
+      :data="paginatedDetainees"
+      style="width: 100%"
+      v-loading="loading"
+      stripe
+      border
+    >
+      <el-table-column
+        prop="detainee_code"
+        label="Mã phạm nhân"
+        width="120"
+        sortable
       />
-    </el-card>
+      <el-table-column prop="full_name" label="Họ và tên" min-width="150" />
+      <el-table-column prop="gender" label="Giới tính" width="80" />
+      <el-table-column prop="date_of_birth" label="Ngày sinh" width="120">
+        <template #default="scope">
+          {{ formatDate(scope.row.date_of_birth) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="id_number" label="CCCD/CMND" width="130" />
+      <el-table-column prop="detention_date" label="Ngày bắt" width="120">
+        <template #default="scope">
+          {{ formatDate(scope.row.detention_date) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="cell_number" label="Buồng giam" width="100" />
+      <el-table-column
+        prop="charges"
+        label="Tội danh"
+        min-width="200"
+        show-overflow-tooltip
+      />
+      <el-table-column label="Trạng thái" width="120" align="center">
+        <template #default="scope">
+          <el-tag :type="getStatusType(scope.row.status)">
+            {{ getStatusText(scope.row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="Thao tác" width="200" fixed="right">
+        <template #default="scope">
+          <el-button size="small" @click="handleView(scope.row)" :icon="View">
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            @click="handleEdit(scope.row)"
+            :icon="Edit"
+          >
+          </el-button>
+          <el-button
+            size="small"
+            type="danger"
+            @click="handleDelete(scope.row)"
+            :icon="Delete"
+          >
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- Pagination -->
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[10, 20, 50, 100]"
+      :total="filteredDetainees.length"
+      layout="total, sizes, prev, pager, next, jumper"
+      class="pagination"
+    />
 
     <!-- Detail Dialog -->
     <el-dialog

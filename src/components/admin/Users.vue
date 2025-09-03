@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div class="search-form" style="padding-bottom: 19px">
-      <header>{{ $t("Search") }}</header>
+    <div class="search-section">
       <el-form
         :inline="true"
         :model="queryForm"
@@ -12,15 +11,24 @@
           <el-input
             v-model="queryForm.userName"
             :placeholder="$t('user.userName')"
-            size="small"
           ></el-input>
         </el-form-item>
-        <el-form-item align="right" style="margin-left: 220px">
+        <el-form-item>
+          <el-button
+            type="primary"
+            @click="handleSearch"
+            :disabled="isButtonEnabled('system:user:select')"
+            size="mini"
+            :icon="Search"
+          >
+            {{ $t("option.query") }}
+          </el-button>
+        </el-form-item>
+        <el-form-item>
           <el-button
             type="primary"
             @click="handleAdd"
             :disabled="isButtonEnabled('system:user:insert')"
-            size="small"
           >
             <el-icon><Plus /></el-icon><span>{{ $t("option.add") }}</span>
           </el-button>
@@ -28,97 +36,91 @@
       </el-form>
     </div>
 
-    <div class="page-table" style="padding-bottom: 40px">
-      <el-row :gutter="20">
-        <el-table
-          :data="filteredTableData"
-          style="width: 97%; margin-top: 10px; margin-left: 20px"
-          :row-class-name="tableRowClassName"
-          align="center"
-          border
-        >
-          <el-table-column
-            type="index"
-            prop="id"
-            :label="$t('common.index')"
-            width="80"
-          ></el-table-column>
-          <el-table-column
-            prop="userName"
-            :label="$t('user.userName')"
-            min-width="100"
-          ></el-table-column>
-          <el-table-column
-            prop="roles"
-            :label="$t('user.roles')"
-            :formatter="rolesFormatter"
-          ></el-table-column>
-          <el-table-column
-            prop="realName"
-            :label="$t('user.realName')"
-          ></el-table-column>
-          <el-table-column
-            prop="createTime"
-            :label="$t('common.createTime')"
-            width="180"
-            :formatter="defaultTimeFormatter"
-          ></el-table-column>
-          <el-table-column
-            prop="updateTime"
-            :label="$t('common.updateTime')"
-            width="180"
-            :formatter="defaultTimeFormatter"
-          ></el-table-column>
-          <el-table-column :label="$t('common.option')" width="480">
-            <template #default="{ row }">
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-bluelight"
-                :disabled="isButtonEnabled('system:user:update')"
-                @click="handleEdit(row)"
-                >{{ $t("option.update") }}
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-greenlight"
-                :disabled="
-                  isButtonEnabled('system:user:assign-roles') ||
-                  row.userName === userNameLogin ||
-                  row.removable != '1'
-                "
-                @click="handleSelectRoles(row)"
-                >{{ $t("user.allocateRole") }}
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-red"
-                :disabled="
-                  isButtonEnabled('system:user:reset-password') ||
-                  row.userName === userNameLogin
-                "
-                @click="resetPassword(row)"
-                >{{ $t("user.resetPassword") }}
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-red"
-                :disabled="
-                  isButtonEnabled('system:user:delete') ||
-                  row.userName === userNameLogin ||
-                  row.removable != '1'
-                "
-                @click="handleDelete(row)"
-                >{{ $t("option.delete") }}
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-row>
-    </div>
+    <el-table
+      :data="filteredTableData"
+      align="center"
+      border
+    >
+      <el-table-column
+        type="index"
+        prop="id"
+        :label="$t('common.index')"
+        width="80"
+      ></el-table-column>
+      <el-table-column
+        prop="userName"
+        :label="$t('user.userName')"
+        min-width="100"
+      ></el-table-column>
+      <el-table-column
+        prop="roles"
+        :label="$t('user.roles')"
+        :formatter="rolesFormatter"
+      ></el-table-column>
+      <el-table-column
+        prop="realName"
+        :label="$t('user.realName')"
+      ></el-table-column>
+      <el-table-column
+        prop="createTime"
+        :label="$t('common.createTime')"
+        width="180"
+        :formatter="defaultTimeFormatter"
+      ></el-table-column>
+      <el-table-column
+        prop="updateTime"
+        :label="$t('common.updateTime')"
+        width="180"
+        :formatter="defaultTimeFormatter"
+      ></el-table-column>
+      <el-table-column :label="$t('common.option')" width="480">
+        <template #default="{ row }">
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-bluelight"
+            :disabled="isButtonEnabled('system:user:update')"
+            @click="handleEdit(row)"
+            >{{ $t("option.update") }}
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-greenlight"
+            :disabled="
+              isButtonEnabled('system:user:assign-roles') ||
+              row.userName === userNameLogin ||
+              row.removable != '1'
+            "
+            @click="handleSelectRoles(row)"
+            >{{ $t("user.allocateRole") }}
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-red"
+            :disabled="
+              isButtonEnabled('system:user:reset-password') ||
+              row.userName === userNameLogin
+            "
+            @click="resetPassword(row)"
+            >{{ $t("user.resetPassword") }}
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-red"
+            :disabled="
+              isButtonEnabled('system:user:delete') ||
+              row.userName === userNameLogin ||
+              row.removable != '1'
+            "
+            @click="handleDelete(row)"
+            >{{ $t("option.delete") }}
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
 
     <el-dialog
       :title="ui.addRecord ? $t('user.add') : $t('user.update')"
@@ -224,8 +226,16 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
 import * as Utils from "../../utils";
+import {
+  Search,
+  Refresh,
+  Plus,
+  Download,
+  View,
+  Edit,
+  Delete,
+} from "@element-plus/icons-vue";
 
 const { t } = useI18n();
 const appStore = useAppStore();

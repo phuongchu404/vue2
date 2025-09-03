@@ -71,6 +71,27 @@ export const usePrisonStore = defineStore("prison", {
         this.loading = false;
       }
     },
+    async getAll() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<Prison[]> = await PrisonService.getAll();
+
+        if (!res.success) {
+          throw new Error(res.message || "Fetch prison failed");
+        }
+
+        this.prisons = res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Fetch prison failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
 
     async fetchDetail(id: number) {
       this.loading = true;
@@ -151,7 +172,6 @@ export const usePrisonStore = defineStore("prison", {
     },
 
     async deletePrison(id: number) {
-      console.log(id);
       this.loading = true;
       this.error = undefined;
       try {
@@ -164,8 +184,8 @@ export const usePrisonStore = defineStore("prison", {
         // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
         if (this.lastQuery) {
-        await this.fetchList(this.lastQuery);
-      }
+          await this.fetchList(this.lastQuery);
+        }
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =

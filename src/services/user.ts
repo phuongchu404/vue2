@@ -1,41 +1,37 @@
 import * as Utils from "../utils";
 import type {
-  CreatePrisonRequest,
-  UpdatePrisonRequest,
+  CreateUserRequest,
+  UpdateUserRequest,
   PageQuery,
-} from "../types/prison";
+} from "../types/user";
 export const PrisonService = {
   async list(params?: PageQuery) {
     let param = Utils.queryFormWrapper(params);
-    const res = Utils.doGet(`/api/admin/detention-center/search?${param}`);
+    const res = Utils.doGet(`/api/admin/users?${param}`);
     return res;
   },
 
-  async getAll() {
-    const res = Utils.doGet(`/api/admin/detention-center/all`);
-    return res;
-  },
-
+  async resetPassword
   async getById(id: number) {
-    const res = Utils.doGet(`/api/admin/detention-center/${id}`);
+    const res = Utils.doGet(`/api/admin/users/${id}`);
     return res;
   },
 
-  async create(payload: CreatePrisonRequest) {
+  async create(payload: CreateUserRequest) {
     const res = await Utils.doPost(
-      "/api/admin/detention-center/create",
+      "/api/admin/users",
       payload
     );
     return res;
   },
 
-  async update(id: number, payload: UpdatePrisonRequest) {
-    const res = await Utils.doPut(`/api/admin/detention-center/${id}`, payload);
+  async update(id: number, payload: UpdateUserRequest) {
+    const res = await Utils.doPut(`/api/admin/users/${id}`, payload);
     return res;
   },
 
   async delete(id: number) {
-    const res = await Utils.doDelete(`/api/admin/detention-center/${id}`);
+    const res = await Utils.doDelete(`/api/admin/users/${id}`);
     return res;
   },
 

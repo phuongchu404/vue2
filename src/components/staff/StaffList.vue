@@ -45,12 +45,13 @@
               <el-select
                 v-model="searchForm.status"
                 placeholder="Chọn trạng thái"
-                clearable
               >
-                <el-option label="Đang làm việc" value="ACTIVE" />
-                <el-option label="Nghỉ phép" value="INACTIVE" />
-                <el-option label="Nghỉ hưu" value="RETIRED" />
-                <el-option label="Chuyển công tác" value="TRANSFERRED" />
+                <el-option
+                  v-for="option in statusOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -101,7 +102,11 @@
       />
       <el-table-column prop="fullName" label="Họ và tên" min-width="150" />
       <el-table-column prop="idNumber" label="Số căn cước" min-width="120" />
-      <el-table-column prop="gender" label="Giới tính" width="120" />
+      <el-table-column label="Giới tính" width="120">
+        <template #default="{ row }">
+          {{ getGenderLabel(row.gender) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="rank" label="Cấp bậc" width="120" />
       <el-table-column prop="phone" label="Điện thoại" width="130" />
       <el-table-column
@@ -131,7 +136,7 @@
           <el-button
             size="small"
             type="danger"
-            @click="onDelete(scope.row)"
+            @click="onDelete(scope.row.id)"
             :icon="Delete"
           >
           </el-button>
@@ -175,10 +180,22 @@
               selectedStaff.profileNumber || "-"
             }}</el-descriptions-item>
             <el-descriptions-item label="Giới tính">{{
-              selectedStaff.gender ? "Nu" : "Nam" || "-"
+              getGenderLabel(selectedStaff.gender)
             }}</el-descriptions-item>
             <el-descriptions-item label="Ngày sinh">{{
               formatDate(selectedStaff.dateOfBirth)
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Nơi sinh">{{
+              selectedStaff.placeOfBirth
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Số CCCD/CMND">{{
+              selectedStaff.idNumber || "-"
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Ngày cấp">{{
+              selectedStaff.idIssueDate || "-"
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Nơi cấp">{{
+              selectedStaff.idIssuePlace || "-"
             }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
@@ -192,15 +209,22 @@
             <el-descriptions-item label="Email" :span="2">{{
               selectedStaff.email || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Số CCCD/CMND">{{
-              selectedStaff.idNumber || "-"
-            }}</el-descriptions-item>
+
             <el-descriptions-item label="Điện thoại">{{
               selectedStaff.phone || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Địa chỉ thường trú" :span="2">{{
-              selectedStaff.temporaryProvinceId || "-"
+            <el-descriptions-item label="Điện thoại liên hệ khẩn cấp">{{
+              selectedStaff.emergencyPhone || "-"
             }}</el-descriptions-item>
+            <el-descriptions-item label="Người liên hệ khẩn cấp">{{
+              selectedStaff.emergencyContact || "-"
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Địa chỉ thường trú" :span="2">
+              {{ permanentFullAddress }}
+            </el-descriptions-item>
+            <el-descriptions-item label="Địa chỉ tạm trú" :span="2">
+              {{ temporaryFullAddress }}
+            </el-descriptions-item>
           </el-descriptions>
         </el-card>
 
@@ -213,17 +237,42 @@
             <el-descriptions-item label="Cấp bậc">{{
               selectedStaff.rank || "-"
             }}</el-descriptions-item>
+            <el-descriptions-item label="Phòng ban">{{
+              selectedStaff.departmentName || "-"
+            }}</el-descriptions-item>
+            <el-descriptions-item label="Chức vụ">{{
+              selectedStaff.positionName || "-"
+            }}
+            </el-descriptions-item>
+            <el-descriptions-item label="Học vấn">{{
+              selectedStaff.educationLevelName || "-"
+            }}
+            </el-descriptions-item>
+            <el-descriptions-item label="Trại giam công tác">{{
+              selectedStaff.detentionCenterName || "-"
+            }}
+            </el-descriptions-item>
             <el-descriptions-item label="Trạng thái">
               <el-tag :type="getStatusType(selectedStaff.status)">
                 {{ getStatusText(selectedStaff.status) }}
               </el-tag>
             </el-descriptions-item>
+            
+            <el-descriptions-item label="Ngày tạo">{{
+              formatDate(selectedStaff.createdAt)
+            }}
+            </el-descriptions-item>
+            <el-descriptions-item label="Ngày cập nhật">{{
+              formatDate(selectedStaff.updatedAt)
+            }}
+            </el-descriptions-item>
+
           </el-descriptions>
         </el-card>
       </div>
 
       <template #footer>
-        <el-button @click="detailDialogVisible = false">Đóng</el-button>
+        <el-button @click="handleDetailClose()">Đóng</el-button>
         <el-button type="primary" @click="handleEdit(selectedStaff)"
           >Chỉnh sửa</el-button
         >
@@ -247,6 +296,10 @@ import {
 import { useStaffStore } from "@/stores/staff";
 import { useRouter } from "vue-router";
 import type { Staff, PageQuery } from "@/types/staff";
+import { statusOptions, Gender, Status, genderOptions } from "@/constants";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const router = useRouter();
 const staffStore = useStaffStore();
@@ -275,7 +328,30 @@ const formatDate = (dateStr: any) => {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleDateString("vi-VN");
 };
-const handleEdit = (staff: Staff) => {
+
+const getGenderLabel = (value: any) => {
+  const option = genderOptions.find((opt) => opt.value === value);
+  return option ? option.label : "Không xác định";
+};
+
+const permanentFullAddress = computed(() => {
+  const parts = [
+    selectedStaff.value?.permanentAddress,
+    selectedStaff.value?.permanentWardFullName,
+    selectedStaff.value?.permanentProvinceFullName,
+  ].filter((v) => !!(typeof v === "string" ? v.trim() : v));
+  return parts.length ? parts.join(", ") : "-";
+});
+
+const temporaryFullAddress = computed(() => {
+  const parts = [
+    selectedStaff.value?.temporaryAddress,
+    selectedStaff.value?.temporaryWardFullName,
+    selectedStaff.value?.temporaryProvinceFullName,
+  ].filter((v) => !!(typeof v === "string" ? v.trim() : v));
+  return parts.length ? parts.join(", ") : "-";
+})
+const handleEdit = (staff: any) => {
   router.push(`/staff/edit/${staff.id}`);
 };
 
@@ -287,8 +363,9 @@ const handleDetailClose = () => {
 const handleExport = () => {
   ElMessage.info("Chức năng xuất Excel đang được phát triển!");
 };
-const handleView = (staff: Staff) => {
+const handleView = (staff: any) => {
   selectedStaff.value = staff;
+  console.log(selectedStaff.value);
   detailDialogVisible.value = true;
 };
 
@@ -331,20 +408,10 @@ const getStatusType = (status: any) => {
   };
   return typeMap[status as keyof typeof typeMap] || "info";
 };
-
-const getStatusText = (status: any) => {
-  const textMap = {
-    ACTIVE: "Đang làm việc",
-    INACTIVE: "Nghỉ phép",
-    RETIRED: "Nghỉ hưu",
-    TRANSFERRED: "Chuyển công tác",
-  };
-  return textMap[status as keyof typeof textMap] || status;
+const getStatusText = (status?: string) => {
+  const hit = statusOptions.find((o) => o.value === status);
+  return hit?.label ?? status ?? "—";
 };
-
-onMounted(() => {
-  // Load data if needed
-});
 
 watch(page, (p) => {
   staffStore.pageNo = p;
@@ -378,6 +445,15 @@ const onSizeChange = (s: number) => {
 };
 
 const onDelete = async (id: number) => {
+  const ok = await ElMessageBox.confirm(
+    t("common.deleteConfirm"),
+    t("common.reminder"),
+    { type: "warning" }
+  )
+    .then(() => true)
+    .catch(() => false);
+
+  if (!ok) return;
   await staffStore.deleteStaff(id);
   search();
 };

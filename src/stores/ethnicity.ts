@@ -1,19 +1,19 @@
 import { defineStore } from "pinia";
 import { ElMessage } from "element-plus";
-import { ReligionService } from "@/services/religion";
-import type { Religion, ReligionState } from "@/types/religion";
+import { EthnicityService } from "@/services/ethnicity";
+import type { Ethnicity, EthnicityState } from "@/types/ethnicity";
 import type { ServiceResult } from "@/types/common";
 
-export const useReligionStore = defineStore("religion", {
-  state: (): ReligionState => ({
-    religions: undefined,
+export const useEthnicityStore = defineStore("ethnicity", {
+  state: (): EthnicityState => ({
+    ethnicities: undefined,
     loading: false,
     error: undefined,
   }),
 
   getters: {
-    getReligions: (state): Religion[] | undefined => state.religions,
-    getLoading: (state): boolean => state.loading,
+    getEthnicities: (state): Ethnicity[] | undefined => state.ethnicities,
+    getLoading: (state): boolean => state.loading!,
     getError: (state): string | undefined => state.error,
   },
 
@@ -22,21 +22,24 @@ export const useReligionStore = defineStore("religion", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Religion[]> = await ReligionService.list();
+        const res: ServiceResult<Ethnicity[]> = await EthnicityService.list();
 
         if (!res.success) {
           throw new Error(res.message || "Fetch prison failed");
         }
 
-        this.religions = res.data;
+        this.ethnicities = res.data;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Fetch prison failed";
         this.error = msg;
         ElMessage.error(msg);
+        throw e;
       } finally {
         this.loading = false;
       }
     },
   },
+
+  // persist: true,
 });

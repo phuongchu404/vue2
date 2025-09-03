@@ -79,6 +79,40 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
+            <el-form-item label="Dân tộc" prop="ethnicityId">
+              <el-select
+                v-model="form.ethnicityId"
+                placeholder="Chọn dân tộc"
+              >
+                <el-option
+                  v-for="option in ethnicities"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :md="12" :span="24">
+            <el-form-item label="Tôn giáo">
+              <el-select
+                v-model="form.religionId"
+                placeholder="Chọn tôn giáo"
+              >
+                <el-option
+                  v-for="option in religions"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+
+        <el-row :gutter="20">
+          <el-col :md="12" :span="24">
             <el-form-item label="Số CCCD/CMND" prop="idNumber">
               <el-input
                 v-model="form.idNumber"
@@ -104,6 +138,7 @@
           <el-input v-model="form.idIssuePlace" placeholder="Nhập nơi cấp..." />
         </el-form-item>
 
+        
         <!-- Thông tin liên hệ -->
         <el-divider content-position="left">Thông tin liên hệ</el-divider>
 
@@ -289,18 +324,39 @@
           </el-col>
           <el-col :md="8" :span="24">
             <el-form-item label="Phòng ban">
-              <el-input
-                v-model="form.departmentName"
-                placeholder="Nhập phòng ban..."
-              />
+              <el-select
+                v-model="form.departmentId"
+                placeholder="Chọn phòng ban"
+                filterable
+                clearable
+                style="width: 100%"
+                :disabled="!form.detentionCenterId"
+              >
+                <el-option
+                  v-for="d in departments"
+                  :key="d.id"
+                  :label="d.name"
+                  :value="d.id"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
             <el-form-item label="Chức vụ">
-              <el-input
-                v-model="form.positionName"
-                placeholder="Nhập chức vụ..."
-              />
+              <el-select
+                v-model="form.positionId"
+                placeholder="Chọn chức vụ"
+                filterable
+                clearable
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="d in positions"
+                  :key="d.id"
+                  :label="d.name"
+                  :value="d.id"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -311,23 +367,14 @@
               <el-select
                 v-model="form.detentionCenterId"
                 placeholder="Chọn trại giam"
+                @change="onDetentionCenterChange"
               >
                 <el-option
-                  v-for="prison in prisonStore.prisons"
+                  v-for="prison in prisons"
                   :key="prison.id"
                   :label="prison.name"
                   :value="prison.id"
                 />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :md="8" :span="24">
-            <el-form-item label="Trạng thái" prop="status">
-              <el-select v-model="form.status" placeholder="Chọn trạng thái">
-                <el-option label="Đang làm việc" value="ACTIVE" />
-                <el-option label="Nghỉ phép" value="INACTIVE" />
-                <el-option label="Nghỉ hưu" value="RETIRED" />
-                <el-option label="Chuyển công tác" value="TRANSFERRED" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -337,9 +384,25 @@
                 v-model="form.educationLevelId"
                 placeholder="Chọn trình độ"
               >
-                <el-option label="Đại học" :value="1" />
-                <el-option label="Cao đẳng" :value="2" />
-                <el-option label="Trung cấp" :value="3" />
+                <el-option
+                  v-for="option in educationLevels"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
+                />
+              </el-select>
+            </el-form-item>
+            
+          </el-col>
+          <el-col :md="8" :span="24">
+            <el-form-item v-if="isEdit" label="Trạng thái" prop="status">
+              <el-select v-model="form.status" placeholder="Chọn trạng thái">
+                <el-option
+                  v-for="option in statusOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -348,9 +411,20 @@
         <el-form-item v-if="isEdit" label="Hoạt động">
           <el-switch
             v-model="form.isActive"
+            class="ml-2"
+            inline-prompt
+            style="
+              --el-switch-on-color: #13ce66;
+              --el-switch-off-color: #ff4949;
+            "
             active-text="Đang hoạt động"
             inactive-text="Không hoạt động"
           />
+          <!-- <el-switch
+            v-model="form.isActive"
+            active-text="Đang hoạt động"
+            inactive-text="Không hoạt động"
+          /> -->
         </el-form-item>
 
         <!-- Buttons -->
@@ -371,22 +445,42 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useStaffStore } from "@/stores/staff";
-import { usePrisonStore } from "@/stores/prison";
 import { statusOptions, Gender, Status, genderOptions } from "@/constants";
 import type { FormInstance, FormRules } from "element-plus";
 import { Staff, CreateStaffRequest, UpdateStaffRequest } from "@/types/staff";
 import { useProvinceStore } from "@/stores/province";
 import { useWardStore } from "@/stores/ward";
+import { usePrisonStore } from "@/stores/prison";
+import { useDepartmentStore } from "@/stores/department";
+import { usePositionStore } from "@/stores/position";
+import { useEducationLevelStore } from "@/stores/educationLevel";
+import {useEthnicityStore} from "@/stores/ethnicity"
+import { useReligionStore } from "@/stores/religion";
+import { useI18n } from "vue-i18n";
+
 import { storeToRefs } from "pinia";
 import type { Province } from "@/types/province";
 import type { Ward } from "@/types/ward";
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const staffStore = useStaffStore();
 const prisonStore = usePrisonStore();
 const provinceStore = useProvinceStore();
 const wardStore = useWardStore();
+const departmentStore = useDepartmentStore();
+const positionStore = usePositionStore();
+const educationLevelStore = useEducationLevelStore();
+const ethnicityStore = useEthnicityStore();
+const religionStore = useReligionStore();
+
+const { prisons } = storeToRefs(prisonStore);
+const { departments } = storeToRefs(departmentStore);
+const { positions } = storeToRefs(positionStore);
+const { educationLevels } = storeToRefs(educationLevelStore);
+const { ethnicities } = storeToRefs(ethnicityStore);
+const { religions } = storeToRefs(religionStore);
 
 // Reactive data
 const formRef = ref<FormInstance>();
@@ -398,15 +492,28 @@ const form = reactive<Partial<Staff>>({
   fullName: "",
   gender: "",
   dateOfBirth: "",
+  placeOfBirth: "",
+  ethnicityId: undefined,
+  religionId: undefined,
   idNumber: "",
+  idIssueDate: "",
+  idIssuePlace: "",
   phone: "",
   email: "",
+  emergencyContact: "",
+  emergencyPhone: "",
+  permanentProvinceId: "",
+  permanentWardId: "",
   permanentAddress: "",
+  temporaryProvinceId: "",
+  temporaryWardId: "",
+  temporaryAddress: "",
   rank: "",
   departmentId: undefined,
   positionId: undefined,
   detentionCenterId: undefined,
   status: "ACTIVE",
+  educationLevelId: undefined,
 });
 const permanentProvinces = ref<Province[]>([]);
 const permanentWards = ref<Ward[]>([]);
@@ -464,12 +571,43 @@ const onPermanentProvinceChange = async (code: string) => {
   } catch {}
 };
 
+const onDetentionCenterChange = async (code: number) => {
+  form.departmentId = undefined;
+  if (!code) {
+    departmentStore.clear();
+    return;
+  }
+  try {
+    await departmentStore.getByDetentionCenterId(code);
+  } catch {}
+};
+
 const getAllProvinces = async () => {
   await provinceStore.getAll();
   if (provinceStore.getProvinces) {
     permanentProvinces.value = provinceStore.getProvinces;
     temporaryProvinces.value = provinceStore.getProvinces;
   }
+};
+
+const getAllPositions = async () => {
+  await positionStore.getAll();
+};
+
+const getAllPrisons = async () => {
+  await prisonStore.getAll();
+};
+
+const getAllEducationLevels = async () => {
+  await educationLevelStore.getAll();
+};
+
+const getAllEthnicities = async () => {
+  await ethnicityStore.getAll();
+};
+
+const getAllReligions = async () => {
+  await religionStore.getAll();
 };
 
 const onTemporaryProvinceChange = async (code: string) => {
@@ -498,13 +636,6 @@ const loadData = async () => {
       router.push("/staff");
     }
   }
-  // const idParam = route.params.id as string | undefined
-  // if (idParam) {
-  //   isEdit.value = true
-  //   const id = Number(idParam)
-  //   const detail = await store.fetchDetail(id)
-  //   Object.assign(form, detail)
-  // }
 };
 
 const handleSubmit = async () => {
@@ -517,14 +648,25 @@ const handleSubmit = async () => {
           fullName: form.fullName,
           gender: form.gender,
           dateOfBirth: form.dateOfBirth,
+          placeOfBirth: form.placeOfBirth,
+          ethnicityId: form.ethnicityId,
+          religionId: form.religionId,
           idNumber: form.idNumber,
+          idIssueDate: form.idIssueDate,
+          idIssuePlace: form.idIssuePlace,
           phone: form.phone,
           email: form.email,
+          emergencyContact: form.emergencyContact,
+          emergencyPhone: form.emergencyPhone,
+          permanentWardId: form.permanentWardId,
           permanentAddress: form.permanentAddress,
+          temporaryWardId: form.temporaryWardId,
+          temporaryAddress: form.temporaryAddress,
           rank: form.rank,
           departmentId: form.departmentId,
           positionId: form.positionId,
           detentionCenterId: form.detentionCenterId,
+          educationLevelId: form.educationLevelId,
           status: form.status,
         };
         await staffStore.updateStaff(form.id as number, payload);
@@ -534,20 +676,31 @@ const handleSubmit = async () => {
           fullName: form.fullName,
           gender: form.gender,
           dateOfBirth: form.dateOfBirth,
+          placeOfBirth: form.placeOfBirth,
+          ethnicityId: form.ethnicityId,
+          religionId: form.religionId,
           idNumber: form.idNumber,
+          idIssueDate: form.idIssueDate,
+          idIssuePlace: form.idIssuePlace,
           phone: form.phone,
           email: form.email,
+          emergencyContact: form.emergencyContact,
+          emergencyPhone: form.emergencyPhone,
+          permanentWardId: form.permanentWardId,
           permanentAddress: form.permanentAddress,
+          temporaryWardId: form.temporaryWardId,
+          temporaryAddress: form.temporaryAddress,
           rank: form.rank,
           departmentId: form.departmentId,
           positionId: form.positionId,
           detentionCenterId: form.detentionCenterId,
-          status: form.status,
+          educationLevelId: form.educationLevelId,
+          isActive: form.isActive,
         };
         console.log(payload);
         await staffStore.createStaff(payload);
       }
-      router.push("/prisons");
+      router.push("/staff");
     });
   } catch (error) {
     console.error("Validation failed:", error);
@@ -562,21 +715,63 @@ const handleReset = () => {
   } else {
     formRef.value?.resetFields();
     Object.assign(form, {
-      code: "",
-      name: "",
-      address: "",
-      director: "",
-      deputyDirector: "",
+      staffCode: "",
+      profileNumber: "",
+      fullName: "",
+      gender: "",
+      dateOfBirth: "",
+      placeOfBirth: "",
+      idNumber: "",
+      ethnicityId: undefined,
+      religionId: undefined,
+      idIssueDate: "",
+      idIssuePlace: "",
       phone: "",
-      capacity: null,
-      currentPopulation: 0,
-      isActive: true,
+      email: "",
+      emergencyContact: "",
+      emergencyPhone: "",
+      permanentProvinceId: "",
+      permanentWardId: "",
+      permanentAddress: "",
+      temporaryProvinceId: "",
+      temporaryWardId: "",
+      temporaryAddress: "",
+      rank: "",
+      departmentId: undefined,
+      positionId: undefined,
+      detentionCenterId: undefined,
+      status: "ACTIVE",
+      educationLevelId: undefined,
     });
   }
 };
 onMounted(async () => {
   await getAllProvinces();
-  loadData();
+  getAllPositions();
+  getAllPrisons();
+  getAllEducationLevels();
+  getAllEthnicities();
+  getAllReligions();
+  await loadData();
+  if (isEdit.value) {
+    if (form.permanentProvinceId) {
+      await wardStore.getByProvinceCode(form.permanentProvinceId as string);
+      if (wardStore.getWards) {
+        permanentWards.value = wardStore.getWards;
+      }
+    }
+    if (form.temporaryProvinceId) {
+      await wardStore.getByProvinceCode(form.temporaryProvinceId as string);
+      if (wardStore.getWards) {
+        temporaryWards.value = wardStore.getWards;
+      }
+    }
+    if (form.detentionCenterId) {
+      await departmentStore.getByDetentionCenterId(
+        form.detentionCenterId as number
+      );
+    }
+  }
 });
 </script>
 

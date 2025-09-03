@@ -172,6 +172,7 @@
       title="Chi tiết trại giam"
       width="60%"
       :before-close="handleDetailClose"
+      class="dialog"
     >
       <div v-if="selectedPrison" class="detail-content">
         <el-descriptions :column="2" border>

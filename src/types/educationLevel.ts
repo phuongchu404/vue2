@@ -1,8 +1,8 @@
 export interface EducationLevel {
-    id: number;
-    name: string;
-    code: string;
-    levelOrder: number;
+  id?: number;
+  name?: string;
+  code?: string;
+  levelOrder?: number;
 }
 export interface EducationLevelState {
   educationLevels?: EducationLevel[];

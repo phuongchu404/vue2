@@ -28,15 +28,15 @@ export interface Staff {
 
   permanentAddress?: string;
   permanentWardId?: string;
-  permanentWardName?: string;
+  permanentWardFullName?: string;
   permanentProvinceId?: string;
-  permanentProvinceName?: string;
+  permanentProvinceFullName?: string;
 
   temporaryAddress?: string;
   temporaryWardId?: string;
-  temporaryWardName?: string;
+  temporaryWardFullName?: string;
   temporaryProvinceId?: string;
-  temporaryProvinceName?: string;
+  temporaryProvinceFullName?: string;
 
   phone?: string;
   email?: string;
@@ -67,10 +67,34 @@ export interface Staff {
 }
 
 export interface CreateStaffRequest
-  extends Omit<Staff, "id" | "createdAt" | "updatedAt" | "permanentWardFullName" | "temporaryWardFullName" | "permanentProvinceFullName" | "temporaryProvinceFullName"> {}
+  extends Omit<
+    Staff,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "permanentWardFullName"
+    | "temporaryWardFullName"
+    | "permanentProvinceFullName"
+    | "temporaryProvinceFullName"
+    | "permanentProvinceId"
+    | "temporaryProvinceId"
+  > {}
 
 export interface UpdateStaffRequest
-  extends Partial<Omit<Staff, "id" | "createdAt" | "updatedAt" | "permanentWardFullName" | "temporaryWardFullName" | "permanentProvinceFullName" | "temporaryProvinceFullName">> {} // tao kieu moi, (bỏ id, created_at) → mọi field còn lại đều không bắt buộc.
+  extends Partial<
+    Omit<
+      Staff,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "permanentWardFullName"
+      | "temporaryWardFullName"
+      | "permanentProvinceFullName"
+      | "temporaryProvinceFullName"
+      | "permanentProvinceId"
+      | "temporaryProvinceId"
+    >
+  > {} // tao kieu moi, (bỏ id, created_at) → mọi field còn lại đều không bắt buộc.
 
 export interface PageQuery {
   pageNo: number;

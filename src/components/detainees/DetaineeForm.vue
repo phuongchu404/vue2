@@ -1,12 +1,12 @@
 <template>
   <div class="detainee-form">
-    <el-page-header @back="$router.go(-1)">
+    <!-- <el-page-header @back="$router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3">
           {{ isEdit ? "Chỉnh sửa phạm nhân" : "Thêm phạm nhân mới" }}
         </span>
       </template>
-    </el-page-header>
+    </el-page-header> -->
 
     <el-card class="form-card">
       <el-form

@@ -13,7 +13,7 @@ export const useWardStore = defineStore("ward", {
   }),
 
   getters: {
-    getProvinces: (state): Ward[] | undefined => state.wards,
+    getWards: (state): Ward[] | undefined => state.wards,
     getLoading: (state): boolean => state.loading,
     getError: (state): string | undefined => state.error,
   },
@@ -46,9 +46,6 @@ export const useWardStore = defineStore("ward", {
       this.wards = undefined;
       this.error = undefined;
       this.loading = false;
-      // router.replace("/prisons");
     },
   },
-
-  // persist: true,
 });
