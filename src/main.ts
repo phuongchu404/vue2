@@ -18,7 +18,7 @@ import AppLanguage from "@/components/common/Language.vue";
 
 // Routes and i18n
 import router from "./router";
-import { i18n } from "./components/i18n";
+import { i18n } from "./i18n";
 
 // ✅ Pinia
 import { createPinia, setActivePinia } from "pinia";

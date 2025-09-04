@@ -7,7 +7,7 @@
     </el-page-header> -->
 
     <!-- Search Section -->
-    <el-card class="search-section">
+    <div class="search-section">
       <el-form :model="searchForm" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="8">
@@ -64,7 +64,7 @@
           <el-button @click="onReset" :icon="Refresh">Làm mới</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <div class="action-card">
       <div class="action-bar">

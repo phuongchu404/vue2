@@ -115,7 +115,7 @@
 <script lang='ts'>
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import i18n from '../i18n';
+import i18n from '../../i18n';
 import * as Utils from '../../utils';
 import * as utils from '../../utils';
 import * as nav from '../../common/nav';

@@ -245,9 +245,6 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch, nextTick } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { usePrisonStore } from "@/stores/prison";
-import { useRouter } from "vue-router";
-import type { PageQuery, Prison } from "@/types/prison";
 import {
   Delete,
   Edit,
@@ -257,6 +254,10 @@ import {
   View,
   Download,
 } from "@element-plus/icons-vue";
+import { usePrisonStore } from "@/stores/prison";
+import { useRouter } from "vue-router";
+import type { PageQuery, Prison } from "@/types/prison";
+
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

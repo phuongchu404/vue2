@@ -1,6 +1,5 @@
 // @ts-ignore
-import i18n from '@/components/i18n';
-const { t } = i18n.global;
+import { t } from "@/i18n";
 export default {
   tag: "system:user",
   leaf: true,
@@ -16,7 +15,7 @@ export default {
       whiteList: false,
       name: t("option.query"),
       pattern: "/api/admin/users",
-      method: "GET"
+      method: "GET",
     },
     {
       tag: "system:user:insert",
@@ -24,7 +23,7 @@ export default {
       whiteList: false,
       name: t("option.add"),
       pattern: "/api/admin/users",
-      method: "POST"
+      method: "POST",
     },
     {
       tag: "system:user:update",
@@ -32,7 +31,7 @@ export default {
       whiteList: false,
       name: t("option.update"),
       pattern: "/api/admin/users/{userId}",
-      method: "PUT"
+      method: "PUT",
     },
     {
       tag: "system:user:delete",
@@ -40,7 +39,7 @@ export default {
       whiteList: false,
       name: t("option.delete"),
       pattern: "/api/admin/users/{userId}",
-      method: "DELETE"
+      method: "DELETE",
     },
     {
       tag: "system:user:assign-roles",
@@ -48,7 +47,7 @@ export default {
       whiteList: false,
       name: t("option.assignRole"),
       pattern: "/api/admin/userroles/{userId}",
-      method: "POST"
+      method: "POST",
     },
     {
       tag: "system:user:reset-password",
@@ -56,7 +55,7 @@ export default {
       whiteList: false,
       name: t("option.resetPassword"),
       pattern: "/api/admin/users/{userId}/passwordreset",
-      method: "POST"
-    }
-  ]
-}
+      method: "POST",
+    },
+  ],
+};

@@ -7,8 +7,10 @@ import type {
   PageQuery,
   CreateUserRequest,
   UpdateUserRequest,
+  ResetPassword,
 } from "@/types/user";
 import type { ServiceResult, PagingResult } from "@/types/common";
+import { t } from "@/i18n";
 
 export const useUserStore = defineStore("user", {
   state: (): UserState => ({
@@ -19,15 +21,17 @@ export const useUserStore = defineStore("user", {
     loading: false,
     error: undefined,
     lastQuery: undefined,
+    success: false,
   }),
 
   getters: {
-    getPrisons: (state): User[] | undefined => state.users,
+    getUsers: (state): User[] | undefined => state.users,
     getTotal: (state): number => state.total ?? 0,
     getPage: (state): number => state.pageNo ?? 1,
     getSize: (state): number => state.pageSize ?? 10,
     getLoading: (state): boolean => state.loading ?? false,
     getError: (state): string | undefined => state.error,
+    getSuccess: (state): boolean => state.success ?? false,
   },
 
   actions: {
@@ -64,6 +68,7 @@ export const useUserStore = defineStore("user", {
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
+        this.success = res.success;
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
@@ -80,15 +85,16 @@ export const useUserStore = defineStore("user", {
       this.error = undefined;
       try {
         const res: ServiceResult<string> = await UserService.create(payload);
-
+        this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("common.insertFail"));
         }
 
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
+        return res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message || e?.message || t("common.insertFail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -97,7 +103,7 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    async updatePrison(id: number, payload: UpdateUserRequest) {
+    async updateUser(id: number, payload: UpdateUserRequest) {
       this.loading = true;
       this.error = undefined;
       try {
@@ -106,11 +112,13 @@ export const useUserStore = defineStore("user", {
           payload
         );
 
+        this.success = res.success;
+
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("common.updateFail"));
         }
 
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Update prison failed";
@@ -122,7 +130,7 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    async deletePrison(id: number) {
+    async deleteUser(id: number) {
       this.loading = true;
       this.error = undefined;
       try {
@@ -130,17 +138,35 @@ export const useUserStore = defineStore("user", {
         if (!res.success) {
           throw new Error(res.message || "Delete prison failed");
         }
-
-        // this.items = (this.items ?? []).filter((x) => x.id !== id);
-        // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
-        if (this.lastQuery) {
-          await this.listPage(this.lastQuery);
-        }
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async resetPassword(payload: ResetPassword) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<boolean> = await UserService.resetPassword(
+          payload
+        );
+        this.success = res.success;
+        if (!res.success) {
+          throw new Error(res.message || t("common.insertFail"));
+        }
+
+        ElMessage.success(t("common.insertSuccess"));
+        return res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || t("common.insertFail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -155,7 +181,7 @@ export const useUserStore = defineStore("user", {
       this.pageNo = 1;
       this.pageSize = 10;
       this.error = undefined;
-      // router.replace("/prisons");
+      this.success = false;
     },
   },
 

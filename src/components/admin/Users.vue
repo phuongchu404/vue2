@@ -16,7 +16,7 @@
         <el-form-item>
           <el-button
             type="primary"
-            @click="handleSearch"
+            @click="onSearch"
             :disabled="isButtonEnabled('system:user:select')"
             size="mini"
             :icon="Search"
@@ -37,7 +37,7 @@
     </div>
 
     <el-table
-      :data="filteredTableData"
+      :data="users"
       align="center"
       border
     >
@@ -45,107 +45,119 @@
         type="index"
         prop="id"
         :label="$t('common.index')"
-        width="80"
+        width="85"
       ></el-table-column>
       <el-table-column
         prop="userName"
         :label="$t('user.userName')"
-        min-width="100"
+        min-width="80" show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="roles"
         :label="$t('user.roles')"
-        :formatter="rolesFormatter"
+        :formatter="rolesFormatter" show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="realName"
-        :label="$t('user.realName')"
+        :label="$t('user.realName')" show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="createTime"
         :label="$t('common.createTime')"
         width="180"
-        :formatter="defaultTimeFormatter"
+        :formatter="defaultTimeFormatter" show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="updateTime"
         :label="$t('common.updateTime')"
         width="180"
-        :formatter="defaultTimeFormatter"
+        :formatter="defaultTimeFormatter" show-overflow-tooltip
       ></el-table-column>
-      <el-table-column :label="$t('common.option')" width="480">
-        <template #default="{ row }">
+      <el-table-column fixed="right" :label="$t('common.option')" width="500">
+        <template #default="scope">
           <el-button
-            size="small"
             type="primary"
             class="normal-btn btn-bluelight"
             :disabled="isButtonEnabled('system:user:update')"
-            @click="handleEdit(row)"
+            @click="handleEdit(scope.row)"
             >{{ $t("option.update") }}
           </el-button>
           <el-button
-            size="small"
             type="primary"
             class="normal-btn btn-greenlight"
             :disabled="
               isButtonEnabled('system:user:assign-roles') ||
-              row.userName === userNameLogin ||
-              row.removable != '1'
+              scope.row.userName === userNameLogin ||
+              scope.row.removable != '1'
             "
-            @click="handleSelectRoles(row)"
+            @click="handleSelectRoles(scope.row)"
             >{{ $t("user.allocateRole") }}
           </el-button>
           <el-button
-            size="small"
             type="primary"
             class="normal-btn btn-red"
             :disabled="
               isButtonEnabled('system:user:reset-password') ||
-              row.userName === userNameLogin
+              scope.row.userName === userNameLogin
             "
-            @click="resetPassword(row)"
+            @click="resetPassword(scope.row)"
             >{{ $t("user.resetPassword") }}
           </el-button>
           <el-button
-            size="small"
             type="primary"
             class="normal-btn btn-red"
             :disabled="
               isButtonEnabled('system:user:delete') ||
-              row.userName === userNameLogin ||
-              row.removable != '1'
+              scope.row.userName === userNameLogin ||
+              scope.row.removable != '1'
             "
-            @click="handleDelete(row)"
+            @click="handleDelete(scope.row.id)"
             >{{ $t("option.delete") }}
           </el-button>
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="userStore.getTotal"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 50, 100]"
+      @size-change="onSizeChange"
+      @current-change="onPageChange"
+      class="pagination"
+    />
 
     <el-dialog
       :title="ui.addRecord ? $t('user.add') : $t('user.update')"
       v-model="ui.dialogVisible"
       width="40%"
-      class="addDio"
+      class="dialog"
     >
       <el-form
-        :model="editForm"
-        :rules="editFormRules"
+        :model="form"
+        :rules="rules"
         label-width="130px"
-        ref="editFormRef"
-        style="padding-right: 50px"
+        ref="formRef"
       >
-        <input type="hidden" v-model="editForm.id" />
         <el-form-item :label="$t('user.userName')" prop="userName">
           <el-input
-            v-model="editForm.userName"
+            v-model="form.userName"
             autofocus
             :readonly="!ui.addRecord"
-            size="small"
           ></el-input>
         </el-form-item>
         <el-form-item :label="$t('user.realName')" prop="realName">
-          <el-input v-model="editForm.realName" size="small"></el-input>
+          <el-input v-model="form.realName"></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('user.email')" prop="mail">
+          <el-input v-model="form.mail" ></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('user.phoneNumber')" prop="phoneNumber">
+          <el-input v-model="form.phoneNumber" ></el-input>
+        </el-form-item>
+        <el-form-item :label="$t('user.description')" >
+          <el-input type="textarea" v-model="form.description" ></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -164,18 +176,16 @@
       :title="$t('ResetPassword')"
       v-model="ui.resetPassword"
       width="40%"
-      class="addDio"
+      class="dialog"
     >
       <el-form
         :model="password"
         :rules="passwordRules"
         label-width="130px"
         ref="passwordFormRef"
-        style="padding-right: 50px"
       >
-        <input type="hidden" v-model="editForm.id" />
         <el-form-item :label="$t('user.password')" prop="password">
-          <el-input v-model="password.password" size="small"></el-input>
+          <el-input v-model="password.password" type="password" show-password></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -195,7 +205,7 @@
       width="35%"
       v-model="ui.rolesDialogVisible"
       @open="loadRolesDialogData"
-      class="addDio"
+      class="dialog"
     >
       <el-tree
         :data="allRoles"
@@ -225,7 +235,7 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import * as Utils from "../../utils";
 import {
   Search,
@@ -236,14 +246,32 @@ import {
   Edit,
   Delete,
 } from "@element-plus/icons-vue";
+import { useUserStore } from "@/stores/user";
+import type { PageQuery, User, ResetPassword, CreateUserRequest, UpdateUserRequest } from "@/types/user";
+import type { Role } from "@/types/role";
+import type {UpdateRoleByUserIdRequest} from "@/types/userRole";
+import { useRoleStore } from "@/stores/role";
+import { useUserRoleStore } from "@/stores/userRole";
+import { useMessage } from '@/composables/useMessage';
+
+const { messageInfoPassword } = useMessage();
 
 const { t } = useI18n();
 const appStore = useAppStore();
+const userStore = useUserStore();
+const roleStore = useRoleStore();
+const userRoleStore = useUserRoleStore();
 
 // Refs
-const editFormRef = ref<FormInstance>();
+const formRef = ref<FormInstance>();
 const passwordFormRef = ref<FormInstance>();
 const rolesTreeRef = ref();
+const users = ref<User[]>([]);
+const page = ref(1);
+const size = ref(10);
+const loading = ref(false);
+const userNameLogin = ref("");
+const allRoles = ref<Partial<Role>[]>([]);
 
 // Reactive data
 const ui = reactive({
@@ -254,51 +282,53 @@ const ui = reactive({
   authentication: false,
   resetPassword: false,
 });
+const password = reactive<Partial<ResetPassword>>({
+  password: "",
+  id: "",
+});
+const queryForm = reactive({ userName: "" });
+const defaultTreeProps = { label: "roleName", children: "children" };
+const rolesForm = reactive({
+  id: "",
+  roles: [],
+  userId: undefined,
+  oldRoles: [""],
+  selectedRoles: [],
+});
+const form = reactive<Partial<User>>({ 
+  id: undefined, 
+  userName: "", 
+  realName: "",
+  mail: "",
+  phoneNumber: "",
+  description: "", });
 
-const Provider = ref<any[]>([]);
-const editForm = reactive({ id: "", userName: "", realName: "" });
-
-const editFormRules = reactive({
+  // Rules
+const rules:FormRules = {
   userName: [
     { required: true, message: t("user.inputUserName"), trigger: "blur" },
   ],
   realName: [
     { required: true, message: t("user.inputRealName"), trigger: "blur" },
   ],
-});
+};
 
-const passwordRules = reactive({
+const passwordRules:FormRules = {
   password: [
     { required: true, message: t("user.inputUserName"), trigger: "blur" },
   ],
-});
-
-const password = reactive({ password: "", id: "" });
-const userNameLogin = ref("");
-const queryForm = reactive({ userName: "" });
-const tableData = ref<any[]>([]);
-const allRoles = ref<any[]>([]);
-const defaultTreeProps = { label: "roleName", children: "children" };
-const rolesEditForm = reactive({
-  id: "",
-  roles: [],
-  userId: "",
-  oldRoles: [""],
-  selectedRoles: [],
-});
-const authentication = reactive({ password: "" });
-const active = ref<number>(0);
-const row = ref<any>(null);
-const isEyes = ref(false);
+};
 
 // Computed
-const filteredTableData = computed(() => {
-  return tableData.value;
-});
 
 // Methods
-const showPassword = () => {
-  isEyes.value = !isEyes.value;
+const onPageChange = (p: number) => {
+  page.value = p;
+  loadTableData();
+};
+const onSizeChange = (s: number) => {
+  size.value = s;
+  loadTableData();
 };
 
 const resetPassword = async (rowData: any) => {
@@ -312,42 +342,33 @@ const isButtonEnabled = (buttonName: string) => {
   return !state;
 };
 
-const tableRowClassName = ({ rowIndex }: { rowIndex: number }) => {
-  if (rowIndex % 2 === 0) return "";
-  return "warning-row";
-};
 
 const handleAdd = async () => {
-  Utils.clearValidateForm(editFormRef.value);
+  // Utils.clearValidateForm(formRef.value);
   ui.dialogVisible = true;
   ui.addRecord = true;
-  editForm.userName = "";
-  editForm.realName = "";
-  editForm.id = "";
+  Object.assign(form, {
+    id: undefined,
+    userName: "",
+    realName: "",
+    mail: "",
+    phoneNumber: "",
+    description: "",
+  });
 };
 
 const handleEdit = async (rowData: any) => {
-  Utils.clearValidateForm(editFormRef.value);
   ui.dialogVisible = true;
   ui.addRecord = false;
-  editForm.userName = rowData.userName;
-  editForm.realName = rowData.realName;
-  editForm.id = rowData.id;
+  Object.assign(form, rowData);
 };
-
-const handleDelete = async (rowData: any) => {
+const handleDelete = async (id: number) => {
   try {
     await ElMessageBox.confirm(t("common.deleteConfirm"), t("common.confirm"), {
       type: "warning",
     });
-    const roleId = rowData.id;
-    const result = await Utils.doDelete("/api/admin/users/" + roleId, {});
-    if (!result.success) {
-      ElMessage.warning(t("common.deleteFail") + t(result.message));
-    } else {
-      ElMessage.success(t("common.deleteSuccess"));
-      loadTableData();
-    }
+    await userStore.deleteUser(id);
+    await loadTableData();
   } catch {
     console.log("canceled.");
   }
@@ -355,40 +376,58 @@ const handleDelete = async (rowData: any) => {
 
 const handleSaveOrUpdate = async () => {
   try {
-    await editFormRef.value?.validate();
-    if (ui.addRecord) {
-      const record = editForm;
-      const result = await Utils.doPost("/api/admin/users", record);
-      if (!result.success) {
-        ElMessage.warning(t("common.insertFail") + t(result.message));
-      } else {
-        ElMessage.success(t("common.insertSuccess"));
-        ui.dialogVisible = false;
-        loadTableData();
-      }
+    await formRef.value?.validate(async (valid) => {
+      if (!valid) return;
+      if (ui.addRecord) {
+        const payload: CreateUserRequest = { ...form };
+        let result:string | undefined = await userStore.createUser(payload);
+        if(userStore.getSuccess) {
+          messageInfoPassword(
+            `<span>${t(
+              "user.resetPasswordSuccess"
+            )} <span style="color: red;">${result}</span></span>`
+          );
+          ui.dialogVisible = false;
+        }
     } else {
-      const record = editForm;
-      const result = await Utils.doPut("/api/admin/users/" + record.id, record);
-      if (!result.success) {
-        ElMessage.warning(t("common.updateFail") + t(result.message));
-      } else {
-        ElMessage.success(t("common.updateSuccess"));
+      const payload: UpdateUserRequest = { ...form };
+      await userStore.updateUser(form.id as number, payload);
+      if(userStore.getSuccess) {
         ui.dialogVisible = false;
-        loadTableData();
       }
     }
+    await  loadTableData();
+    });
+    
   } catch {
     // Validation failed
   }
 };
 
-const loadTableData = async () => {
-  const result = await Utils.doGet("/api/admin/users");
-  if (result.success) {
-    tableData.value = result.data.content;
-  } else {
-    ElMessage.warning(t("common.loadFail"));
+const loadTableData = async (extra?: Partial<PageQuery>) => {
+  try {
+    loading.value = true;
+
+    const request = {
+      pageNo: page.value,
+      pageSize: size.value,
+      userName: queryForm.userName?.trim() ?? null,
+      ...extra,
+    } as PageQuery;
+    console.log(request);
+    await userStore.listPage(request);
+
+    users.value = userStore.getUsers || [];
+  } catch (error) {
+    ElMessage.error("Có lỗi xảy ra khi tải danh sách người dùng!");
+  } finally {
+    loading.value = false;
   }
+};
+
+const onSearch = () => {
+  page.value = 1;
+  loadTableData({ pageNo: 1 });
 };
 
 const rolesFormatter = (row: any, column: any) => {
@@ -405,12 +444,12 @@ const defaultTimeFormatter = (row: any, column: any) => {
 };
 
 const handleSelectRoles = async (rowData: any) => {
-  rolesEditForm.userId = rowData.id;
+  rolesForm.userId = rowData.id;
   allRoles.value = [];
   const oldRows = rowData.roles.map((item: any) => {
     return item.id;
   });
-  rolesEditForm.oldRoles = oldRows;
+  rolesForm.oldRoles = oldRows;
   ui.rolesDialogVisible = true;
 };
 
@@ -421,12 +460,9 @@ const handleResetPassword = async () => {
       t("common.confirm"),
       { type: "warning" }
     );
-    const result = await Utils.doPost("/api/admin/users/password", password);
-    if (result.success) {
-      ElMessage.info(t("user.resetPasswordSuccess") + result.data + "]");
+    await userStore.resetPassword(password);
+    if (userStore.getSuccess) {
       ui.resetPassword = false;
-    } else {
-      ElMessage.warning(t("user.resetPasswordFail") + t(result.message));
     }
   } catch {
     // User cancelled
@@ -434,22 +470,20 @@ const handleResetPassword = async () => {
 };
 
 const loadAllRoles = async () => {
-  const result = await Utils.doGet("/api/admin/roles");
-  if (result.success) {
-    allRoles.value = result.data.records;
-  } else {
-    ElMessage.warning(t("common.loadFail") + t(result.message));
+  await roleStore.getAll();
+  if(roleStore.getRoles) {
+    allRoles.value = roleStore.getRoles;
   }
 };
 
 const loadRolesDialogData = async () => {
   await loadAllRoles();
-  rolesTreeRef.value?.setCheckedKeys(rolesEditForm.oldRoles);
+  rolesTreeRef.value?.setCheckedKeys(rolesForm.oldRoles);
 };
 
 const handleRolesUpdate = async () => {
   const keys = rolesTreeRef.value?.getCheckedKeys();
-  const oldRoles = rolesEditForm.oldRoles;
+  const oldRoles = rolesForm.oldRoles;
   if (keys.length === oldRoles.length) {
     const oldRolesSet = new Set(oldRoles);
     const diffArr = keys.filter((item: any) => {
@@ -461,18 +495,16 @@ const handleRolesUpdate = async () => {
       return;
     }
   }
-  rolesEditForm.selectedRoles = keys;
-  const result = await Utils.doPut(
-    "/api/admin/userroles/" + rolesEditForm.userId,
-    rolesEditForm
-  );
-  if (result.success) {
-    ElMessage.success(t("common.updateSuccess"));
-    loadTableData();
+  rolesForm.selectedRoles = keys;
+  const payload: UpdateRoleByUserIdRequest = { ...rolesForm };
+  if (rolesForm.userId !== undefined && rolesForm.userId !== null) {
+  await userRoleStore.updateRoleByUserId(rolesForm.userId as number, payload);
+} 
+  if (userRoleStore.getSuccess) {
+    
     ui.rolesDialogVisible = false;
-  } else {
-    ElMessage.warning(t("common.updateFail") + t(result.message));
-  }
+  } 
+  await loadTableData();
 };
 
 // Lifecycle
@@ -502,5 +534,10 @@ onMounted(async () => {
 
 .danger:disabled {
   color: #bfcbd9;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

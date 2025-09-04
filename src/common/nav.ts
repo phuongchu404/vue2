@@ -19,7 +19,7 @@
  */
 // @ts-ignore
 // import i18n from "@/components/i18n";
-import { t } from "@/components/i18n";
+import { t } from "@/i18n";
 import user from "./menu/user";
 import role from "./menu/role";
 import detainee from "./menu/detainee";

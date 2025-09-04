@@ -1,8 +1,8 @@
 <template>
-  <div class="page-container">
+  <div>
     <!--Query Form  -->
-    <div class="search-form">
-      <header>{{ $t("Search") }}</header>
+    <div class="search-section">
+      <!-- <header>{{ $t("Search") }}</header> -->
       <el-form
         :inline="true"
         :model="queryForm"
@@ -13,124 +13,136 @@
           <el-input
             v-model="queryForm.roleName"
             :placeholder="$t('role.roleName')"
-            size="small"
           ></el-input>
         </el-form-item>
-        <el-form-item align="right" style="margin-left: 220px">
+        <el-form-item>
+          <el-button
+            type="primary"
+            @click="onSearch"
+            :disabled="isButtonEnabled('system:user:select')"
+            :icon="Search"
+          >
+            {{ $t("option.query") }}
+          </el-button>
+        </el-form-item>
+        <el-form-item align="right">
           <el-button
             type="primary"
             @click="handleAdd"
             :disabled="isButtonEnabled('system:role:insert')"
-            size="small"
+            :icon="Plus"
           >
-            <el-icon><Plus /></el-icon><span>{{ $t("option.add") }}</span>
+            <span>{{ $t("option.add") }}</span>
           </el-button>
           <el-button
             type="primary"
             @click="handleSynchronizePermission"
             :disabled="isButtonEnabled('system:role:insert')"
-            size="small"
+            :icon="Refresh"
           >
-            <el-icon><Plus /></el-icon><span>{{ $t("option.syn") }}</span>
+            <span>{{ $t("option.syn") }}</span>
           </el-button>
         </el-form-item>
       </el-form>
     </div>
 
-    <div class="page-table">
-      <el-row :gutter="20">
-        <el-table
-          :data="filteredTableData"
-          style="width: 97%; margin-top: 10px; margin-left: 20px"
-          :row-class-name="tableRowClassName"
-          v-loading="ui.loading"
-          align="center"
-          border
-        >
-          <el-table-column
-            type="index"
-            prop="id"
-            :label="$t('common.index')"
-            width="80"
-          ></el-table-column>
-          <el-table-column
-            prop="roleName"
-            :label="$t('role.roleName')"
-            min-width="80"
-          ></el-table-column>
-          <el-table-column
-            prop="description"
-            :label="$t('role.description')"
-          ></el-table-column>
-          <el-table-column
-            prop="createTime"
-            :label="$t('common.createTime')"
-            width="230"
-            :formatter="defaultTimeFormatter"
-          ></el-table-column>
-          <el-table-column
-            prop="updateTime"
-            :label="$t('common.updateTime')"
-            width="230"
-            :formatter="defaultTimeFormatter"
-          ></el-table-column>
-          <el-table-column :label="$t('common.option')" width="350">
-            <template #default="{ row }">
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-bluelight"
-                @click="handleEdit(row)"
-                :disabled="isButtonEnabledByUser(row, 'system:role:update')"
-                >{{ $t("option.update") }}
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-greenlight"
-                @click="handleAuthorize(row)"
-                :disabled="
-                  isButtonEnabledByUser(row, 'system:role:assign-permission')
-                "
-              >
-                {{ $t("common.authorize") }}
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                class="normal-btn btn-red"
-                @click="handleDelete(row)"
-                :disabled="isButtonEnabledByUser(row, 'system:role:delete')"
-                >{{ $t("option.delete") }}
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-row>
-    </div>
+    <el-table
+      :data="roles"
+      :row-class-name="tableRowClassName"
+      v-loading="ui.loading"
+      align="center"
+      border
+    >
+      <el-table-column
+        type="index"
+        prop="id"
+        :label="$t('common.index')"
+        width="90"
+      ></el-table-column>
+      <el-table-column
+        prop="roleName"
+        :label="$t('role.roleName')"
+        min-width="80"
+      ></el-table-column>
+      <el-table-column
+        prop="description"
+        :label="$t('role.description')"
+      ></el-table-column>
+      <el-table-column
+        prop="createTime"
+        :label="$t('common.createTime')"
+        width="230"
+        :formatter="defaultTimeFormatter"
+      ></el-table-column>
+      <el-table-column
+        prop="updateTime"
+        :label="$t('common.updateTime')"
+        width="230"
+        :formatter="defaultTimeFormatter"
+      ></el-table-column>
+      <el-table-column :label="$t('common.option')" width="350">
+        <template #default="{ row }">
+          <el-button
+            type="primary"
+            class="normal-btn btn-bluelight"
+            @click="handleEdit(row)"
+            :disabled="isButtonEnabledByUser(row, 'system:role:update')"
+            >{{ $t("option.update") }}
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-greenlight"
+            @click="handleAuthorize(row)"
+            :disabled="
+              isButtonEnabledByUser(row, 'system:role:assign-permission')
+            "
+          >
+            {{ $t("common.authorize") }}
+          </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            class="normal-btn btn-red"
+            @click="handleDelete(row)"
+            :disabled="isButtonEnabledByUser(row, 'system:role:delete')"
+            >{{ $t("option.delete") }}
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="roleStore.getTotal"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 50, 100]"
+      @size-change="onSizeChange"
+      @current-change="onPageChange"
+      class="pagination"
+    />
 
     <el-dialog
       :title="ui.addRecord ? $t('role.add') : $t('role.update')"
       v-model="ui.dialogVisible"
       width="40%"
-      class="addDio"
+      class="dialog"
     >
       <el-form
-        :model="editForm"
-        :rules="editFormRules"
+        :model="form"
+        :rules="rules"
         label-width="100px"
         style="padding-right: 50px"
-        ref="editFormRef"
+        ref="formRef"
       >
         <el-form-item :label="$t('role.roleName')" prop="roleName">
           <el-input
-            v-model="editForm.roleName"
-            autofocus
-            size="small"
+            v-model="form.roleName"
+            autofocus :disabled="!ui.addRecord"
           ></el-input>
         </el-form-item>
         <el-form-item :label="$t('role.description')" prop="description">
-          <el-input v-model="editForm.description" size="small"></el-input>
+          <el-input v-model="form.description"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -149,19 +161,19 @@
       :title="$t('common.authorize')"
       v-model="ui.permsDialogVisible"
       @open="loadPermsDialogData"
-      class="addDio"
+      class="dialog"
     >
       <el-row :gutter="20">
         <el-col :push="15" style="margin-bottom: 10px">
-          <el-button size="small" @click="selectAll()" class="button-no-focus"
+          <el-button @click="selectAll()" class="button-no-focus"
             >{{ $t("common.select-all") }}
           </el-button>
-          <el-button size="small" @click="selectNone()" class="button-no-focus"
+          <el-button @click="selectNone()" class="button-no-focus"
             >{{ $t("common.select-none") }}
           </el-button>
         </el-col>
       </el-row>
-      <el-row>
+      <el-row :gutter="20">
         <div class="permsTree">
           <el-tree
             :data="allPermissions"
@@ -193,17 +205,45 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox, type FormInstance } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+} from "element-plus";
 import * as Utils from "../../utils";
 import * as nav from "../../common/nav";
+import {
+  Search,
+  Refresh,
+  Plus,
+  Download,
+  View,
+  Edit,
+  Delete,
+} from "@element-plus/icons-vue";
+import type {
+  PageQuery,
+  Role,
+  CreateRoleRequest,
+  UpdateRoleRequest,
+} from "@/types/role";
+import type {UpdatePermissionByRoleIdRequest, PermissionVO} from "@/types/rolePermission";
+import { useRoleStore } from "@/stores/role";
+import { useRolePermissionStore } from "@/stores/rolePermission";
 
 const { t } = useI18n();
 const appStore = useAppStore();
+const roleStore = useRoleStore();
+const rolePermissionStore = useRolePermissionStore();
 
 // Refs
-const editFormRef = ref<FormInstance>();
+const formRef = ref<FormInstance>();
 const treeRef = ref();
+const page = ref(1);
+const size = ref(10);
+const loading = ref(false);
+const roles = ref<Role[]>([]);
 
 // Reactive data
 const ui = reactive({
@@ -213,39 +253,42 @@ const ui = reactive({
   permsDialogVisible: false,
   authentication: false,
 });
-
 const tableData = ref<any[]>([]);
 const queryForm = reactive({ roleName: "" });
-const editForm = reactive({ id: "", roleName: "", description: "" });
-const editFormRules = reactive({
+const form = reactive<Partial<Role>>({ 
+  id: undefined, 
+  roleName: "", 
+  description: "" });
+const rules: FormRules = {
   roleName: [
     { required: true, message: t("role.inputRoleName"), trigger: "blur" },
   ],
-});
+};
 
 const disablePermissions = ref<any[]>([]);
 const authentication = reactive({ password: "" });
 const defaultTreeProps = { label: "name", children: "children" };
 const allPermissions = ref<any[]>([]);
-const permsEditForm = reactive({
-  roleId: "",
-  oldPerms: [""],
-  selectedPermissions: [""],
+const permsForm = reactive({
+  roleId: undefined,
+  oldPerms: [] as string[],
+  selectedPermissions: [] as string[],
 });
 const active = ref<number>(0);
 const row = ref<any>(null);
 const Permissions = ref<any[]>([]);
 
 // Computed
-const filteredTableData = computed(() => {
-  const roleName = queryForm.roleName;
-  if (roleName === "") return tableData.value;
-  return tableData.value.filter((item: any) => {
-    return item.roleName.indexOf(roleName) !== -1;
-  });
-});
 
 // Methods
+const onPageChange = (p: number) => {
+  page.value = p;
+  loadTableData();
+};
+const onSizeChange = (s: number) => {
+  size.value = s;
+  loadTableData();
+};
 const tableRowClassName = ({ rowIndex }: { rowIndex: number }) => {
   if (rowIndex % 2 === 0) return "";
   return "warning-row";
@@ -278,15 +321,29 @@ const selectNone = () => {
   treeRef.value?.setCheckedKeys(["session:all"]);
 };
 
-const loadTableData = async () => {
-  ui.loading = true;
-  const result = await Utils.doGet("/api/admin/roles");
-  if (result.success) {
-    tableData.value = result.data.records;
-  } else {
-    ElMessage.warning(t("common.loadFail"));
+const loadTableData = async (extra?: Partial<PageQuery>) => {
+  try {
+    loading.value = true;
+
+    const request = {
+      pageNo: page.value,
+      pageSize: size.value,
+      roleName: queryForm.roleName?.trim() ?? null,
+      ...extra,
+    } as PageQuery;
+    await roleStore.listPage(request);
+
+    roles.value = roleStore.getRoles || [];
+  } catch (error) {
+    ElMessage.error("Có lỗi xảy ra khi tải danh sách người dùng!");
+  } finally {
+    loading.value = false;
   }
-  ui.loading = false;
+};
+
+const onSearch = () => {
+  page.value = 1;
+  loadTableData({ pageNo: 1 });
 };
 
 const defaultTimeFormatter = (row: any, column: any) => {
@@ -295,21 +352,19 @@ const defaultTimeFormatter = (row: any, column: any) => {
 };
 
 const handleAdd = async () => {
-  Utils.clearValidateForm(editFormRef.value);
   ui.dialogVisible = true;
   ui.addRecord = true;
-  editForm.roleName = "";
-  editForm.description = "";
-  editForm.id = "";
+  Object.assign(form, {
+    id: undefined,
+    roleName: "",
+    description: "",
+  });
 };
 
 const handleEdit = async (rowData: any) => {
-  Utils.clearValidateForm(editFormRef.value);
   ui.dialogVisible = true;
   ui.addRecord = false;
-  editForm.roleName = rowData.roleName;
-  editForm.description = rowData.description;
-  editForm.id = rowData.id;
+  Object.assign(form, rowData);
 };
 
 const handleDelete = async (rowData: any) => {
@@ -317,14 +372,8 @@ const handleDelete = async (rowData: any) => {
     await ElMessageBox.confirm(t("common.deleteConfirm"), t("common.confirm"), {
       type: "warning",
     });
-    const roleId = rowData.id;
-    const result = await Utils.doDelete("/api/admin/roles/" + roleId, {});
-    if (!result.success) {
-      ElMessage.warning(t("common.deleteFail") + t(result.message));
-    } else {
-      ElMessage.success(t("common.deleteSuccess"));
-      loadTableData();
-    }
+    await roleStore.deleteRole(rowData.id as number);
+    await loadTableData();
   } catch {
     // User cancelled
   }
@@ -332,25 +381,33 @@ const handleDelete = async (rowData: any) => {
 
 const handleSaveOrUpdate = async () => {
   try {
-    await editFormRef.value?.validate();
-    if (ui.addRecord) {
-      const record = editForm;
-      const result = await Utils.doPost("/api/admin/roles", record);
-      if (!result.success) {
-        ElMessage.warning(t("common.insertFail") + t(result.message));
-      } else {
-        ElMessage.success(t("common.updateSuccess"));
+    await formRef.value?.validate(async (valid) => {
+      if (!valid) return;
+      if (ui.addRecord) {
+        const payload: CreateRoleRequest = { ...form };
+        await roleStore.createRole(payload);
+        if(roleStore.getSuccess) {
+          ui.dialogVisible = false;
+        }
+    } else {
+      const payload: UpdateRoleRequest = { ...form };
+      console.log(payload);
+      console.log(form);
+      await roleStore.updateRole(form.id as number, payload);
+      if(roleStore.getSuccess) {
         ui.dialogVisible = false;
-        loadTableData();
       }
     }
+    await  loadTableData();
+    });
+    
   } catch {
     // Validation failed
   }
 };
 
 const handleAuthorize = async (rowData: any) => {
-  permsEditForm.roleId = rowData.id;
+  permsForm.roleId = rowData.id;
   allPermissions.value = [];
   ui.permsDialogVisible = true;
   authentication.password = "";
@@ -359,7 +416,7 @@ const handleAuthorize = async (rowData: any) => {
 const loadPermsDialogData = async () => {
   const permissions: any = nav.getPermissionTree();
   allPermissions.value = permissions;
-  const selectedPermissions = await loadAllPermsByRoleId(permsEditForm.roleId);
+  const selectedPermissions = await loadAllPermsByRoleId(permsForm.roleId);
   treeRef.value?.setCheckedKeys(selectedPermissions);
 };
 
@@ -367,7 +424,7 @@ const handlePermsUpdate = async () => {
   const keys = treeRef.value
     ?.getCheckedKeys()
     .concat(treeRef.value?.getHalfCheckedKeys());
-  const oldPerms = permsEditForm.oldPerms;
+  const oldPerms = permsForm.oldPerms;
   if (keys.length === oldPerms.length) {
     const oldPermsSet = new Set(oldPerms);
     const diffArr = keys.filter((item: any) => {
@@ -379,17 +436,16 @@ const handlePermsUpdate = async () => {
       return;
     }
   }
-  permsEditForm.selectedPermissions = keys;
-  const result = await Utils.doPut(
-    "/api/admin/roleperms/" + permsEditForm.roleId,
-    permsEditForm
-  );
-  if (result.success) {
+  permsForm.selectedPermissions = keys;
+  const payload: UpdatePermissionByRoleIdRequest = {...permsForm};
+  if (permsForm.roleId !== undefined && permsForm.roleId !== null) {
+  await rolePermissionStore.updatePermissionByRoleId(permsForm.roleId as number, payload);
+}
+  if (rolePermissionStore.getSuccess) {
     ElMessage.success(t("common.updateSuccess"));
     ui.permsDialogVisible = false;
-  } else {
-    ElMessage.warning(t("common.updateFail") + t(result.message));
   }
+  await loadTableData();
 };
 
 const handleSynchronizePermission = async () => {
@@ -405,14 +461,12 @@ const handleSynchronizePermission = async () => {
 };
 
 const loadAllPermsByRoleId = async (roleId: any) => {
-  const result = await Utils.doGet("/api/admin/roleperms/" + roleId);
-  if (result.success) {
-    const oldPerms = buildOldPerms(result.data);
-    permsEditForm.oldPerms = oldPerms;
-    disablePermissions.value = buildDisabledPerms(result.data);
+  await rolePermissionStore.getPermissionByRoleId(roleId);
+  if (rolePermissionStore.getSuccess) {
+    const oldPerms = buildOldPerms(rolePermissionStore.getPermissions);
+    permsForm.oldPerms = oldPerms;
+    disablePermissions.value = buildDisabledPerms(rolePermissionStore.getPermissions);
     return oldPerms;
-  } else {
-    ElMessage.warning(t("common.loadFail") + t(result.message));
   }
   return [];
 };
@@ -472,7 +526,17 @@ onMounted(async () => {
 }
 
 .permsTree {
+  width: 100%;
   height: 50vh;
-  overflow-y: scroll;
+  overflow-y: auto;       /* auto mượt hơn scroll cứng */
+  display: flex;
+  justify-content: center; /* Căn giữa ngang */
+  padding: 10px 0;        /* Tạo khoảng cách trên dưới */
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

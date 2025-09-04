@@ -7,8 +7,8 @@
     </el-page-header> -->
 
     <!-- Search Section -->
-    <el-card class="search-section">
-      <el-form :model="searchForm"label-width="130px" label-position="left">
+    <div class="search-section">
+      <el-form :model="searchForm" label-width="130px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="Mã phạm nhân">
@@ -60,10 +60,10 @@
             <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
           </el-form-item>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- Action Bar -->
-    <el-card class="action-card">
+    <div class="action-card">
       <div class="action-bar">
         <div>
           <el-button
@@ -81,7 +81,7 @@
           Tổng số: {{ filteredDetainees.length }} phạm nhân
         </div>
       </div>
-    </el-card>
+    </div>
 
     <!-- Data Table -->
     <el-table
@@ -92,32 +92,33 @@
       border
     >
       <el-table-column
+        align="center"
         prop="detainee_code"
         label="Mã phạm nhân"
-        width="120"
+        width="160"
         sortable
       />
-      <el-table-column prop="full_name" label="Họ và tên" min-width="150" />
-      <el-table-column prop="gender" label="Giới tính" width="80" />
-      <el-table-column prop="date_of_birth" label="Ngày sinh" width="120">
+      <el-table-column align="center" prop="full_name" label="Họ và tên" min-width="100" show-overflow-tooltip=""/>
+      <el-table-column align="center" prop="gender" label="Giới tính" width="120" />
+      <el-table-column align="center" prop="date_of_birth" label="Ngày sinh" width="135">
         <template #default="scope">
           {{ formatDate(scope.row.date_of_birth) }}
         </template>
       </el-table-column>
-      <el-table-column prop="id_number" label="CCCD/CMND" width="130" />
-      <el-table-column prop="detention_date" label="Ngày bắt" width="120">
+      <el-table-column align="center" prop="id_number" label="CCCD/CMND" width="150" />
+      <el-table-column align="center" prop="detention_date" label="Ngày bắt" width="120">
         <template #default="scope">
           {{ formatDate(scope.row.detention_date) }}
         </template>
       </el-table-column>
-      <el-table-column prop="cell_number" label="Buồng giam" width="100" />
+      <el-table-column align="center" prop="cell_number" label="Buồng giam" width="145" />
       <el-table-column
         prop="charges"
         label="Tội danh"
         min-width="200"
         show-overflow-tooltip
       />
-      <el-table-column label="Trạng thái" width="120" align="center">
+      <el-table-column label="Trạng thái" width="150" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
@@ -228,7 +229,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {

@@ -1,4 +1,4 @@
-import i18n from "@/components/i18n";
+import i18n from "@/i18n";
 const { t } = i18n.global;
 export default {
   tag: "report",

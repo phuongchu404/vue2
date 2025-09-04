@@ -3,6 +3,9 @@ export interface Role {
   roleName?: string;
   description?: string;
   removable?: number;
+  createTime?: string;
+  updateTime?: string;
+  createUserId?: number;
 }
 export interface RoleState {
   roles?: Role[];
@@ -12,6 +15,7 @@ export interface RoleState {
   loading?: boolean;
   error?: string;
   lastQuery?: PageQuery;
+  success?: boolean;
 }
 
 export interface PageQuery {
