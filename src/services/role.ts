@@ -16,7 +16,7 @@ export const RoleService = {
   },
 
   async create(payload: CreateRoleRequest) {
-    const res = await Utils.doPost("/api/admin/users", payload);
+    const res = await Utils.doPost("/api/admin/roles", payload);
     return res;
   },
 

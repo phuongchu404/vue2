@@ -10,7 +10,7 @@ import type {
 } from "@/types/role";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
-export const useUserStore = defineStore("user", {
+export const useRoleStore = defineStore("role", {
   state: (): RoleState => ({
     roles: undefined,
     total: 0,
@@ -19,15 +19,17 @@ export const useUserStore = defineStore("user", {
     loading: false,
     error: undefined,
     lastQuery: undefined,
+    success: false,
   }),
 
   getters: {
-    getPrisons: (state): Role[] | undefined => state.roles,
+    getRoles: (state): Role[] | undefined => state.roles,
     getTotal: (state): number => state.total ?? 0,
     getPage: (state): number => state.pageNo ?? 1,
     getSize: (state): number => state.pageSize ?? 10,
     getLoading: (state): boolean => state.loading ?? false,
     getError: (state): string | undefined => state.error,
+    getSuccess: (state): boolean => state.success ?? false,
   },
 
   actions: {
@@ -101,7 +103,7 @@ export const useUserStore = defineStore("user", {
       this.error = undefined;
       try {
         const res: ServiceResult<boolean> = await RoleService.create(payload);
-
+        this.success = res.success;
         if (!res.success) {
           throw new Error(res.message || "Create prison failed");
         }
@@ -126,6 +128,7 @@ export const useUserStore = defineStore("user", {
           id,
           payload
         );
+        this.success = res.success;
 
         if (!res.success) {
           throw new Error(res.message || "Update prison failed");
@@ -152,13 +155,11 @@ export const useUserStore = defineStore("user", {
           throw new Error(res.message || "Delete prison failed");
         }
 
-        // this.items = (this.items ?? []).filter((x) => x.id !== id);
-        // this.total = Math.max(0, this.total - 1);
         ElMessage.success("Deleted successfully");
+
         if (this.lastQuery) {
           await this.listPage(this.lastQuery);
         }
-        // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";
@@ -176,11 +177,6 @@ export const useUserStore = defineStore("user", {
       this.pageNo = 1;
       this.pageSize = 10;
       this.error = undefined;
-      // router.replace("/prisons");
     },
   },
-
-  // persist: true,
 });
-
-// export const usePrisonStoreWithOut = () => usePrisonStore(store)

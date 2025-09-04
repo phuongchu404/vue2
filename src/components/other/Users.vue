@@ -127,7 +127,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import * as Utils from '../../utils';
-import i18n from '../i18n';
+import i18n from '../../i18n';
 import * as utils from "../../utils";
 
 @Component

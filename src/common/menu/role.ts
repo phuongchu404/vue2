@@ -1,6 +1,5 @@
 // @ts-ignore
-import i18n from '@/components/i18n';
-const { t } = i18n.global;
+import { t } from "@/i18n";
 export default {
   tag: "system:role",
   leaf: true,
@@ -16,7 +15,7 @@ export default {
       whiteList: false,
       name: t("option.query"),
       pattern: "/api/admin/roles",
-      method: "GET"
+      method: "GET",
     },
     {
       tag: "system:role:insert",
@@ -24,7 +23,7 @@ export default {
       whiteList: false,
       name: t("option.add"),
       pattern: "/api/admin/roles",
-      method: "POST"
+      method: "POST",
     },
     {
       tag: "system:role:update",
@@ -32,7 +31,7 @@ export default {
       whiteList: false,
       name: t("option.update"),
       pattern: "/api/admin/roles/{roleId}",
-      method: "PUT"
+      method: "PUT",
     },
     {
       tag: "system:role:delete",
@@ -40,7 +39,7 @@ export default {
       whiteList: false,
       name: t("option.delete"),
       pattern: "/api/admin/roles/{roleId}",
-      method: "DELETE"
+      method: "DELETE",
     },
     {
       tag: "system:role:assign-permission",
@@ -48,7 +47,7 @@ export default {
       whiteList: false,
       name: t("option.assignPermission"),
       pattern: "/api/admin/roleperms/{roleId}",
-      method: "PUT"
+      method: "PUT",
     },
     {
       tag: "system:role:select-role-permission",
@@ -56,8 +55,8 @@ export default {
       whiteList: false,
       name: t("role.selectRolePermission"),
       pattern: "/api/admin/roleperms/{roleId}",
-      method: "GET"
-    }
+      method: "GET",
+    },
     // {
     //   tag: "system:role:sync-permission",
     //   type: "button",
@@ -66,5 +65,5 @@ export default {
     //   pattern: "/api/admin/permissions",
     //   method: "POST"
     // }
-  ]
-}
+  ],
+};

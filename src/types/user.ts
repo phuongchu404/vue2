@@ -13,6 +13,7 @@ export interface User {
   idsRole?: number | null;
   phoneNumber?: string;
   createUser?: string;
+  description?: string;
 }
 
 export interface UserState {
@@ -23,6 +24,7 @@ export interface UserState {
   loading?: boolean;
   error?: string;
   lastQuery?: PageQuery;
+  success?: boolean;
 }
 
 export interface CreateUserRequest
@@ -35,7 +37,9 @@ export interface CreateUserRequest
     | "removable"
     | "idsRole"
     | "createUser"
-  > {}
+  > {
+  description?: string;
+}
 
 export interface UpdateUserRequest
   extends Partial<
@@ -58,6 +62,6 @@ export interface PageQuery {
 }
 
 export interface ResetPassword {
-  id: string;
-  password: string;
+  id?: string;
+  password?: string;
 }

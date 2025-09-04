@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import moment from "moment";
-import { i18n } from "../components/i18n";
+import { i18n } from "../i18n";
 import { Codes } from "./Codes";
 import router from "@/router";
 

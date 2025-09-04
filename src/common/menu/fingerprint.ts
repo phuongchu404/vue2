@@ -1,5 +1,4 @@
-import i18n from "@/components/i18n";
-const { t } = i18n.global;
+import { t } from "@/i18n";
 export default {
   tag: "fingerprint-card",
   leaf: true,

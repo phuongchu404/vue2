@@ -1,7 +1,6 @@
-import i18n from "@/components/i18n";
-const { t } = i18n.global;
+import { t } from "@/i18n";
 export default {
-  tag: "system:user",
+  tag: "staff",
   leaf: true,
   path: "/staff",
   type: "menu",
