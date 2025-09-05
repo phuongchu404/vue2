@@ -138,7 +138,8 @@
         <el-form-item :label="$t('role.roleName')" prop="roleName">
           <el-input
             v-model="form.roleName"
-            autofocus :disabled="!ui.addRecord"
+            autofocus
+            :disabled="!ui.addRecord"
           ></el-input>
         </el-form-item>
         <el-form-item :label="$t('role.description')" prop="description">
@@ -228,7 +229,10 @@ import type {
   CreateRoleRequest,
   UpdateRoleRequest,
 } from "@/types/role";
-import type {UpdatePermissionByRoleIdRequest, PermissionVO} from "@/types/rolePermission";
+import type {
+  UpdatePermissionByRoleIdRequest,
+  PermissionVO,
+} from "@/types/rolePermission";
 import { useRoleStore } from "@/stores/role";
 import { useRolePermissionStore } from "@/stores/rolePermission";
 
@@ -255,10 +259,11 @@ const ui = reactive({
 });
 const tableData = ref<any[]>([]);
 const queryForm = reactive({ roleName: "" });
-const form = reactive<Partial<Role>>({ 
-  id: undefined, 
-  roleName: "", 
-  description: "" });
+const form = reactive<Partial<Role>>({
+  id: undefined,
+  roleName: "",
+  description: "",
+});
 const rules: FormRules = {
   roleName: [
     { required: true, message: t("role.inputRoleName"), trigger: "blur" },
@@ -362,10 +367,6 @@ const handleAdd = async () => {
 };
 
 const handleEdit = async (rowData: any) => {
-<<<<<<< HEAD
-=======
-  Utils.clearValidateForm(formRef.value);
->>>>>>> fa4fbcae2c6ae9ae30acf2c859164505602665f2
   ui.dialogVisible = true;
   ui.addRecord = false;
   Object.assign(form, rowData);
@@ -390,21 +391,20 @@ const handleSaveOrUpdate = async () => {
       if (ui.addRecord) {
         const payload: CreateRoleRequest = { ...form };
         await roleStore.createRole(payload);
-        if(roleStore.getSuccess) {
+        if (roleStore.getSuccess) {
           ui.dialogVisible = false;
         }
-    } else {
-      const payload: UpdateRoleRequest = { ...form };
-      console.log(payload);
-      console.log(form);
-      await roleStore.updateRole(form.id as number, payload);
-      if(roleStore.getSuccess) {
-        ui.dialogVisible = false;
+      } else {
+        const payload: UpdateRoleRequest = { ...form };
+        console.log(payload);
+        console.log(form);
+        await roleStore.updateRole(form.id as number, payload);
+        if (roleStore.getSuccess) {
+          ui.dialogVisible = false;
+        }
       }
-    }
-    await  loadTableData();
+      await loadTableData();
     });
-    
   } catch {
     // Validation failed
   }
@@ -441,10 +441,13 @@ const handlePermsUpdate = async () => {
     }
   }
   permsForm.selectedPermissions = keys;
-  const payload: UpdatePermissionByRoleIdRequest = {...permsForm};
+  const payload: UpdatePermissionByRoleIdRequest = { ...permsForm };
   if (permsForm.roleId !== undefined && permsForm.roleId !== null) {
-  await rolePermissionStore.updatePermissionByRoleId(permsForm.roleId as number, payload);
-}
+    await rolePermissionStore.updatePermissionByRoleId(
+      permsForm.roleId as number,
+      payload
+    );
+  }
   if (rolePermissionStore.getSuccess) {
     ElMessage.success(t("common.updateSuccess"));
     ui.permsDialogVisible = false;
@@ -469,7 +472,9 @@ const loadAllPermsByRoleId = async (roleId: any) => {
   if (rolePermissionStore.getSuccess) {
     const oldPerms = buildOldPerms(rolePermissionStore.getPermissions);
     permsForm.oldPerms = oldPerms;
-    disablePermissions.value = buildDisabledPerms(rolePermissionStore.getPermissions);
+    disablePermissions.value = buildDisabledPerms(
+      rolePermissionStore.getPermissions
+    );
     return oldPerms;
   }
   return [];
@@ -532,10 +537,10 @@ onMounted(async () => {
 .permsTree {
   width: 100%;
   height: 50vh;
-  overflow-y: auto;       /* auto mượt hơn scroll cứng */
+  overflow-y: auto; /* auto mượt hơn scroll cứng */
   display: flex;
   justify-content: center; /* Căn giữa ngang */
-  padding: 10px 0;        /* Tạo khoảng cách trên dưới */
+  padding: 10px 0; /* Tạo khoảng cách trên dưới */
 }
 
 .pagination {

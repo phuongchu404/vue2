@@ -50,7 +50,7 @@
         <el-aside width="auto" class="sidebar">
           <el-menu
             :default-active="$route.path"
-            unique-opene
+            unique-opened
             text-color="#7f8c8d"
             router
             class="sidebar-menu"
@@ -103,7 +103,9 @@
             <div class="router-view-container">
               <el-page-header @back="$router.go(-1)">
                 <template #content>
-                  <span class="text-large font-600 mr-3">{{ $route.name }}</span>
+                  <span class="text-large font-600 mr-3">{{
+                    $route.name
+                  }}</span>
                 </template>
               </el-page-header>
               <RouterView v-slot="{ Component }">
@@ -483,14 +485,18 @@ onMounted(() => {
 .el-menu-item,
 .el-sub-menu {
   color: var(--text-color) !important;
-  border-radius: 10px;  
-  font-weight: 600!important;
+  border-radius: 10px;
+  font-weight: 600 !important;
 }
 
 /* Active state */
 .el-menu-item.is-active,
 .el-submenu__title.is-active {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--dark-primary-color) 100%
+  ) !important;
   color: var(--white) !important;
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
@@ -505,7 +511,6 @@ onMounted(() => {
 .el-submenu__title.is-active i {
   color: var(--white) !important;
 }
-
 
 /* Main Content */
 .main-content {
