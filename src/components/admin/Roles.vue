@@ -362,6 +362,10 @@ const handleAdd = async () => {
 };
 
 const handleEdit = async (rowData: any) => {
+<<<<<<< HEAD
+=======
+  Utils.clearValidateForm(formRef.value);
+>>>>>>> fa4fbcae2c6ae9ae30acf2c859164505602665f2
   ui.dialogVisible = true;
   ui.addRecord = false;
   Object.assign(form, rowData);
