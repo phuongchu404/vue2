@@ -65,6 +65,7 @@ const common: Common = {
   inputFile: "Chưa chọn tệp dữ liệu",
   inputStatus: "Hãy điền thông tin này",
   Search: "Tìm kiếm",
+  create: "Thêm",
   edit: "Chỉnh sửa",
   update: "Cập nhật",
   exportUpdating: "Chức năng xuất Excel đang được phát triển!",

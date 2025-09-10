@@ -1,32 +1,30 @@
 <template>
   <div class="detainee-form">
-
     <el-card class="form-card">
       <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="140px"
-        @submit.prevent="handleSubmit"
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          label-width="140px"
+          @submit.prevent="handleSubmit"
       >
-        <el-divider content-position="left">Thông tin cơ bản</el-divider>
-
+        <!-- Basic Info -->
+        <el-divider content-position="left">{{ $t('detainee.section.basicInfo') }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Số hồ sơ" prop="profileNumber">
+            <el-form-item :label="$t('detainee.profileNumber')" prop="profileNumber">
               <el-input
-                v-model="form.profileNumber"
-                placeholder="Nhập số hồ sơ..."
+                  v-model="form.profileNumber"
+                  :placeholder="$t('detainee.placeholder.profileNumber')"
               />
             </el-form-item>
-            
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item v-if="isEdit" label="Mã phạm nhân" prop="detaineeCode">
+            <el-form-item v-if="isEdit" :label="$t('detainee.code')" prop="detaineeCode">
               <el-input
-                v-model="form.detaineeCode"
-                placeholder="Nhập mã phạm nhân..."
-                :disabled="isEdit"
+                  v-model="form.detaineeCode"
+                  :placeholder="$t('detainee.placeholder.code')"
+                  :disabled="isEdit"
               />
             </el-form-item>
           </el-col>
@@ -34,18 +32,18 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Họ và tên" prop="fullName">
+            <el-form-item :label="$t('detainee.fullName')" prop="fullName">
               <el-input
-                v-model="form.fullName"
-                placeholder="Nhập họ và tên..."
+                  v-model="form.fullName"
+                  :placeholder="$t('detainee.placeholder.fullName')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Tên gọi khác">
+            <el-form-item :label="$t('detainee.aliasName')">
               <el-input
-                v-model="form.aliasName"
-                placeholder="Nhập tên gọi khác..."
+                  v-model="form.aliasName"
+                  :placeholder="$t('detainee.placeholder.aliasName')"
               />
             </el-form-item>
           </el-col>
@@ -53,154 +51,145 @@
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Giới tính" prop="gender">
-              <el-select v-model="form.gender" placeholder="Chọn giới tính">
+            <el-form-item :label="$t('detainee.gender')" prop="gender">
+              <el-select v-model="form.gender" :placeholder="$t('detainee.placeholder.gender')">
                 <el-option
-                  v-for="option in genderOptions"
-                  :key="option.value"
-                  :label="option.label"
-                  :value="option.value"
+                    v-for="option in genderOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ngày sinh" prop="dateOfBirth">
+            <el-form-item :label="$t('detainee.dateOfBirth')" prop="dateOfBirth">
               <el-date-picker
-                v-model="form.dateOfBirth"
-                type="date"
-                placeholder="Chọn ngày sinh"
-                style="width: 100%"
-                format="DD/MM/YYYY"
-                value-format="YYYY-MM-DD"
+                  v-model="form.dateOfBirth"
+                  type="date"
+                  :placeholder="$t('detainee.placeholder.dateOfBirth')"
+                  style="width: 100%"
+                  format="DD/MM/YYYY"
+                  value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Nơi sinh">
+            <el-form-item :label="$t('detainee.placeOfBirth')">
               <el-input
-                v-model="form.placeOfBirth"
-                placeholder="Nhập nơi sinh..."
+                  v-model="form.placeOfBirth"
+                  :placeholder="$t('detainee.placeholder.placeOfBirth')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Giấy tờ tùy thân</el-divider>
-
+        <!-- Identity -->
+        <el-divider content-position="left">{{ $t('detainee.section.identity') }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Số CCCD/CMND" prop="idNumber">
+            <el-form-item :label="$t('detainee.idNumber')" prop="idNumber">
               <el-input
-                v-model="form.idNumber"
-                placeholder="Nhập số CCCD/CMND..."
+                  v-model="form.idNumber"
+                  :placeholder="$t('detainee.placeholder.idNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ngày cấp">
+            <el-form-item :label="$t('detainee.idIssueDate')">
               <el-date-picker
-                v-model="form.idIssueDate"
-                type="date"
-                placeholder="Chọn ngày cấp"
-                style="width: 100%"
-                format="DD/MM/YYYY"
-                value-format="YYYY-MM-DD"
+                  v-model="form.idIssueDate"
+                  type="date"
+                  :placeholder="$t('detainee.placeholder.idIssueDate')"
+                  style="width: 100%"
+                  format="DD/MM/YYYY"
+                  value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Nơi cấp">
+            <el-form-item :label="$t('detainee.idIssuePlace')">
               <el-input
-                v-model="form.idIssuePlace"
-                placeholder="Nhập nơi cấp..."
+                  v-model="form.idIssuePlace"
+                  :placeholder="$t('detainee.placeholder.idIssuePlace')"
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Quốc tịch" prop="nationalityId">
+            <el-form-item :label="$t('detainee.nationality')" prop="nationalityId">
               <el-select
-              filterable
-                clearable
-                v-model="form.nationalityId"
-                placeholder="Chọn quốc tịch"
+                  v-model="form.nationalityId"
+                  filterable
+                  clearable
+                  :placeholder="$t('detainee.placeholder.nationality')"
               >
                 <el-option
-                  v-for="option in countries"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in countries"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Dân tộc">
+            <el-form-item :label="$t('detainee.ethnicity')">
               <el-select
-              filterable
-                clearable
-                v-model="form.ethnicityId"
-                placeholder="Chọn dân tộc"
+                  v-model="form.ethnicityId"
+                  filterable
+                  clearable
+                  :placeholder="$t('detainee.placeholder.ethnicity')"
               >
                 <el-option
-                  v-for="option in ethnicities"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in ethnicities"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Tôn giáo">
+            <el-form-item :label="$t('detainee.religion')">
               <el-select
-              filterable
-                clearable
-                v-model="form.religionId"
-                placeholder="Chọn tôn giáo"
+                  v-model="form.religionId"
+                  filterable
+                  clearable
+                  :placeholder="$t('detainee.placeholder.religion')"
               >
                 <el-option
-                  v-for="option in religions"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in religions"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-<el-row :gutter="20">
+        <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Họ tên cha">
-              <el-input
-                v-model="form.fatherName"
-                placeholder="Nhập họ tên cha"
-              />
+            <el-form-item :label="$t('detainee.fatherName')">
+              <el-input v-model="form.fatherName" :placeholder="$t('detainee.placeholder.fatherName')" />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Họ tên mẹ">
-              <el-input
-                v-model="form.motherName"
-                placeholder="Nhập họ tên mẹ"
-              />
+            <el-form-item :label="$t('detainee.motherName')">
+              <el-input v-model="form.motherName" :placeholder="$t('detainee.placeholder.motherName')" />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Họ tên vợ/chồng">
-              <el-input
-                v-model="form.spouseName"
-                placeholder="Nhập họ tên vợ/chồng"
-              />
+            <el-form-item :label="$t('detainee.spouseName')">
+              <el-input v-model="form.spouseName" :placeholder="$t('detainee.placeholder.spouseName')" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="Nghề nghiệp">
+        <el-form-item :label="$t('detainee.occupation')">
           <el-input
             v-model="form.occupation"
-            placeholder="Nhập nghề nghiệp..."
+            :placeholder="$t('detainee.placeholder.occupation')"
           />
         </el-form-item>
 
@@ -213,14 +202,14 @@
           />
         </el-form-item> -->
 
-        <el-divider content-position="left">Địa chỉ thường trú</el-divider>
+        <el-divider content-position="left">{{ $t('detainee.section.permanent') }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="permanentProvinceId">
+            <el-form-item :label="$t('detainee.permanentProvince')" prop="permanentProvinceId">
               <el-select
                 v-model="form.permanentProvinceId"
-                placeholder="Chọn tỉnh"
+                :placeholder="$t('detainee.placeholder.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -238,10 +227,10 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="permanentWardId">
+            <el-form-item :label="$t('detainee.permanentWard')" prop="permanentWardId">
               <el-select
                 v-model="form.permanentWardId"
-                placeholder="Chọn xã/phường"
+                :placeholder="$t('detainee.placeholder.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -258,24 +247,24 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="$t('permanentAddress')" prop="address">
               <el-input
                 v-model="form.permanentAddress"
-                placeholder="Số nhà, đường, thôn/xóm..."
+                :placeholder="$t('detainee.placeholder.permanentAddress')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Địa chỉ tạm trú</el-divider>
+        <el-divider content-position="left">{{ $t('detainee.section.temporary') }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="temporaryProvinceId">
+            <el-form-item :label="$t('detainee.temporaryProvince')" prop="temporaryProvinceId">
               <el-select
                 v-model="form.temporaryProvinceId"
-                placeholder="Chọn tỉnh"
+                :placeholder="$t('detainee.placeholder.temporaryProvince')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -293,10 +282,10 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="temporaryWardId">
+            <el-form-item :label="$t('detainee.temporaryWard')" prop="temporaryWardId">
               <el-select
                 v-model="form.temporaryWardId"
-                placeholder="Chọn xã/phường"
+                :placeholder="$t('detainee.placeholder.temporaryWard')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -313,24 +302,24 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="$t('detainee.temporaryAddress')" prop="address">
               <el-input
                 v-model="form.temporaryAddress"
-                placeholder="Số nhà, đường, thôn/xóm..."
+                :placeholder="$t('detainee.placeholder.temporaryAddress')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Nơi ở hiện tại</el-divider>
+        <el-divider content-position="left">{{ $t('detainee.section.currentAddress') }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="currentProvinceId">
+            <el-form-item :label="$t('detainee.currentProvince')" prop="currentProvinceId">
               <el-select
                 v-model="form.currentProvinceId"
-                placeholder="Chọn tỉnh"
+                :placeholder="$t('detainee.placeholder.currentProvince')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -348,10 +337,10 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="currentWardId">
+            <el-form-item :label="$t('detainee.currentWard')" prop="currentWardId">
               <el-select
                 v-model="form.currentWardId"
-                placeholder="Chọn xã/phường"
+                :placeholder="$t('detainee.placeholder.currentWard')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -368,25 +357,25 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="$t('detainee.currentAddress')" prop="address">
               <el-input
                 v-model="form.currentAddress"
-                placeholder="Số nhà, đường, thôn/xóm..."
+                :placeholder="$t('detainee.placeholder.currentAddress')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Thông tin giam giữ</el-divider>
+        <el-divider content-position="left">{{ $t('detainee.section.detention') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Ngày bắt" prop="detentionDate">
+            <el-form-item :label="$t('detainee.detentionDate')" prop="detentionDate">
               <el-date-picker
                 v-model="form.detentionDate"
                 type="date"
-                placeholder="Chọn ngày bắt"
+                :placeholder="$t('detainee.placeholder.detentionDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -394,11 +383,11 @@
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ngày thả dự kiến" prop="expectedReleaseDate">
+            <el-form-item :label="$t('detainee.expectedReleaseDate')" prop="expectedReleaseDate">
               <el-date-picker
                 v-model="form.expectedReleaseDate"
                 type="date"
-                placeholder="Chọn ngày thả dự kiến"
+                :placeholder="$t('detainee.placeholder.expectedReleaseDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -406,11 +395,11 @@
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ngày thả thực tế">
+            <el-form-item :label="$t('detainee.actualReleaseDate')">
               <el-date-picker
                 v-model="form.actualReleaseDate"
                 type="date"
-                placeholder="Chọn ngày thả thực tế"
+                :placeholder="$t('detainee.placeholder.actualReleaseDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -420,26 +409,26 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Thời hạn tù" >
+            <el-form-item :label="$t('detainee.sentenceDuration')">
               <el-input
                 v-model="form.sentenceDuration"
-                placeholder="Nhập thời hạn tù"
+                :placeholder="$t('detainee.placeholder.sentenceDuration')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Số án">
+            <el-form-item :label="$t('detainee.caseNumber')">
               <el-input
                 v-model="form.caseNumber"
-                placeholder="Nhập số án..."
+                :placeholder="$t('detainee.placeholder.caseNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Số buồng giam">
+            <el-form-item :label="$t('detainee.cellNumber')">
               <el-input
                 v-model="form.cellNumber"
-                placeholder="Nhập số buồng giam..."
+                :placeholder="$t('detainee.placeholder.cellNumber')"
               />
             </el-form-item>
           </el-col>
@@ -447,8 +436,8 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Trại giam" prop="detentionCenterId">
-              <el-select v-model="form.detentionCenterId" placeholder="Chọn trại giam">
+            <el-form-item :label="$t('detainee.detentionCenter')" prop="detentionCenterId">
+              <el-select v-model="form.detentionCenterId"  :placeholder="$t('detainee.placeholder.detentionCenter')">
                 <el-option
                   v-for="prison in prisons"
                   :key="prison.id"
@@ -459,10 +448,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Trạng thái" prop="status">
+            <el-form-item :label="$t('detainee.status')" prop="status">
               <el-select
                 v-model="form.status"
-                placeholder="Chọn trạng thái"
+                :placeholder="$t('detainee.placeholder.status')"
                 clearable
               >
                 <el-option
@@ -476,30 +465,30 @@
           </el-col>
         </el-row>
 
-        <el-form-item label="Tội danh">
+        <el-form-item :label="$t('detainee.charges')">
           <el-input
             v-model="form.charges"
             type="textarea"
             :rows="3"
-            placeholder="Nhập tội danh..."
+            :placeholder="$t('detainee.placeholder.charges')"
           />
         </el-form-item>
 
-        <el-form-item label="Ghi chú">
+        <el-form-item :label="$t('detainee.notes')">
           <el-input
             v-model="form.notes"
             type="textarea"
             :rows="3"
-            placeholder="Nhập ghi chú..."
+            :placeholder="$t('detainee.placeholder.notes')"
           />
         </el-form-item>
 
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+            {{ isEdit ? $t('common.update') : $t('common.add') }}
           </el-button>
-          <el-button @click="handleReset">Làm mới</el-button>
-          <el-button @click="$router.go(-1)">Hủy</el-button>
+          <el-button @click="handleReset">{{ $t('common.reset') }}</el-button>
+          <el-button @click="$router.go(-1)">{{ $t('common.cancel') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>

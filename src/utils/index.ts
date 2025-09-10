@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import moment from "moment";
-import { i18n } from "../i18n";
+import { t } from "@/i18n";
 import { Codes } from "./Codes";
 import router from "@/router";
 
@@ -73,9 +73,7 @@ export async function handleSessionExpiration(code: any): Promise<boolean> {
   ) {
     sessionStorage.removeItem("TOKEN");
     sessionStorage.removeItem("user");
-    await confirmRelogin(
-      String(i18n.global.t("common.session-expired-message"))
-    );
+    await confirmRelogin(String(t("common.session-expired-message")));
     router.push({ path: "/login" });
 
     return true;
@@ -86,7 +84,6 @@ export async function handleSessionExpiration(code: any): Promise<boolean> {
 export async function doPost(url: string, data?: any): Promise<any> {
   try {
     const result = await axiosAction("POST", url, data);
-    console.log(result);
     if (await handleSessionExpiration(result.code)) {
       // Pass router from context if available
       return { success: false, message: "" };

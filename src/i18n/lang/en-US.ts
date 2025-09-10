@@ -11,6 +11,7 @@ import staff from "./en-US/staff";
 import prison from "./en-US/prison";
 import route from "./en-US/route";
 import identity from "./en-US/identity";
+import detainee from "./en-US/detainee";
 
 export default {
   route,
@@ -26,4 +27,5 @@ export default {
   staff,
   prison,
   identity,
+  detainee,
 };

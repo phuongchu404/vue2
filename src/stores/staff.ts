@@ -52,6 +52,10 @@ export const useStaffStore = defineStore("staff", {
           throw new Error(res.message || "Fetch prisons failed");
         }
 
+        if (!res.data) {
+          throw new Error("No data returned from fetch prisons");
+        }
+
         const {
           content,
           totalElements,
@@ -158,9 +162,9 @@ export const useStaffStore = defineStore("staff", {
           throw new Error(res.message || "Delete prison failed");
         }
         ElMessage.success("Deleted successfully");
-        if (this.lastQuery) {
-          await this.fetchList(this.lastQuery);
-        }
+        // if (this.lastQuery) {
+        //   await this.fetchList(this.lastQuery);
+        // }
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";

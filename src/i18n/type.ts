@@ -63,6 +63,7 @@ export interface Common {
   inputFile: string;
   inputStatus: string;
   Search: string;
+  create: string;
   edit: string;
   update: string;
   exportUpdating: string;
@@ -121,6 +122,10 @@ export interface Identity {
     createdPlace: string;
     arrestDate: string;
     fpClassification: string;
+    dp: string;
+    tw: string;
+    akFileNo: string;
+    notes: string;
     reasonNote: string;
     faceShape: string;
     noseBridge: string;
@@ -133,6 +138,10 @@ export interface Identity {
   createdPlace: string;
   arrestDate: string;
   fpClassification: string;
+  dp: string;
+  tw: string;
+  akFileNo: string;
+  notes: string;
   reasonNote: string;
   faceShape: string;
   height: string;

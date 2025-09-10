@@ -1,50 +1,55 @@
 <template>
   <div class="identity-list">
-<!--    <el-page-header @back="$router.go(-1)">-->
-<!--      <template #content>-->
-<!--        <span class="text-large font-600 mr-3">Quản lý danh bản</span>-->
-<!--      </template>-->
-<!--    </el-page-header>-->
+    <!--    <el-page-header @back="$router.go(-1)">-->
+    <!--      <template #content>-->
+    <!--        <span class="text-large font-600 mr-3">Quản lý danh bản</span>-->
+    <!--      </template>-->
+    <!--    </el-page-header>-->
     <!-- Search Section -->
     <div class="search-section">
-      <el-form :model="searchForm" inline label-width="auto" label-position="left">
+      <el-form
+        :model="searchForm"
+        inline
+        label-width="auto"
+        label-position="left"
+      >
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-form-item :label="$t('identity.detaineeId')">
+            <el-form-item :label="t('identity.detaineeId')">
               <el-input
-                  v-model="searchForm.detaineeId"
-                  :placeholder="$t('identity.placeholder.detaineeId')"
-                  clearable
+                v-model="searchForm.detaineeCode"
+                :placeholder="t('identity.placeholder.detaineeId')"
+                clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item :label="$t('identity.detaineeName')">
+            <el-form-item :label="t('identity.detaineeName')">
               <el-input
-                  v-model="searchForm.detaineeName"
-                  :placeholder="$t('identity.placeholder.detaineeName')"
-                  clearable
+                v-model="searchForm.detaineeName"
+                :placeholder="t('identity.placeholder.detaineeName')"
+                clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-form-item :label="$t('identity.arrestUnit')">
+            <el-form-item :label="t('identity.arrestUnit')">
               <el-input
-                  v-model="searchForm.arrestUnit"
-                  :placeholder="$t('identity.placeholder.arrestUnit')"
-                  clearable
+                v-model="searchForm.arrestUnit"
+                :placeholder="t('identity.placeholder.arrestUnit')"
+                clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item>
-              <el-button type="primary" @click="handleSearch" :icon="Search">
-                {{ $t('Search') }}
+              <el-button type="primary" @click="onSearch" :icon="Search">
+                {{ $t('common.Search') }}
               </el-button>
-              <el-button @click="handleReset" :icon="Refresh">
-                {{ $t('common.reset') }}
+              <el-button @click="onReset" :icon="Refresh">
+                {{ t("common.reset") }}
               </el-button>
             </el-form-item>
           </el-col>
@@ -57,41 +62,72 @@
       <div class="action-bar">
         <div>
           <el-button
-              type="primary"
-              @click="$router.push('/identity/add')"
-              :icon="Plus"
+            type="primary"
+            @click="$router.push('/identity/add')"
+            :icon="Plus"
           >
-            {{ $t('common.add') }}
+            {{ t("common.add") }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            {{ $t('common.export') }}
+            {{ t("common.export") }}
           </el-button>
         </div>
         <div class="result-info">
-          {{ $t('common.total') }}: {{ filteredRecords.length }} {{ $t('common.unit') }}
+          {{ t("common.total") }}: {{ identityStore.getTotal }}
+          {{ t("common.unit") }}
         </div>
       </div>
     </div>
 
     <!-- Data Table -->
     <el-table
-      :data="paginatedRecords"
+      :data="identities"
       style="width: 100%"
       v-loading="loading"
       stripe
       border
     >
-      <el-table-column prop="id" :label="$t('identity.id')" width="80" sortable />
-      <el-table-column prop="detainee_id" :label="$t('identity.detaineeId')" width="170" />
-      <el-table-column prop="detainee_name" :label="$t('identity.detaineeName')" min-width="180" />
-      <el-table-column prop="arrest_date" :label="$t('identity.arrestDate')" width="140">
+      <el-table-column
+        type="index"
+        prop="id"
+        :label="$t('common.index')"
+        width="85"
+      ></el-table-column>
+      <el-table-column
+        prop="detaineeCode"
+        :label="t('identity.detaineeId')"
+        width="170"
+      />
+      <el-table-column
+        prop="detaineeName"
+        :label="t('identity.detaineeName')"
+        min-width="180"
+      />
+      <el-table-column
+        prop="arrestDate"
+        :label="t('identity.arrestDate')"
+        width="140"
+      >
         <template #default="scope">
-          {{ formatDate(scope.row.arrest_date) }}
+          {{ formatDate(scope.row.arrestDate) }}
         </template>
       </el-table-column>
-      <el-table-column prop="arrest_unit" :label="$t('identity.arrestUnit')" min-width="130" show-overflow-tooltip />
-      <el-table-column prop="fp_classification" :label="$t('identity.fpClassification')" width="150" />
-      <el-table-column :label="$t('identity.photo')" width="120" align="center">
+      <el-table-column
+        prop="arrestUnit"
+        :label="t('identity.arrestUnit')"
+        min-width="130"
+        show-overflow-tooltip
+      />
+      <el-table-column
+        prop="fpClassification"
+        :label="t('identity.fpClassification')"
+        width="150"
+      />
+      <el-table-column
+        :label="t('identity.photoTable')"
+        width="150"
+        align="center"
+      >
         <template #default="scope">
           <el-tag v-if="hasPhotos(scope.row)" type="success" size="small">
             {{ getPhotoCount(scope.row) }}/3
@@ -99,68 +135,75 @@
           <el-tag v-else type="info" size="small">0/3</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" :label="$t('common.createTime')" width="180">
+      <el-table-column
+        prop="createdAt"
+        :label="t('common.createTime')"
+        width="180"
+      >
         <template #default="scope">
-          {{ formatDate(scope.row.created_at) }}
+          {{ formatDate(scope.row.createdAt) }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
+      <el-table-column :label="t('common.actions')" width="200" fixed="right">
         <template #default="scope">
-          <el-button size="small" type="primary"
-                     @click="handleEdit(scope.row)"
-                     :icon="Edit">
-            {{ $t('common.view') }}
-          </el-button>
-          <el-button size="small" type="primary" @click="handleEdit(scope.row)" :icon="Edit">
-            {{ $t('common.edit') }}
-          </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row)" :icon="Delete">
-          </el-button>
+          <el-button @click="handleView(scope.row)" :icon="View" />
+          <el-button
+            type="primary"
+            @click="handleEdit(scope.row)"
+            :icon="Edit"
+          />
+          <el-button
+            type="danger"
+            @click="handleDelete(scope.row)"
+            :icon="Delete"
+          />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- Pagination -->
     <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[10, 20, 50, 100]"
-      :total="filteredRecords.length"
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="identityStore.getTotal"
       layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 50, 100]"
+      @size-change="onSizeChange"
+      @current-change="onPageChange"
       class="pagination"
     />
-
     <!-- Detail Dialog -->
     <el-dialog
       v-model="detailDialogVisible"
       title="Chi tiết danh bản"
       width="80%"
       :before-close="handleDetailClose"
+      class="dialog"
     >
       <div v-if="selectedRecord" class="detail-content">
         <el-row :gutter="20">
           <el-col :span="14">
             <el-descriptions :column="2" border>
               <el-descriptions-item label="Mã phạm nhân">{{
-                selectedRecord.detainee_id
+                selectedRecord.detaineeCode
               }}</el-descriptions-item>
               <el-descriptions-item label="Tên phạm nhân">{{
-                selectedRecord.detainee_name
+                selectedRecord.detaineeName
               }}</el-descriptions-item>
               <el-descriptions-item label="Tạo tại">{{
-                selectedRecord.created_place || "-"
+                selectedRecord.createdPlace || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Lý do lập">{{
-                selectedRecord.reason_note || "-"
+                selectedRecord.reasonNote || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Ngày bắt">{{
-                formatDate(selectedRecord.arrest_date)
+                formatDate(selectedRecord.arrestDate)
               }}</el-descriptions-item>
               <el-descriptions-item label="Đơn vị bắt">{{
-                selectedRecord.arrest_unit || "-"
+                selectedRecord.arrestUnit || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Phân loại VT" :span="2">{{
-                selectedRecord.fp_classification || "-"
+                selectedRecord.fpClassification || "-"
               }}</el-descriptions-item>
             </el-descriptions>
 
@@ -173,24 +216,24 @@
               v-if="selectedRecord.anthropometry"
             >
               <el-descriptions-item label="Khuôn mặt">{{
-                selectedRecord.anthropometry.face_shape || "-"
+                selectedRecord.anthropometry.faceShape || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Chiều cao">{{
-                selectedRecord.anthropometry.height_cm
-                  ? selectedRecord.anthropometry.height_cm + " cm"
+                selectedRecord.anthropometry.heightCm
+                  ? selectedRecord.anthropometry.heightCm + " cm"
                   : "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Sống mũi">{{
-                selectedRecord.anthropometry.nose_bridge || "-"
+                selectedRecord.anthropometry.noseBridge || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Nếp tai dưới">{{
-                selectedRecord.anthropometry.ear_lower_fold || "-"
+                selectedRecord.anthropometry.earLowerFold || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Dái tai" :span="2">{{
-                selectedRecord.anthropometry.ear_lobe || "-"
+                selectedRecord.anthropometry.earLobe || "-"
               }}</el-descriptions-item>
               <el-descriptions-item label="Dấu vết riêng" :span="2">{{
-                selectedRecord.anthropometry.distinctive_marks || "-"
+                selectedRecord.anthropometry.distinctiveMarks || "-"
               }}</el-descriptions-item>
             </el-descriptions>
           </el-col>
@@ -200,19 +243,16 @@
               <h4>Ảnh danh bản</h4>
               <div class="photo-grid">
                 <div
-                  v-for="(type, key) in photoTypes"
+                  v-for="[key, label] in photoTypeEntries"
                   :key="key"
                   class="photo-item"
                 >
-                  <div class="photo-label">{{ type }}</div>
+                  <div class="photo-label">{{ label }}</div>
                   <div class="photo-container">
                     <img
-                      v-if="selectedRecord.photos && selectedRecord.photos[key]"
-                      :src="
-                        selectedRecord.photos[key].minioUrl ||
-                        selectedRecord.photos[key]
-                      "
-                      :alt="type"
+                      v-if="photoMap[key]"
+                      :src="photoMap[key]"
+                      :alt="label"
                       @error="handleImageError"
                     />
                     <div v-else class="no-photo">
@@ -237,8 +277,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted, reactive, watch, nextTick } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   Search,
@@ -250,23 +290,32 @@ import {
   Delete,
   Picture,
 } from "@element-plus/icons-vue";
-import { useIdentityStore } from "@/stores";
+import { useIdentityStore } from "@/stores/identity";
+import type { Identity, PageQuery } from "@/types/identity";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const router = useRouter();
 const identityStore = useIdentityStore();
+const identities = ref<Identity[]>([]);
 
 // Reactive data
 const loading = ref(false);
-const searchForm = ref({
-  detaineeId: "",
+const searchForm = reactive<{
+  detaineeCode?: string;
+  detaineeName?: string;
+  arrestUnit?: string;
+}>({
+  detaineeCode: "",
   detaineeName: "",
   arrestUnit: "",
 });
-const currentPage = ref(1);
-const pageSize = ref(10);
+const page = ref(1);
+const size = ref(10);
 const detailDialogVisible = ref(false);
-const selectedRecord = ref(null);
+const selectedRecord = ref<Identity | null>(null);
 
 const photoTypes = {
   front: "Mặt trước",
@@ -274,71 +323,97 @@ const photoTypes = {
   right: "Nghiêng phải",
 };
 
+const viewToKey: Record<string, keyof typeof photoTypes> = {
+  FRONT: "front",
+  LEFT_PROFILE: "left",
+  RIGHT_PROFILE: "right",
+};
+const photoMap = computed<Record<keyof typeof photoTypes, string>>(() => {
+  const out = { front: "", left: "", right: "" } as Record<
+    keyof typeof photoTypes,
+    string
+  >;
+  const list = selectedRecord.value?.photos ?? [];
+  for (const p of list) {
+    const k = viewToKey[p.view as string];
+    if (!k) continue;
+    // ưu tiên presigned linkUrl, fallback objectUrl
+    out[k] = p.linkUrl || p.objectUrl || "";
+  }
+  return out;
+});
+
 // Computed
-const filteredRecords = computed(() => {
-  return identityStore.identityRecords.filter((record) => {
-    return (
-      (!searchForm.value.detaineeId ||
-        record.detainee_id
-          .toLowerCase()
-          .includes(searchForm.value.detaineeId.toLowerCase())) &&
-      (!searchForm.value.detaineeName ||
-        (record.detainee_name &&
-          record.detainee_name
-            .toLowerCase()
-            .includes(searchForm.value.detaineeName.toLowerCase()))) &&
-      (!searchForm.value.arrestUnit ||
-        (record.arrest_unit &&
-          record.arrest_unit
-            .toLowerCase()
-            .includes(searchForm.value.arrestUnit.toLowerCase())))
-    );
-  });
-});
-
-const paginatedRecords = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredRecords.value.slice(start, end);
-});
-
+const photoTypeEntries = computed(
+  () => Object.entries(photoTypes) as [keyof typeof photoTypes, string][]
+);
 // Methods
-const handleSearch = () => {
-  currentPage.value = 1;
+const formatDate = (dateStr: any) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+const search = async (extra?: Partial<PageQuery>) => {
+  try {
+    loading.value = true;
+
+    await identityStore.listPage({
+      pageNo: page.value,
+      pageSize: size.value,
+      detaineeCode: searchForm.detaineeCode ?? null,
+      detaineeName: searchForm.detaineeName ?? null,
+      arrestUnit: searchForm.arrestUnit ?? null,
+      ...extra,
+    } as PageQuery);
+
+    identities.value = identityStore.getIdentities || [];
+  } catch (error) {
+    ElMessage.error(t("common.dataFail"));
+  } finally {
+    loading.value = false;
+  }
+};
+const onSearch = () => {
+  page.value = 1;
+  search({ pageNo: 1 });
+};
+const onReset = () => {
+  searchForm.detaineeCode = "";
+  searchForm.detaineeName = "";
+  searchForm.arrestUnit = "";
+  page.value = 1;
+  search({ pageNo: 1 });
 };
 
-const handleReset = () => {
-  searchForm.value = {
-    detaineeId: "",
-    detaineeName: "",
-    arrestUnit: "",
-  };
-  currentPage.value = 1;
-};
-
-const handleView = (record) => {
+const handleView = (record: any) => {
   selectedRecord.value = record;
   detailDialogVisible.value = true;
 };
 
-const handleEdit = (record) => {
+const handleEdit = (record: any) => {
   router.push(`/identity/edit/${record.id}`);
 };
 
-const handleDelete = async (record) => {
+const handleDelete = async (record: any) => {
   try {
-    await ElMessageBox.confirm(
-      `Bạn có chắc chắn muốn xóa danh bản của "${record.detainee_name}" không?`,
+    const ok = await ElMessageBox.confirm(
+      `Bạn có chắc chắn muốn xóa danh bản của "${record.detaineeName}" không?`,
       "Xác nhận xóa",
       {
         confirmButtonText: "Xóa",
         cancelButtonText: "Hủy",
         type: "warning",
       }
-    );
+    )
+      .then(() => true)
+      .catch(() => false);
 
-    identityStore.deleteIdentityRecord(record.id);
-    ElMessage.success("Xóa danh bản thành công!");
+    if (!ok) return;
+    await identityStore.deleteIdentity(record.id);
+    search();
   } catch {
     ElMessage.info("Đã hủy thao tác xóa");
   }
@@ -353,28 +428,43 @@ const handleDetailClose = () => {
   selectedRecord.value = null;
 };
 
-const hasPhotos = (record) => {
+const hasPhotos = (record: any) => {
   if (!record.photos) return false;
   return Object.values(record.photos).some((photo) => photo !== null);
 };
 
-const getPhotoCount = (record) => {
+const getPhotoCount = (record: any) => {
   if (!record.photos) return 0;
   return Object.values(record.photos).filter((photo) => photo !== null).length;
 };
 
-const handleImageError = (event) => {
+const handleImageError = (event: any) => {
   event.target.style.display = "none";
   event.target.nextElementSibling.style.display = "flex";
 };
+watch(page, (p) => {
+  identityStore.pageNo = p;
+  search();
+});
+watch(size, (s) => {
+  identityStore.pageSize = s;
+  search();
+});
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+const onPageChange = (p: number) => {
+  page.value = p;
+  search();
+};
+const onSizeChange = (s: number) => {
+  size.value = s;
+  search();
 };
 
-onMounted(() => {
-  // Load data if needed
+onMounted(async () => {
+  await nextTick();
+  if (identityStore.pageNo) page.value = identityStore.pageNo;
+  if (identityStore.pageSize) size.value = identityStore.pageSize;
+  await search();
 });
 </script>
 
@@ -463,5 +553,10 @@ onMounted(() => {
 
 .no-photo span {
   font-size: 12px;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

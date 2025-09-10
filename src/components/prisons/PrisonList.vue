@@ -47,7 +47,7 @@
           <el-col :span="8">
             <el-form-item>
               <el-button type="primary" @click="onSearch" :icon="Search">
-                {{ t('Search') }}
+                {{ t('common.Search') }}
               </el-button>
               <el-button @click="onReset" :icon="Refresh">
                 {{ t('common.reset') }}

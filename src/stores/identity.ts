@@ -1,19 +1,18 @@
 import { defineStore } from "pinia";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
-import { DetaineeService } from "@/services/detainee";
+import { ElMessage } from "element-plus";
+import { IdentityService } from "@/services/identity";
 import type {
-  DetaineeState,
-  Detainee,
+  IdentityState,
+  Identity,
   PageQuery,
-  CreateDetaineeRequest,
-  UpdateDetaineeRequest,
-} from "@/types/detainee";
+  IdentityRecordCreateRequest,
+  IdentityRecordUpdateRequest,
+} from "@/types/identity";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
-export const useDetaineeStore = defineStore("detainee", {
-  state: (): DetaineeState => ({
-    detainees: undefined,
+export const useIdentityStore = defineStore("identity", {
+  state: (): IdentityState => ({
+    identities: undefined,
     total: 0,
     pageNo: 1,
     pageSize: 10,
@@ -23,7 +22,7 @@ export const useDetaineeStore = defineStore("detainee", {
   }),
 
   getters: {
-    getDetainees: (state): Detainee[] | undefined => state.detainees,
+    getIdentities: (state): Identity[] | undefined => state.identities,
     getTotal: (state): number => state.total,
     getPage: (state): number => state.pageNo,
     getSize: (state): number => state.pageSize,
@@ -43,13 +42,14 @@ export const useDetaineeStore = defineStore("detainee", {
         };
 
         // Call API
-        const res: ServiceResult<PagingResult<Detainee>> =
-          await DetaineeService.list(params);
+        const res: ServiceResult<PagingResult<Identity>> =
+          await IdentityService.list(params);
 
         // Kiểm tra success
         if (!res.success) {
           throw new Error(res.message || "Fetch prisons failed");
         }
+
         if (!res.data) {
           throw new Error("No data returned from fetch prisons");
         }
@@ -61,7 +61,7 @@ export const useDetaineeStore = defineStore("detainee", {
           size: pageSize,
         } = res.data;
 
-        this.detainees = content;
+        this.identities = content;
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
@@ -80,7 +80,7 @@ export const useDetaineeStore = defineStore("detainee", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Detainee> = await DetaineeService.getById(id);
+        const res: ServiceResult<Identity> = await IdentityService.getById(id);
 
         if (!res.success) {
           throw new Error(res.message || "Fetch prison failed");
@@ -99,11 +99,11 @@ export const useDetaineeStore = defineStore("detainee", {
       }
     },
 
-    async createDetainee(payload: CreateDetaineeRequest) {
+    async createIdentity(payload: FormData) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Detainee> = await DetaineeService.create(
+        const res: ServiceResult<Identity> = await IdentityService.create(
           payload
         );
 
@@ -125,11 +125,11 @@ export const useDetaineeStore = defineStore("detainee", {
       }
     },
 
-    async updateDetainee(id: number, payload: UpdateDetaineeRequest) {
+    async updateIdentity(id: number, payload: FormData) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<Detainee> = await DetaineeService.update(
+        const res: ServiceResult<Identity> = await IdentityService.update(
           id,
           payload
         );
@@ -152,19 +152,19 @@ export const useDetaineeStore = defineStore("detainee", {
       }
     },
 
-    async deleteDetainee(id: number) {
+    async deleteIdentity(id: number) {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<boolean> = await DetaineeService.delete(id);
+        const res: ServiceResult<boolean> = await IdentityService.delete(id);
 
         if (!res.success) {
           throw new Error(res.message || "Delete prison failed");
         }
         ElMessage.success("Deleted successfully");
-        // if (this.lastQuery) {
-        //   await this.fetchList(this.lastQuery);
-        // }
+        if (this.lastQuery) {
+          await this.listPage(this.lastQuery);
+        }
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";
@@ -176,30 +176,8 @@ export const useDetaineeStore = defineStore("detainee", {
       }
     },
 
-    async getAll() {
-      this.loading = true;
-      this.error = undefined;
-      try {
-        const res: ServiceResult<Detainee[]> = await DetaineeService.getAll();
-
-        if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
-        }
-
-        this.detainees = res.data;
-      } catch (e: any) {
-        const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
-        this.error = msg;
-        ElMessage.error(msg);
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
-
     resetAndBackToList() {
-      this.detainees = undefined;
+      this.identities = undefined;
       this.total = 0;
       this.pageNo = 1;
       this.pageSize = 10;

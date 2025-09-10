@@ -58,7 +58,7 @@
         </el-row>
         <el-form-item>
           <el-button type="primary" @click="onSearch" :icon="Search">
-            {{ t('Search') }}
+            {{ t('common.Search') }}
           </el-button>
           <el-button @click="onReset" :icon="Refresh">
             {{ t('common.reset') }}
@@ -105,7 +105,7 @@
           fixed="left"
       />
       <el-table-column prop="fullName" :label="t('staff.fullName')" min-width="150" />
-      <el-table-column prop="idNumber" :label="t('staff.idNumber')" min-width="120" />
+      <el-table-column prop="idNumber" :label="t('staff.idNumber')" min-width="170" />
       <el-table-column :label="t('staff.gender')" width="120">
         <template #default="{ row }">
           {{ getGenderLabel(row.gender) }}
@@ -321,8 +321,12 @@ const selectedStaff = ref<Staff | null>(null);
 
 // Methods
 const formatDate = (dateStr: any) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 };
 
 const getGenderLabel = (value: any) => {
@@ -381,7 +385,6 @@ const search = async (extra?: Partial<PageQuery>) => {
 
     staffs.value = staffStore.getStaffs || [];
   } catch (error) {
-    console.error("Error fetching prison list:", error);
     ElMessage.error(t('common.dataFail'));
   } finally {
     loading.value = false;

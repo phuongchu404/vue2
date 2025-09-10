@@ -11,19 +11,19 @@
       <el-form :model="searchForm" label-width="130px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-form-item label="Mã phạm nhân">
+            <el-form-item :label="$t('detainee.code')">
               <el-input
                 v-model="searchForm.detaineeCode"
-                placeholder="Nhập mã phạm nhân..."
+                :placeholder="$t('detainee.placeholder.code')"
                 clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="Họ và tên">
+            <el-form-item :label="$t('detainee.fullName')">
               <el-input
                 v-model="searchForm.fullName"
-                placeholder="Nhập họ và tên..."
+                :placeholder="$t('detainee.placeholder.fullName')"
                 clearable
               />
             </el-form-item>
@@ -31,18 +31,18 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="8"
-            ><el-form-item label="Số CCCD/CMND">
+            ><el-form-item :label="$t('detainee.idNumber')">
               <el-input
                 v-model="searchForm.idNumber"
-                placeholder="Nhập số CCCD/CMND..."
+                :placeholder="$t('detainee.placeholder.idNumber')"
                 clearable
               /> </el-form-item
           ></el-col>
           <el-col :span="8"
-            ><el-form-item label="Trạng thái">
+            ><el-form-item :label="$t('detainee.status')">
               <el-select
                 v-model="searchForm.status"
-                placeholder="Chọn trạng thái"
+                :placeholder="$t('detainee.placeholder.status')"
                 clearable
               >
                 <el-option
@@ -57,9 +57,9 @@
 
         <el-form-item>
           <el-button type="primary" @click="onSearch" :icon="Search"
-            >Tìm kiếm</el-button
+            >{{ $t('common.Search') }}</el-button
           >
-          <el-button @click="onReset" :icon="Refresh">Làm mới</el-button>
+          <el-button @click="onReset" :icon="Refresh">{{ $t('common.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -73,14 +73,14 @@
             @click="$router.push('/detainees/add')"
             :icon="Plus"
           >
-            Thêm phạm nhân mới
+            {{ $t('common.add') }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            Xuất Excel
+            {{ $t('common.export') }}
           </el-button>
         </div>
         <div class="result-info">
-          Tổng số: {{ detaineeStore.getTotal }} phạm nhân
+          {{ $t('common.total') }}: {{ detaineeStore.getTotal }} {{ $t('common.unit') }}
         </div>
       </div>
     </div>
@@ -96,18 +96,18 @@
       <el-table-column
         align="center"
         prop="detaineeCode"
-        label="Mã phạm nhân"
+        :label="$t('detainee.code')"
         width="160"
         sortable show-overflow-tooltip
       />
       <el-table-column
         align="center"
         prop="fullName"
-        label="Họ và tên"
+        :label="$t('detainee.fullName')"
         min-width="100"
         show-overflow-tooltip
       />
-      <el-table-column label="Giới tính" width="120">
+      <el-table-column :label="$t('detainee.gender')" width="120">
         <template #default="{ row }">
           {{ getGenderLabel(row.gender) }}
         </template>
@@ -115,7 +115,7 @@
       <el-table-column
         align="center"
         prop="dateOfBirth"
-        label="Ngày sinh"
+        :label="$t('detainee.dateOfBirth')"
         width="135" show-overflow-tooltip
       >
         <template #default="scope">
@@ -125,13 +125,13 @@
       <el-table-column
         align="center"
         prop="idNumber"
-        label="CCCD/CMND"
+        :label="$t('detainee.idNumber')"
         width="150" show-overflow-tooltip
       />
       <el-table-column
         align="center"
         prop="detentionDate"
-        label="Ngày bắt"
+        :label="$t('detainee.detentionDate')"
         width="120" show-overflow-tooltip
       >
         <template #default="scope">
@@ -141,23 +141,23 @@
       <el-table-column
         align="center"
         prop="cellNumber"
-        label="Buồng giam"
+        :label="$t('detainee.cellNumber')"
         width="145"
       />
       <el-table-column
         prop="charges"
-        label="Tội danh"
+        :label="$t('detainee.charges')"
         min-width="200"
         show-overflow-tooltip
       />
-      <el-table-column label="Trạng thái" width="150" align="center">
+      <el-table-column :label="$t('detainee.status')" width="150" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Thao tác" width="200" fixed="right">
+      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
         <template #default="scope">
           <el-button  @click="handleView(scope.row)" :icon="View">
           </el-button>
@@ -187,12 +187,18 @@
       @size-change="onSizeChange"
       @current-change="onPageChange"
       class="pagination"
+      :locale="{
+        goto: t('el.pagination.goto'),
+        pagesize: t('el.pagination.pagesize'),
+        total: t('el.pagination.total'),
+        pageClassifier: t('el.pagination.pageClassifier')
+      }"
     />
 
     <!-- Detail Dialog -->
     <el-dialog
       v-model="detailDialogVisible"
-      title="Chi tiết phạm nhân"
+      :title="$t('detainee.detailTitle')"
       width="60%"
       :before-close="handleDetailClose"
       class="dialog"
@@ -200,105 +206,105 @@
       <div class="permsTree">
         <div v-if="selectedDetainee" class="detail-content">
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="Mã phạm nhân">{{
+            <el-descriptions-item :label="$t('detainee.code')">{{
               selectedDetainee.detaineeCode
             }}</el-descriptions-item>
-            <el-descriptions-item label="Số hồ sơ">{{
+            <el-descriptions-item :label="$t('detainee.profileNumber')">{{
               selectedDetainee.profileNumber || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Họ và tên" :span="2">{{
+            <el-descriptions-item :label="$t('detainee.fullName')" :span="2">{{
               selectedDetainee.fullName
             }}</el-descriptions-item>
-            <el-descriptions-item label="Tên gọi khác">{{
+            <el-descriptions-item :label="$t('detainee.aliasName')">{{
               selectedDetainee.aliasName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Giới tính">{{
+            <el-descriptions-item :label="$t('detainee.gender')">{{
               getGenderLabel(selectedDetainee.gender)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày sinh">{{
+            <el-descriptions-item :label="$t('detainee.dateOfBirth')">{{
               formatDate(selectedDetainee.dateOfBirth)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Nơi sinh">{{
+            <el-descriptions-item :label="$t('detainee.placeOfBirth')">{{
               selectedDetainee.placeOfBirth || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Số CCCD/CMND">{{
+            <el-descriptions-item :label="$t('detainee.idNumber')">{{
               selectedDetainee.idNumber || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày cấp">{{
+            <el-descriptions-item :label="$t('detainee.idIssueDate')">{{
               formatDate(selectedDetainee.idIssueDate)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Nơi cấp">{{
+            <el-descriptions-item :label="$t('detainee.idIssuePlace')">{{
               selectedDetainee.idIssuePlace || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Quốc tịch">{{
+            <el-descriptions-item :label="$t('detainee.nationality')">{{
               selectedDetainee.nationalityName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Dân tộc">{{
+            <el-descriptions-item :label="$t('detainee.ethnicity')">{{
               selectedDetainee.ethnicityName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Tôn giáo">{{
+            <el-descriptions-item :label="$t('detainee.religion')">{{
               selectedDetainee.religionName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Nghề nghiệp">{{
+            <el-descriptions-item :label="$t('detainee.occupation')">{{
               selectedDetainee.occupation || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Họ tên cha">{{
+            <el-descriptions-item :label="$t('detainee.fatherName')">{{
               selectedDetainee.fatherName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Họ tên mẹ">{{
+            <el-descriptions-item :label="$t('detainee.motherName')">{{
               selectedDetainee.motherName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Họ tên vợ/chồng">{{
+            <el-descriptions-item :label="$t('detainee.spouseName')">{{
               selectedDetainee.spouseName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Tên trại giam">{{
+            <el-descriptions-item :label="$t('detainee.detentionCenter')">{{
               selectedDetainee.detentionCenterName || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày bắt">{{
+            <el-descriptions-item :label="$t('detainee.detentionDate')">{{
               formatDate(selectedDetainee.detentionDate)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày dự kiến thả">{{
+            <el-descriptions-item :label="$t('detainee.expectedReleaseDate')">{{
               formatDate(selectedDetainee.expectedReleaseDate)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày thả chính thức">{{
+            <el-descriptions-item :label="$t('detainee.actualReleaseDate')">{{
               formatDate(selectedDetainee.actualReleaseDate)
             }}</el-descriptions-item>
-            <el-descriptions-item label="Số án">{{
+            <el-descriptions-item :label="$t('detainee.caseNumber')">{{
               selectedDetainee.caseNumber || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Buồng giam">{{
+            <el-descriptions-item :label="$t('detainee.cellNumber')">{{
               selectedDetainee.cellNumber || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item label="Trạng thái">
+            <el-descriptions-item :label="$t('detainee.status')">
               <el-tag :type="getStatusType(selectedDetainee.status)">
                 {{ getStatusText(selectedDetainee.status) }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="Địa chỉ thường trú" :span="2">
+            <el-descriptions-item :label="$t('detainee.permanentAddress')" :span="2">
               {{ permanentFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item label="Địa chỉ tạm trú" :span="2">
+            <el-descriptions-item :label="$t('detainee.temporaryAddress')" :span="2">
               {{ temporaryFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item label="Nơi ở hiện tại" :span="2">
+            <el-descriptions-item :label="$t('detainee.currentAddress')" :span="2">
               {{ currentFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item label="Tội danh" :span="2">
+            <el-descriptions-item :label="$t('detainee.charges')" :span="2">
               {{ selectedDetainee.charges || "-" }}
             </el-descriptions-item>
-            <el-descriptions-item label="Thời hạn án" :span="2">
+            <el-descriptions-item :label="$t('detainee.sentenceDuration')" :span="2">
               {{ selectedDetainee.sentenceDuration || "-" }}
             </el-descriptions-item>
-            <el-descriptions-item label="Tòa án xét xử" :span="2">
+            <el-descriptions-item :label="$t('detainee.courtName')" :span="2">
               {{ selectedDetainee.courtName || "-" }}
             </el-descriptions-item>
-            <el-descriptions-item label="Ghi chú" :span="2">
+            <el-descriptions-item :label="$t('detainee.notes')" :span="2">
               {{ selectedDetainee.notes || "-" }}
             </el-descriptions-item>
-            <el-descriptions-item label="Ngày tạo"
+            <el-descriptions-item :label="$t('detainee.createdAt')"
               >{{ formatDate(selectedDetainee.createdAt) }}
             </el-descriptions-item>
-            <el-descriptions-item label="Ngày cập nhật"
+            <el-descriptions-item :label="$t('detainee.updatedAt')"
               >{{ formatDate(selectedDetainee.updatedAt) }}
             </el-descriptions-item>
           </el-descriptions>
@@ -306,9 +312,9 @@
       </div>
 
       <template #footer>
-        <el-button @click="detailDialogVisible = false">Đóng</el-button>
+        <el-button @click="detailDialogVisible = false">{{ $t('common.close') }}</el-button>
         <el-button type="primary" @click="handleEdit(selectedDetainee?.id)"
-          >Chỉnh sửa</el-button
+          >{{ $t('common.edit') }}</el-button
         >
       </template>
     </el-dialog>
@@ -409,7 +415,7 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
+  ElMessage.info(t('common.exportUpdating'));
 };
 const handleView = (staff: any) => {
   selectedDetainee.value = staff;
@@ -421,7 +427,7 @@ const search = async (extra?: Partial<PageQuery>) => {
   try {
     loading.value = true;
 
-    await detaineeStore.fetchList({
+    await detaineeStore.listPage({
       pageNo: page.value,
       pageSize: size.value,
       detaineeCode: searchForm.detaineeCode ?? null,
@@ -440,12 +446,7 @@ const search = async (extra?: Partial<PageQuery>) => {
   }
 };
 
-onMounted(async () => {
-  await nextTick();
-  if (detaineeStore.pageNo) page.value = detaineeStore.pageNo;
-  if (detaineeStore.pageSize) size.value = detaineeStore.pageSize;
-  await search();
-});
+
 
 const getStatusType = (status: any) => {
   const typeMap = {
@@ -505,6 +506,12 @@ const onDelete = async (id: number) => {
   await detaineeStore.deleteDetainee(id);
   search();
 };
+onMounted(async () => {
+  await nextTick();
+  if (detaineeStore.pageNo) page.value = detaineeStore.pageNo;
+  if (detaineeStore.pageSize) size.value = detaineeStore.pageSize;
+  await search();
+});
 </script>
 
 <style scoped>

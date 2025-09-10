@@ -11,6 +11,7 @@ import staff from "./vi-VN/staff";
 import prison from "./vi-VN/prison";
 import route from "./vi-VN/route";
 import identity from "./vi-VN/identity";
+import detainee from "@/i18n/lang/vi-VN/detainee.ts";
 
 export default {
   route,
@@ -26,4 +27,5 @@ export default {
   staff,
   prison,
   identity,
+  detainee,
 };

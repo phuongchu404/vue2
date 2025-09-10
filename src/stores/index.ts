@@ -250,7 +250,7 @@ export const useStaffStore = defineStore("staff1", () => {
 });
 
 // Identity Store
-export const useIdentityStore = defineStore("identity", () => {
+export const useIdentityStore = defineStore("identity1", () => {
   const identityRecords = ref([]);
 
   const addIdentityRecord = (record: any) => {

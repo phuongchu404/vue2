@@ -1,12 +1,12 @@
 <template>
   <div class="identity-form">
-<!--    <el-page-header @back="$router.go(-1)">-->
-<!--      <template #content>-->
-<!--         <span class="text-large font-600 mr-3">-->
-<!--          {{ isEdit ? $t('identity.editTitle') : $t('identity.createTitle') }}-->
-<!--        </span>-->
-<!--      </template>-->
-<!--    </el-page-header>-->
+    <!--    <el-page-header @back="$router.go(-1)">-->
+    <!--      <template #content>-->
+    <!--         <span class="text-large font-600 mr-3">-->
+    <!--          {{ isEdit ? t('identity.editTitle') : t('identity.createTitle') }}-->
+    <!--        </span>-->
+    <!--      </template>-->
+    <!--    </el-page-header>-->
 
     <el-card class="form-card">
       <el-form
@@ -16,31 +16,33 @@
         label-width="140px"
         @submit.prevent="handleSubmit"
       >
-        <el-divider content-position="left">{{ $t('identity.infoSection') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("identity.infoSection")
+        }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.detaineeId')" prop="detainee_id">
+            <el-form-item :label="t('identity.detaineeId')" prop="detaineeCode">
               <el-select
-                v-model="form.detainee_id"
-                :placeholder="$t('identity.placeholder.detaineeId')"
+                v-model="form.detaineeCode"
+                :placeholder="t('identity.placeholder.detaineeId')"
                 filterable
                 @change="onDetaineeChange"
               >
                 <el-option
-                  v-for="detainee in detaineeStore.detainees"
-                  :key="detainee.id"
-                  :label="`${detainee.detainee_code} - ${detainee.full_name}`"
-                  :value="detainee.detainee_code"
+                  v-for="detainee in detaineeStore.getDetainees"
+                  :key="detainee.detaineeCode"
+                  :label="`${detainee.detaineeCode} - ${detainee.fullName}`"
+                  :value="detainee.detaineeCode"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.createdPlace')">
+            <el-form-item :label="t('identity.createdPlace')">
               <el-input
-                v-model="form.created_place"
-                :placeholder="$t('identity.placeholder.createdPlace')"
+                v-model="form.createdPlace"
+                :placeholder="t('identity.placeholder.createdPlace')"
               />
             </el-form-item>
           </el-col>
@@ -48,11 +50,11 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.arrestDate')">
+            <el-form-item :label="t('identity.arrestDate')">
               <el-date-picker
-                v-model="form.arrest_date"
+                v-model="form.arrestDate"
                 type="date"
-                :placeholder="$t('identity.placeholder.arrestDate')"
+                :placeholder="t('identity.placeholder.arrestDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -60,10 +62,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.arrestUnit')">
+            <el-form-item :label="t('identity.arrestUnit')">
               <el-input
-                v-model="form.arrest_unit"
-                :placeholder="$t('identity.placeholder.arrestUnit')"
+                v-model="form.arrestUnit"
+                :placeholder="t('identity.placeholder.arrestUnit')"
               />
             </el-form-item>
           </el-col>
@@ -71,28 +73,88 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.fpClassification')">
+            <el-form-item :label="t('identity.fpClassification')">
               <el-input
-                v-model="form.fp_classification"
-                :placeholder="$t('identity.placeholder.fpClassification')"
+                v-model="form.fpClassification"
+                :placeholder="t('identity.placeholder.fpClassification')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.reasonNote')">
+            <el-form-item :label="t('identity.reasonNote')">
               <el-input
-                v-model="form.reason_note"
-                :placeholder="$t('identity.placeholder.reasonNote')"
+                v-model="form.reasonNote"
+                :placeholder="t('identity.placeholder.reasonNote')"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :md="12" :span="24">
+            <el-form-item :label="t('identity.dp')">
+              <el-input
+                v-model="form.dp"
+                :placeholder="t('identity.placeholder.dp')"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :md="12" :span="24">
+            <el-form-item :label="t('identity.tw')">
+              <el-input
+                v-model="form.tw"
+                :placeholder="t('identity.placeholder.tw')"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :md="12" :span="24">
+            <el-form-item :label="t('identity.akFileNo')">
+              <el-input
+                v-model="form.akFileNo"
+                :placeholder="t('identity.placeholder.akFileNo')"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :md="12" :span="24">
+            <el-form-item :label="t('identity.notes')">
+              <el-input
+                v-model="form.notes"
+                :placeholder="t('identity.placeholder.notes')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
         <!-- Photo Upload Section -->
-        <el-divider content-position="left">{{ $t('identity.photoSection') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("identity.photoSection")
+        }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.photoFront')">
+            <el-form-item :label="t('identity.photoLeft')">
+              <el-upload
+                class="photo-uploader"
+                :show-file-list="false"
+                :on-success="
+                  (res, file) => handlePhotoSuccess('leftProfile', file)
+                "
+                :before-upload="beforePhotoUpload"
+                action="#"
+                :auto-upload="false"
+                :on-change="(file) => handlePhotoChange('leftProfile', file)"
+              >
+                <img
+                  v-if="photoPreview.leftProfile"
+                  :src="photoPreview.leftProfile"
+                  class="photo-preview"
+                />
+                <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+          <el-col :md="8" :span="24">
+            <el-form-item :label="t('identity.photoFront')">
               <el-upload
                 class="photo-uploader"
                 :show-file-list="false"
@@ -100,62 +162,57 @@
                 :before-upload="beforePhotoUpload"
                 action="#"
                 :auto-upload="false"
-                :on-change="file => handlePhotoChange('front', file)"
+                :on-change="(file) => handlePhotoChange('front', file)"
               >
-                <img v-if="photoPreview.front" :src="photoPreview.front" class="photo-preview" />
+                <img
+                  v-if="photoPreview.front"
+                  :src="photoPreview.front"
+                  class="photo-preview"
+                />
                 <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.photoLeft')">
+            <el-form-item :label="t('identity.photoRight')">
               <el-upload
                 class="photo-uploader"
                 :show-file-list="false"
-                :on-success="(res, file) => handlePhotoSuccess('left', file)"
+                :on-success="
+                  (res, file) => handlePhotoSuccess('rightProfile', file)
+                "
                 :before-upload="beforePhotoUpload"
                 action="#"
                 :auto-upload="false"
-                :on-change="file => handlePhotoChange('left', file)"
+                :on-change="(file) => handlePhotoChange('rightProfile', file)"
               >
-                <img v-if="photoPreview.left" :src="photoPreview.left" class="photo-preview" />
-                <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
-              </el-upload>
-            </el-form-item>
-          </el-col>
-          <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.photoRight')">
-              <el-upload
-                class="photo-uploader"
-                :show-file-list="false"
-                :on-success="(res, file) => handlePhotoSuccess('right', file)"
-                :before-upload="beforePhotoUpload"
-                action="#"
-                :auto-upload="false"
-                :on-change="file => handlePhotoChange('right', file)"
-              >
-                <img v-if="photoPreview.right" :src="photoPreview.right" class="photo-preview" />
+                <img
+                  v-if="photoPreview.rightProfile"
+                  :src="photoPreview.rightProfile"
+                  class="photo-preview"
+                />
                 <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
           </el-col>
         </el-row>
 
-
-        <el-divider content-position="left">{{ $t('identity.anthropometry') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("identity.anthropometry")
+        }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.faceShape')">
+            <el-form-item :label="t('identity.faceShape')">
               <el-input
-                v-model="form.anthropometry.face_shape"
-                :placeholder="$t('identity.placeholder.faceShape')"
+                v-model="form.anthropometry.faceShape"
+                :placeholder="t('identity.placeholder.faceShape')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('identity.height')">
+            <el-form-item :label="t('identity.height')">
               <el-input-number
-                v-model="form.anthropometry.height_cm"
+                v-model="form.anthropometry.heightCm"
                 :min="100"
                 :max="250"
                 :precision="1"
@@ -167,58 +224,70 @@
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.noseBridge')">
+            <el-form-item :label="t('identity.noseBridge')">
               <el-input
-                v-model="form.anthropometry.nose_bridge"
-                :placeholder="$t('identity.placeholder.noseBridge')"
+                v-model="form.anthropometry.noseBridge"
+                :placeholder="t('identity.placeholder.noseBridge')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.earLowerFold')">
+            <el-form-item :label="t('identity.earLowerFold')">
               <el-input
-                v-model="form.anthropometry.ear_lower_fold"
-                :placeholder="$t('identity.placeholder.earLowerFold')"
+                v-model="form.anthropometry.earLowerFold"
+                :placeholder="t('identity.placeholder.earLowerFold')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('identity.earLobe')">
+            <el-form-item :label="t('identity.earLobe')">
               <el-input
-                v-model="form.anthropometry.ear_lobe"
-                :placeholder="$t('identity.placeholder.earLobe')"
+                v-model="form.anthropometry.earLobe"
+                :placeholder="t('identity.placeholder.earLobe')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item :label="$t('identity.distinctiveMarks')">
+        <el-form-item :label="t('identity.distinctiveMarks')">
           <el-input
-            v-model="form.anthropometry.distinctive_marks"
+            v-model="form.anthropometry.distinctiveMarks"
             type="textarea"
             :rows="3"
-            :placeholder="$t('identity.placeholder.distinctiveMarks')"
+            :placeholder="t('identity.placeholder.distinctiveMarks')"
           />
         </el-form-item>
 
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? $t('common.update') : $t('common.create') }}
+            {{ isEdit ? t("common.update") : t("common.create") }}
           </el-button>
-          <el-button @click="handleReset">{{ $t('common.reset') }}</el-button>
-          <el-button @click="$router.go(-1)">{{ $t('common.cancel') }}</el-button>
+          <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
+          <el-button @click="$router.go(-1)">{{
+            t("common.cancel")
+          }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { useIdentityStore, useDetaineeStore } from "@/stores";
+import { useIdentityStore } from "@/stores/identity";
+import { useDetaineeStore } from "@/stores/detainee";
+import { useI18n } from "vue-i18n";
+import type {
+  Identity,
+  IdentityRecordUpdateRequest,
+  IdentityRecordCreateRequest,
+  AnthropometryResponse,
+} from "@/types/identity";
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -230,33 +299,39 @@ const formRef = ref();
 const submitting = ref(false);
 const isEdit = computed(() => !!route.params.id);
 
-const form = reactive({
-  detainee_id: "",
-  created_place: "",
-  reason_note: "",
-  arrest_date: "",
-  arrest_unit: "",
-  fp_classification: "",
+const form = reactive<Partial<Identity>>({
+  // IdentityRecord
+  detaineeCode: "",
+  createdPlace: "",
+  reasonNote: "",
+  arrestDate: "",
+  arrestUnit: "",
+  fpClassification: "",
+  dp: "",
+  tw: "",
+  akFileNo: "",
+  notes: "",
+  //  Anthropometry
   anthropometry: {
-    face_shape: "",
-    height_cm: null,
-    nose_bridge: "",
-    ear_lower_fold: "",
-    ear_lobe: "",
-    distinctive_marks: "",
-  },
+    faceShape: "",
+    heightCm: undefined,
+    noseBridge: "",
+    earLowerFold: "",
+    earLobe: "",
+    distinctiveMarks: "",
+  } as AnthropometryResponse,
 });
 
-const photoPreview = reactive({
+const photoPreview: any = reactive({
   front: "",
-  left: "",
-  right: "",
+  leftProfile: "",
+  rightProfile: "",
 });
 
-const photoFiles = reactive({
+const photoFiles: any = reactive({
   front: null,
-  left: null,
-  right: null,
+  leftProfile: null,
+  rightProfile: null,
 });
 
 // Validation rules
@@ -267,31 +342,41 @@ const rules = reactive({
 });
 
 // Methods
-const onDetaineeChange = (value) => {
-  const detainee = detaineeStore.detainees.find(
-    (d) => d.detainee_code === value
+const viewToKey = (
+  v: string
+): "front" | "leftProfile" | "rightProfile" | undefined => {
+  const map: Record<string, "front" | "leftProfile" | "rightProfile"> = {
+    FRONT: "front",
+    LEFT_PROFILE: "leftProfile",
+    RIGHT_PROFILE: "rightProfile",
+  };
+  return map[v];
+};
+const onDetaineeChange = (value: any) => {
+  const detainee = detaineeStore.getDetainees?.find(
+    (d) => d.detaineeCode === value
   );
   if (detainee) {
-    form.arrest_date = detainee.detention_date;
+    form.arrestDate = detainee.detentionDate || "";
   }
 };
 
-const handlePhotoChange = (type, file) => {
+const handlePhotoChange = (type: any, file: any) => {
   if (file.raw) {
     photoFiles[type] = file.raw;
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (e: any) => {
       photoPreview[type] = e.target.result;
     };
     reader.readAsDataURL(file.raw);
   }
 };
 
-const handlePhotoSuccess = (type, file) => {
+const handlePhotoSuccess = (type: any, file: any) => {
   ElMessage.success(`Tải ảnh ${type} thành công!`);
 };
 
-const beforePhotoUpload = (file) => {
+const beforePhotoUpload = (file: any) => {
   const isImage = file.type.startsWith("image/");
   const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -306,17 +391,23 @@ const beforePhotoUpload = (file) => {
   return true;
 };
 
-const loadData = () => {
+const loadData = async () => {
   if (isEdit.value) {
-    const record = identityStore.getIdentityRecordById(route.params.id);
+    const record = await identityStore.fetchDetail(Number(route.params.id));
     if (record) {
       Object.assign(form, record);
       // Load photo previews if available
-      if (record.photos) {
-        Object.keys(record.photos).forEach((type) => {
-          if (record.photos[type] && record.photos[type].minioUrl) {
-            photoPreview[type] = record.photos[type].minioUrl;
-          }
+      if (Array.isArray(record?.photos)) {
+        // (tuỳ chọn) reset trước khi fill
+        photoPreview.front = "";
+        photoPreview.leftProfile = "";
+        photoPreview.rightProfile = "";
+
+        record.photos.forEach((p: any) => {
+          const key = viewToKey(p.view);
+          if (!key) return;
+          // ưu tiên presigned linkUrl; fallback objectUrl
+          photoPreview[key] = p.linkUrl ?? p.objectUrl ?? "";
         });
       }
     } else {
@@ -332,40 +423,66 @@ const handleSubmit = async () => {
   try {
     await formRef.value.validate();
 
-    // Check if detainee exists
-    const detainee = detaineeStore.detainees.find(
-      (d) => d.detainee_code === form.detainee_id
-    );
-    if (!detainee) {
-      ElMessage.error("Không tìm thấy phạm nhân với mã này!");
-      return;
-    }
+    submitting.value = true;
 
-    // Check if identity record already exists for this detainee (for new records)
-    if (!isEdit.value) {
-      const existingRecord = identityStore.identityRecords.find(
-        (r) => r.detainee_id === form.detainee_id
-      );
-      if (existingRecord) {
-        ElMessage.error("Phạm nhân này đã có danh bản!");
-        return;
+    const fd = new FormData();
+    for (const key in photoFiles) {
+      if (photoFiles[key]) {
+        fd.append(key, photoFiles[key]);
       }
     }
 
-    submitting.value = true;
-
-    const recordData = {
-      ...form,
-      detainee_name: detainee.full_name,
-      photos: photoFiles,
-    };
-
     if (isEdit.value) {
-      identityStore.updateIdentityRecord(parseInt(route.params.id), recordData);
-      ElMessage.success("Cập nhật danh bản thành công!");
+      const recordData: IdentityRecordUpdateRequest = {
+        createdPlace: form.createdPlace,
+        reasonNote: form.reasonNote,
+        arrestDate: form.arrestDate,
+        arrestUnit: form.arrestUnit,
+        fpClassification: form.fpClassification,
+        dp: form.dp,
+        tw: form.tw,
+        akFileNo: form.akFileNo,
+        notes: form.notes,
+        faceShape: (form.anthropometry as AnthropometryResponse).faceShape,
+        heightCm: (form.anthropometry as AnthropometryResponse).heightCm,
+        noseBridge: (form.anthropometry as AnthropometryResponse).noseBridge,
+        earLowerFold: (form.anthropometry as AnthropometryResponse)
+          .earLowerFold,
+        earLobe: (form.anthropometry as AnthropometryResponse).earLobe,
+        distinctiveMarks: (form.anthropometry as AnthropometryResponse)
+          .distinctiveMarks,
+      };
+      fd.append(
+        "payload",
+        new Blob([JSON.stringify(recordData)], { type: "application/json" })
+      );
+      await identityStore.updateIdentity(Number(route.params.id), fd);
     } else {
-      identityStore.addIdentityRecord(recordData);
-      ElMessage.success("Tạo danh bản thành công!");
+      const recordData: IdentityRecordCreateRequest = {
+        detaineeCode: form.detaineeCode,
+        createdPlace: form.createdPlace,
+        reasonNote: form.reasonNote,
+        arrestDate: form.arrestDate,
+        arrestUnit: form.arrestUnit,
+        fpClassification: form.fpClassification,
+        dp: form.dp,
+        tw: form.tw,
+        akFileNo: form.akFileNo,
+        notes: form.notes,
+        faceShape: (form.anthropometry as AnthropometryResponse).faceShape,
+        heightCm: (form.anthropometry as AnthropometryResponse).heightCm,
+        noseBridge: (form.anthropometry as AnthropometryResponse).noseBridge,
+        earLowerFold: (form.anthropometry as AnthropometryResponse)
+          .earLowerFold,
+        earLobe: (form.anthropometry as AnthropometryResponse).earLobe,
+        distinctiveMarks: (form.anthropometry as AnthropometryResponse)
+          .distinctiveMarks,
+      };
+      fd.append(
+        "payload",
+        new Blob([JSON.stringify(recordData)], { type: "application/json" })
+      );
+      await identityStore.createIdentity(fd);
     }
 
     router.push("/identity");
@@ -383,26 +500,44 @@ const handleReset = () => {
     formRef.value?.resetFields();
     Object.assign(form, {
       detainee_id: "",
-      created_place: "",
-      reason_note: "",
-      arrest_date: "",
-      arrest_unit: "",
-      fp_classification: "",
+      detainee_code: "",
+      reason: "",
+      reasonNote: "",
+      arrestDate: "",
+      arrestUnit: "",
+      fpClassification: "",
+      dp: "",
+      tw: "",
+      akFileNo: "",
+      notes: "",
       anthropometry: {
-        face_shape: "",
-        height_cm: null,
-        nose_bridge: "",
-        ear_lower_fold: "",
-        ear_lobe: "",
-        distinctive_marks: "",
+        faceShape: "",
+        heightCm: undefined,
+        noseBridge: "",
+        distinctiveMarks: "",
+        earLowerFold: "",
+        earLobe: "",
       },
     });
-    Object.assign(photoPreview, { front: "", left: "", right: "" });
-    Object.assign(photoFiles, { front: null, left: null, right: null });
+    Object.assign(photoPreview, {
+      front: "",
+      leftProfile: "",
+      rightProfile: "",
+    });
+    Object.assign(photoFiles, {
+      front: null,
+      leftProfile: null,
+      rightProfile: null,
+    });
   }
 };
 
-onMounted(() => {
+const getAllDetainees = () => {
+  detaineeStore.getAll();
+};
+
+onMounted(async () => {
+  await getAllDetainees();
   loadData();
 });
 </script>

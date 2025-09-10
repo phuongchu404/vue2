@@ -2,7 +2,11 @@
   --primary-color: #667eea;
   --dark-primary-color: #764ba2;
   --light-primary-color: rgba(255, 255, 255, 0.95);
-  --linear-primary-color: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%);
+  --linear-primary-color: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--dark-primary-color) 100%
+  );
   --label-color: #2c3e50;
   --text-color: #7f8c8d;
   --white: #fff;
@@ -160,10 +164,9 @@ tr.el-table__row:hover {
 }
 
 .el-dialog {
-  padding: 0!important;
+  padding: 0 !important;
 }
 .dialog {
-
   .el-dialog__header {
     padding: 15px 20px !important;
     background: var(--primary-color) !important;
@@ -178,7 +181,7 @@ tr.el-table__row:hover {
     }
   }
 
-  .el-dialog__body  {
+  .el-dialog__body {
     padding: 20px;
   }
 
@@ -1372,7 +1375,6 @@ thead {
   color: #2c3e50;
 }
 
-.el-input__inner,
 .el-select .el-input__inner,
 .el-textarea__inner {
   // border: 2px solid #ecf0f1 !important;

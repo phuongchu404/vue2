@@ -66,6 +66,7 @@ const common: Common = {
   inputFile: "No data file selected",
   inputStatus: "Please fill in this information",
   Search: "Search",
+  create: "Create",
   edit: "Edit",
   update: "Update",
   exportUpdating: "Excel export function is under development!",
