@@ -1,28 +1,18 @@
-export default {
-  "option.add": "Add",
-  "option.active": "Active",
-  "option.inactive": "Inactive",
-  "option.update": "Update",
-  "option.lost": "Lost card",
-  "option.delete": "Delete",
-  "option.query": "Query",
-  "option.upload": "Upload File",
-  "option.page": "Page",
-  "option.lock": "Lock",
-  "option.unlock": "Unlock",
-  "option.resetPassword": "Reset password",
-  "option.account": "Account",
-  "option.emv": "EMV",
-  "option.assignRole": "Assign role",
-  "option.assignPermission": "Assign permission",
-  "option.generateToken": "Generate token",
-  "option.queryProgress": "Query progress",
-  "option.merchantInfo": "Merchant information",
-  "option.import":"Import",
-  "license.upload":"Upload license file",
-  "option.return":"Return card",
-  "option.addVisitor":"Add visitor",
-  "option.checkIn":"Check In",
-  "option.syn":"Synchronize",
-  "option.Detail":"Detail",
-}
+import type { Option } from "@/i18n/type";
+
+const option: Option = {
+  add: "Add",
+  update: "Edit",
+  delete: "Delete",
+  query: "Search",
+  page: "Page",
+  resetPassword: "Reset Password",
+  account: "Account",
+  assignRole: "Assign Role",
+  assignPermission: "Assign Permission",
+  import: "Import",
+  syn: "Synchronize",
+  detail: "Detail",
+};
+
+export default option;

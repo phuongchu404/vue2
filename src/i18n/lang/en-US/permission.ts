@@ -1,7 +1,10 @@
-export default {
-  "permission.menus": "Menu tree",
-  "permission.options": "Operation list",
-  "permission.name": "Button",
-  "permission.description": "Description",
-  "permission.url": "Access path",
-}
+import type { Permission } from "@/i18n/type";
+
+const permission: Permission = {
+  menus: "Menu Tree",
+  options: "Actions",
+  description: "Description",
+  url: "URL",
+};
+
+export default permission;

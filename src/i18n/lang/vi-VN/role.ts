@@ -1,11 +1,15 @@
-export default {
-    "role.roleName": "Tên vai trò",
-    "role.description": "Mô tả vai trò",
-    "role.add": "Thêm vai trò",
-    "role.update": "Cập nhật vai trò",
-    "role.syncPermission": "Đồng bộ quyền hạn",
-    "role.detailedInformation": "Thông tin chi tiết",
-    "role.inputRoleName": "Hãy điền thông tin này",
-    "role.inputDescription": "Hãy điền thông tin này",
-    "role.selectRolePermission": "Hãy chọn quyền hạn",
-}
+import type { Role } from "@/i18n/type";
+
+const role: Role = {
+  roleName: "Tên vai trò",
+  description: "Mô tả vai trò",
+  add: "Thêm vai trò",
+  update: "Cập nhật vai trò",
+  syncPermission: "Đồng bộ quyền hạn",
+  detailedInformation: "Thông tin chi tiết",
+  inputRoleName: "Hãy điền thông tin này",
+  inputDescription: "Hãy điền thông tin này",
+  selectRolePermission: "Hãy chọn quyền hạn",
+};
+
+export default role;

@@ -36,7 +36,7 @@ const pinia = createPinia();
 axios.interceptors.request.use((config: any) => {
   config.headers["lang"] =
     localStorage.getItem("LANG") || window.navigator.language;
-  const token = localStorage.getItem("TOKEN");
+  const token = sessionStorage.getItem("TOKEN");
   if (token) {
     console.log("token", token);
     config.headers["x-access-token"] = token;
@@ -46,9 +46,9 @@ axios.interceptors.request.use((config: any) => {
 
 axios.interceptors.response.use((response) => {
   const token = response.headers["x-access-token"];
-  const oldToken = localStorage.getItem("TOKEN");
+  const oldToken = sessionStorage.getItem("TOKEN");
   if (token && token !== oldToken) {
-    localStorage.setItem("TOKEN", token);
+    sessionStorage.setItem("TOKEN", token);
   }
   return response;
 });
@@ -58,7 +58,7 @@ router.beforeEach((to, from, next) => {
   setActivePinia(pinia);
   if (to.path === "/login") {
     sessionStorage.removeItem("user");
-    localStorage.removeItem("TOKEN");
+    sessionStorage.removeItem("TOKEN");
   }
 
   const userString = sessionStorage.getItem("user");
@@ -92,5 +92,11 @@ app.use(ElementPlus);
 app.use(pinia); // ✅ dùng Pinia thay vì store Vuex
 app.use(router);
 app.use(i18n);
+
+import { useAuthStore } from "@/stores/login";
+const authStore = useAuthStore();
+authStore.loadFromSession();
+
+
 // Mount app
 app.mount("#app");

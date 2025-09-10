@@ -34,16 +34,19 @@ export const routes: Array<RouteRecordRaw> = [
         name: "Dashboard",
         path: "/",
         component: DashBoard,
+        meta: { title: "dashboard" },
       },
       {
         name: "Users",
         path: "/users",
         component: Users,
+        meta: { title: "users" }
       },
       {
         name: "Roles",
         path: "/roles",
         component: Roles,
+        meta: { title: "roles" }
       },
       {
         name: "Permissions",
@@ -54,66 +57,80 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/prisons",
         name: "PrisonList",
         component: PrisonList,
+        meta: { title: "prisonList" }
       },
       {
         path: "/prisons/add",
         name: "PrisonAdd",
         component: PrisonForm,
+        meta: { title: "prisonAdd" }
       },
       {
         path: "/prisons/edit/:id",
         name: "PrisonEdit",
         component: PrisonForm,
+        meta: { title: "prisonEdit" }
       },
       {
         path: "/detainees",
         name: "DetaineeList",
         component: DetaineeList,
+        meta: { title: "detaineeList" },
       },
       {
         path: "/detainees/add",
         name: "DetaineeAdd",
         component: DetaineeForm,
+        meta: { title: "detaineeAdd" }
       },
       {
         path: "/detainees/edit/:id",
         name: "DetaineeEdit",
         component: DetaineeForm,
+        meta: { title: "detaineeEdit" }
       },
       {
         path: "/staff",
         name: "StaffList",
         component: StaffList,
+        meta: { title: "staffList" }
+
       },
       {
         path: "/staff/add",
         name: "StaffAdd",
         component: StaffForm,
+        meta: { title: "staffAdd" },
       },
       {
         path: "/staff/edit/:id",
         name: "StaffEdit",
         component: StaffForm,
+         meta: { title: "staffEdit" },
       },
       {
         path: "/identity",
         name: "IdentityList",
         component: IdentityList,
+         meta: { title: "identityList" },
       },
       {
         path: "/identity/add",
         name: "IdentityAdd",
         component: IdentityForm,
+         meta: { title: "identityAdd" },
       },
       {
         path: "/identity/edit/:id",
         name: "IdentityEdit",
         component: IdentityForm,
+        meta: { title: "identityEdit" },
       },
       {
         path: "/fingerprint",
         name: "Fingerprint",
         component: Fingerprint,
+        meta: { title: "fingerprint" },
       },
       // {
       //   path: "/fingerprint/add",
@@ -129,6 +146,7 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/report",
         name: "Reports",
         component: Reports,
+        meta: { title: "reports" },
       },
     ],
   },

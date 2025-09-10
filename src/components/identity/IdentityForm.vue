@@ -1,12 +1,12 @@
 <template>
   <div class="identity-form">
-    <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3">
-          {{ isEdit ? "Chỉnh sửa danh bản" : "Tạo danh bản mới" }}
-        </span>
-      </template>
-    </el-page-header>
+<!--    <el-page-header @back="$router.go(-1)">-->
+<!--      <template #content>-->
+<!--         <span class="text-large font-600 mr-3">-->
+<!--          {{ isEdit ? $t('identity.editTitle') : $t('identity.createTitle') }}-->
+<!--        </span>-->
+<!--      </template>-->
+<!--    </el-page-header>-->
 
     <el-card class="form-card">
       <el-form
@@ -16,14 +16,14 @@
         label-width="140px"
         @submit.prevent="handleSubmit"
       >
-        <el-divider content-position="left">Thông tin danh bản</el-divider>
+        <el-divider content-position="left">{{ $t('identity.infoSection') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Mã phạm nhân" prop="detainee_id">
+            <el-form-item :label="$t('identity.detaineeId')" prop="detainee_id">
               <el-select
                 v-model="form.detainee_id"
-                placeholder="Chọn phạm nhân"
+                :placeholder="$t('identity.placeholder.detaineeId')"
                 filterable
                 @change="onDetaineeChange"
               >
@@ -37,10 +37,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Tạo tại">
+            <el-form-item :label="$t('identity.createdPlace')">
               <el-input
                 v-model="form.created_place"
-                placeholder="Nhập nơi tạo danh bản..."
+                :placeholder="$t('identity.placeholder.createdPlace')"
               />
             </el-form-item>
           </el-col>
@@ -48,11 +48,11 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Ngày bắt">
+            <el-form-item :label="$t('identity.arrestDate')">
               <el-date-picker
                 v-model="form.arrest_date"
                 type="date"
-                placeholder="Chọn ngày bắt"
+                :placeholder="$t('identity.placeholder.arrestDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -60,10 +60,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Đơn vị bắt">
+            <el-form-item :label="$t('identity.arrestUnit')">
               <el-input
                 v-model="form.arrest_unit"
-                placeholder="Nhập đơn vị bắt..."
+                :placeholder="$t('identity.placeholder.arrestUnit')"
               />
             </el-form-item>
           </el-col>
@@ -71,108 +71,89 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Phân loại vân tay">
+            <el-form-item :label="$t('identity.fpClassification')">
               <el-input
                 v-model="form.fp_classification"
-                placeholder="Nhập phân loại vân tay..."
+                :placeholder="$t('identity.placeholder.fpClassification')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Lý do lập">
+            <el-form-item :label="$t('identity.reasonNote')">
               <el-input
                 v-model="form.reason_note"
-                placeholder="Nhập lý do lập danh bản..."
+                :placeholder="$t('identity.placeholder.reasonNote')"
               />
             </el-form-item>
           </el-col>
         </el-row>
-
-        <el-divider content-position="left">Ảnh danh bản</el-divider>
 
         <!-- Photo Upload Section -->
+        <el-divider content-position="left">{{ $t('identity.photoSection') }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Ảnh mặt trước">
+            <el-form-item :label="$t('identity.photoFront')">
               <el-upload
                 class="photo-uploader"
                 :show-file-list="false"
-                :on-success="
-                  (response, file) => handlePhotoSuccess('front', file)
-                "
+                :on-success="(res, file) => handlePhotoSuccess('front', file)"
                 :before-upload="beforePhotoUpload"
                 action="#"
                 :auto-upload="false"
-                :on-change="(file) => handlePhotoChange('front', file)"
+                :on-change="file => handlePhotoChange('front', file)"
               >
-                <img
-                  v-if="photoPreview.front"
-                  :src="photoPreview.front"
-                  class="photo-preview"
-                />
+                <img v-if="photoPreview.front" :src="photoPreview.front" class="photo-preview" />
                 <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ảnh nghiêng trái">
+            <el-form-item :label="$t('identity.photoLeft')">
               <el-upload
                 class="photo-uploader"
                 :show-file-list="false"
-                :on-success="
-                  (response, file) => handlePhotoSuccess('left', file)
-                "
+                :on-success="(res, file) => handlePhotoSuccess('left', file)"
                 :before-upload="beforePhotoUpload"
                 action="#"
                 :auto-upload="false"
-                :on-change="(file) => handlePhotoChange('left', file)"
+                :on-change="file => handlePhotoChange('left', file)"
               >
-                <img
-                  v-if="photoPreview.left"
-                  :src="photoPreview.left"
-                  class="photo-preview"
-                />
+                <img v-if="photoPreview.left" :src="photoPreview.left" class="photo-preview" />
                 <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Ảnh nghiêng phải">
+            <el-form-item :label="$t('identity.photoRight')">
               <el-upload
                 class="photo-uploader"
                 :show-file-list="false"
-                :on-success="
-                  (response, file) => handlePhotoSuccess('right', file)
-                "
+                :on-success="(res, file) => handlePhotoSuccess('right', file)"
                 :before-upload="beforePhotoUpload"
                 action="#"
                 :auto-upload="false"
-                :on-change="(file) => handlePhotoChange('right', file)"
+                :on-change="file => handlePhotoChange('right', file)"
               >
-                <img
-                  v-if="photoPreview.right"
-                  :src="photoPreview.right"
-                  class="photo-preview"
-                />
+                <img v-if="photoPreview.right" :src="photoPreview.right" class="photo-preview" />
                 <el-icon v-else class="photo-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Đặc điểm hình thái học</el-divider>
 
+        <el-divider content-position="left">{{ $t('identity.anthropometry') }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Khuôn mặt">
+            <el-form-item :label="$t('identity.faceShape')">
               <el-input
                 v-model="form.anthropometry.face_shape"
-                placeholder="Mô tả khuôn mặt..."
+                :placeholder="$t('identity.placeholder.faceShape')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Chiều cao (cm)">
+            <el-form-item :label="$t('identity.height')">
               <el-input-number
                 v-model="form.anthropometry.height_cm"
                 :min="100"
@@ -186,46 +167,46 @@
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Sống mũi">
+            <el-form-item :label="$t('identity.noseBridge')">
               <el-input
                 v-model="form.anthropometry.nose_bridge"
-                placeholder="Mô tả sống mũi..."
+                :placeholder="$t('identity.placeholder.noseBridge')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Nếp tai dưới">
+            <el-form-item :label="$t('identity.earLowerFold')">
               <el-input
                 v-model="form.anthropometry.ear_lower_fold"
-                placeholder="Mô tả nếp tai dưới..."
+                :placeholder="$t('identity.placeholder.earLowerFold')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Dái tai">
+            <el-form-item :label="$t('identity.earLobe')">
               <el-input
                 v-model="form.anthropometry.ear_lobe"
-                placeholder="Mô tả dái tai..."
+                :placeholder="$t('identity.placeholder.earLobe')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item label="Dấu vết riêng">
+        <el-form-item :label="$t('identity.distinctiveMarks')">
           <el-input
             v-model="form.anthropometry.distinctive_marks"
             type="textarea"
             :rows="3"
-            placeholder="Mô tả các dấu vết đặc biệt, scar, hình xăm..."
+            :placeholder="$t('identity.placeholder.distinctiveMarks')"
           />
         </el-form-item>
 
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? "Cập nhật" : "Tạo mới" }}
+            {{ isEdit ? $t('common.update') : $t('common.create') }}
           </el-button>
-          <el-button @click="handleReset">Làm mới</el-button>
-          <el-button @click="$router.go(-1)">Hủy</el-button>
+          <el-button @click="handleReset">{{ $t('common.reset') }}</el-button>
+          <el-button @click="$router.go(-1)">{{ $t('common.cancel') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>

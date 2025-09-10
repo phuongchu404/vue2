@@ -5,3 +5,9 @@ export interface Country {
   alpha2Code?: string;
   alpha3Code?: string;
 }
+
+export interface CountryState {
+  countries?: Country[];
+  loading: boolean;
+  error?: string;
+}

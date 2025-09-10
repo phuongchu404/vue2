@@ -1,30 +1,30 @@
 <template>
   <div class="staff-list">
-    <!-- <el-page-header @back="$router.go(-1)">
+    <el-page-header @back="$router.go(-1)">
       <template #content>
         <span class="text-large font-600 mr-3">Quản lý cán bộ</span>
       </template>
-    </el-page-header> -->
+    </el-page-header>
 
     <!-- Search Section -->
     <div class="search-section">
       <el-form :model="searchForm" label-width="100px" label-position="left">
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-form-item label="Mã cán bộ">
+            <el-form-item :label="t('staff.code')">
               <el-input
-                v-model="searchForm.staffCode"
-                placeholder="Nhập mã cán bộ..."
-                clearable
+                  v-model="searchForm.staffCode"
+                  :placeholder="t('staff.placeholder.code')"
+                  clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="Họ và tên">
+            <el-form-item :label="t('staff.fullName')">
               <el-input
-                v-model="searchForm.fullName"
-                placeholder="Nhập họ và tên..."
-                clearable
+                  v-model="searchForm.fullName"
+                  :placeholder="t('staff.placeholder.fullName')"
+                  clearable
               />
             </el-form-item>
           </el-col>
@@ -32,37 +32,39 @@
 
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-form-item label="Cấp bậc">
+            <el-form-item :label="t('staff.rank')">
               <el-input
-                v-model="searchForm.rank"
-                placeholder="Nhập cấp bậc..."
-                clearable
+                  v-model="searchForm.rank"
+                  :placeholder="t('staff.placeholder.rank')"
+                  clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="Trạng thái">
+            <el-form-item :label="t('staff.status')">
               <el-select
-                v-model="searchForm.status"
-                placeholder="Chọn trạng thái"
+                  v-model="searchForm.status"
+                  :placeholder="t('common.inputStatus')"
               >
                 <el-option
-                  v-for="option in statusOptions"
-                  :key="option.value"
-                  :label="option.label"
-                  :value="option.value"
+                    v-for="option in statusOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                 />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-form-item>
-          <el-button type="primary" @click="onSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="onReset" :icon="Refresh">Làm mới</el-button>
+          <el-button type="primary" @click="onSearch" :icon="Search">
+            {{ t('Search') }}
+          </el-button>
+          <el-button @click="onReset" :icon="Refresh">
+            {{ t('common.reset') }}
+          </el-button>
         </el-form-item>
+
       </el-form>
     </div>
 
@@ -70,159 +72,157 @@
       <div class="action-bar">
         <div>
           <el-button
-            type="primary"
-            @click="$router.push('/staff/add')"
-            :icon="Plus"
+              type="primary"
+              @click="$router.push('/staff/add')"
+              :icon="Plus"
           >
-            Thêm cán bộ mới
+            {{ t('common.add') }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            Xuất Excel
+            {{ t('common.export') }}
           </el-button>
         </div>
         <div class="result-info">
-          Tổng số: {{ staffStore.getTotal }} trại giam
+          {{ t('common.total') }}: {{ staffStore.getTotal }}
+          {{ t('common.unit')}}
         </div>
       </div>
     </div>
+
     <!-- Data Table -->
     <el-table
-      :data="staffs"
-      style="width: 100%"
-      v-loading="loading"
-      stripe
-      border
+        :data="staffs"
+        style="width: 100%"
+        v-loading="loading"
+        stripe
+        border
     >
       <el-table-column
-        prop="staffCode"
-        label="Mã cán bộ"
-        width="130"
-        sortable
-        fixed="left"
+          prop="staffCode"
+          :label="t('staff.code')"
+          width="130"
+          sortable
+          fixed="left"
       />
-      <el-table-column prop="fullName" label="Họ và tên" min-width="150" />
-      <el-table-column prop="idNumber" label="Số căn cước" min-width="120" />
-      <el-table-column label="Giới tính" width="120">
+      <el-table-column prop="fullName" :label="t('staff.fullName')" min-width="150" />
+      <el-table-column prop="idNumber" :label="t('staff.idNumber')" min-width="120" />
+      <el-table-column :label="t('staff.gender')" width="120">
         <template #default="{ row }">
           {{ getGenderLabel(row.gender) }}
         </template>
       </el-table-column>
-      <el-table-column prop="rank" label="Cấp bậc" width="120" />
-      <el-table-column prop="phone" label="Điện thoại" width="130" />
+      <el-table-column prop="rank" :label="t('staff.rank')" width="120" />
+      <el-table-column prop="phone" :label="t('staff.phone')" width="130" />
       <el-table-column
-        prop="email"
-        label="Email"
-        min-width="120"
-        show-overflow-tooltip
+          prop="email"
+          :label="t('staff.email')"
+          min-width="120"
+          show-overflow-tooltip
       />
-      <el-table-column label="Trạng thái" width="130" align="center">
+      <el-table-column :label="t('staff.status')" width="130" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Thao tác" min-width="130" fixed="right">
+      <el-table-column :label="t('common.actions')" min-width="160" fixed="right">
         <template #default="scope">
-          <el-button size="small" @click="handleView(scope.row)" :icon="View">
-          </el-button>
+          <el-button size="small" @click="handleView(scope.row)" :icon="View" />
           <el-button
-            size="small"
-            type="primary"
-            @click="handleEdit(scope.row)"
-            :icon="Edit"
-          >
-          </el-button>
+              size="small"
+              type="primary"
+              @click="handleEdit(scope.row)"
+              :icon="Edit"
+          />
           <el-button
-            size="small"
-            type="danger"
-            @click="onDelete(scope.row.id)"
-            :icon="Delete"
-          >
-          </el-button>
+              size="small"
+              type="danger"
+              @click="onDelete(scope.row.id)"
+              :icon="Delete"
+          />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- Pagination -->
     <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="staffStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="staffStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
     />
 
     <!-- Detail Dialog -->
     <el-dialog
-      v-model="detailDialogVisible"
-      title="Chi tiết cán bộ"
-      width="60%"
-      class="dialog"
+        v-model="detailDialogVisible"
+        :title="t('staff.detailTitle')"
+        width="60%"
+        class="dialog"
     >
       <div v-if="selectedStaff" class="space-y-6">
-        <!-- Section 1: Thông tin cơ bản -->
+        <!-- Section 1: Basic Info -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">Thông tin cơ bản</h5>
+            <h5 class="m-0">{{ t('staff.basicInfo') }}</h5>
           </template>
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="Họ và tên" :span="2">{{
-              selectedStaff.fullName
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Mã cán bộ">{{
-              selectedStaff.staffCode
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Số hồ sơ">{{
-              selectedStaff.profileNumber || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Giới tính">{{
-              getGenderLabel(selectedStaff.gender)
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày sinh">{{
-              formatDate(selectedStaff.dateOfBirth)
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Nơi sinh">{{
-              selectedStaff.placeOfBirth
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Số CCCD/CMND">{{
-              selectedStaff.idNumber || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Ngày cấp">{{
-              selectedStaff.idIssueDate || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Nơi cấp">{{
-              selectedStaff.idIssuePlace || "-"
-            }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.fullName')" :span="2">{{
+                selectedStaff.fullName
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.code')">{{
+                selectedStaff.staffCode
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.profileNumber')">{{
+                selectedStaff.profileNumber || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.gender')">{{
+                getGenderLabel(selectedStaff.gender)
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.dateOfBirth')">{{
+                formatDate(selectedStaff.dateOfBirth)
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.placeOfBirth')">{{
+                selectedStaff.placeOfBirth
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.idNumber')">{{
+                selectedStaff.idNumber || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.idIssueDate')">{{
+                selectedStaff.idIssueDate || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.idIssuePlace')">{{
+                selectedStaff.idIssuePlace || "-"
+              }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
 
         <!-- Section 2: Liên lạc -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">Liên lạc</h5>
+            <h5 class="m-0">{{ t('staff.contactInfo') }}</h5>
           </template>
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="Email" :span="2">{{
-              selectedStaff.email || "-"
-            }}</el-descriptions-item>
-
-            <el-descriptions-item label="Điện thoại">{{
-              selectedStaff.phone || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Điện thoại liên hệ khẩn cấp">{{
-              selectedStaff.emergencyPhone || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Người liên hệ khẩn cấp">{{
-              selectedStaff.emergencyContact || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Địa chỉ thường trú" :span="2">
+            <el-descriptions-item :label="t('staff.email')" :span="2">{{
+                selectedStaff.email || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.phone')">{{
+                selectedStaff.phone || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.emergencyPhone')">{{
+                selectedStaff.emergencyPhone || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.emergencyContact')">{{
+                selectedStaff.emergencyContact || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.permanentAddress')" :span="2">
               {{ permanentFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item label="Địa chỉ tạm trú" :span="2">
+            <el-descriptions-item :label="t('staff.temporaryAddress')" :span="2">
               {{ temporaryFullAddress }}
             </el-descriptions-item>
           </el-descriptions>
@@ -231,51 +231,47 @@
         <!-- Section 3: Công việc -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">Công việc</h5>
+            <h5 class="m-0">{{ t('staff.jobInfo') }}</h5>
           </template>
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="Cấp bậc">{{
-              selectedStaff.rank || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Phòng ban">{{
-              selectedStaff.departmentName || "-"
-            }}</el-descriptions-item>
-            <el-descriptions-item label="Chức vụ">{{
-              selectedStaff.positionName || "-"
-            }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Học vấn">{{
-              selectedStaff.educationLevelName || "-"
-            }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Trại giam công tác">{{
-              selectedStaff.detentionCenterName || "-"
-            }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Trạng thái">
+            <el-descriptions-item :label="t('staff.rank')">{{
+                selectedStaff.rank || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.department')">{{
+                selectedStaff.departmentName || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.position')">{{
+                selectedStaff.positionName || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.education')">{{
+                selectedStaff.educationLevelName || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.detentionCenter')">{{
+                selectedStaff.detentionCenterName || "-"
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('staff.status')">
               <el-tag :type="getStatusType(selectedStaff.status)">
                 {{ getStatusText(selectedStaff.status) }}
               </el-tag>
             </el-descriptions-item>
-            
-            <el-descriptions-item label="Ngày tạo">{{
-              formatDate(selectedStaff.createdAt)
-            }}
-            </el-descriptions-item>
-            <el-descriptions-item label="Ngày cập nhật">{{
-              formatDate(selectedStaff.updatedAt)
-            }}
-            </el-descriptions-item>
-
+            <el-descriptions-item :label="t('common.createTime')">{{
+                formatDate(selectedStaff.createdAt)
+              }}</el-descriptions-item>
+            <el-descriptions-item :label="t('common.updateTime')">{{
+                formatDate(selectedStaff.updatedAt)
+              }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
 
+
       <template #footer>
-        <el-button @click="handleDetailClose()">Đóng</el-button>
-        <el-button type="primary" @click="handleEdit(selectedStaff)"
-          >Chỉnh sửa</el-button
-        >
+        <el-button @click="handleDetailClose()">
+          {{ t('common.close') }}
+        </el-button>
+        <el-button type="primary" @click="handleEdit(selectedStaff)">
+          {{ t('common.edit') }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -331,7 +327,7 @@ const formatDate = (dateStr: any) => {
 
 const getGenderLabel = (value: any) => {
   const option = genderOptions.find((opt) => opt.value === value);
-  return option ? option.label : "Không xác định";
+  return option ? option.label : t('common.unspecified');
 };
 
 const permanentFullAddress = computed(() => {
@@ -361,7 +357,7 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
+  ElMessage.info(t('common.exportUpdating'));
 };
 const handleView = (staff: any) => {
   selectedStaff.value = staff;
@@ -386,7 +382,7 @@ const search = async (extra?: Partial<PageQuery>) => {
     staffs.value = staffStore.getStaffs || [];
   } catch (error) {
     console.error("Error fetching prison list:", error);
-    ElMessage.error("Có lỗi xảy ra khi tải danh sách trại giam!");
+    ElMessage.error(t('common.dataFail'));
   } finally {
     loading.value = false;
   }

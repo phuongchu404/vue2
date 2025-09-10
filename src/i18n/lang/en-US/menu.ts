@@ -1,12 +1,16 @@
-export default {
-  "menu.index": "Home",
-  "menu.system": "System Management",
-  "menu.user": "User Management",
-  "menu.role": "Role Management",
-  "menu.prison": "Prison Management",
-  "menu.detainee": "Detainee Management",
-  "menu.staff": "Staff Management",
-  "menu.identity": "Identity Records Management",
-  "menu.fingerprint": "Fingerprint Records Management",
-  "menu.report": "Reports & Statistics",
+import type { Menu } from "@/i18n/type";
+
+const menu: Menu = {
+  index: "Home",
+  system: "System Management",
+  user: "User Management",
+  role: "Role Management",
+  prison: "Prison Management",
+  detainee: "Detainee Management",
+  staff: "Staff Management",
+  identity: "Identity Record Management",
+  fingerprint: "Fingerprint Record Management",
+  report: "Reports & Statistics",
 };
+
+export default menu;

@@ -1,22 +1,25 @@
-export default {
-  "user.userName": "Username",
-  "user.roles": "Roles",
-  "user.allocateRole": "Assign role",
-  "user.resetPassword": "Reset password",
-  "user.realName": "Real name",
-  "user.selectRole": "Select role",
-  "user.add": "Add User",
-  "user.update": "Update User",
-  "user.inputUserName": "Please enter username",
-  "user.inputRealName": "Please enter real name",
-  "user.inputProvider": "Please enter provider name",
-  "user.resetPasswordConfirm":
-    "After reset password, please notify user。Are you sure to reset password？",
-  "user.resetPasswordSuccess":
-    "Reset password successfully。New password is：[",
-  "user.resetPasswordFail": "Failed to reset password！Reason:",
-  "user.provider": "Provider name",
-  "user.incorrectpassword": "Incorrect password.",
-  ResetPassword: "Reset Password",
-  "user.password": "Password",
+import type { User } from "@/i18n/type";
+
+const user: User = {
+  userName: "Username",
+  roles: "Roles",
+  allocateRole: "Assign Management Level",
+  resetPassword: "Reset Password",
+  realName: "Full Name",
+  selectRole: "Select Management Level",
+  add: "Add Account",
+  update: "Update Account",
+  inputUserName: "Please provide this information",
+  inputRealName: "Please provide this information",
+  inputProvider: "Please provide this information",
+  resetPasswordConfirm:
+    "Please notify the account owner of the new password after resetting it. Confirm reset?",
+  resetPasswordSuccess: "Password reset successfully. The new password is: [",
+  resetPasswordFail: "Password reset failed! Reason: ",
+  provider: "Provider Name",
+  incorrectpassword: "Incorrect password.",
+  password: "Password",
+  ResetPassword: "Change Password",
 };
+
+export default user;

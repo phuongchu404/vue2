@@ -1,12 +1,16 @@
-export default {
-  "menu.index": "Trang chủ",
-  "menu.system": "Quản lý hệ thống",
-  "menu.user": "Quản lý người dùng",
-  "menu.role": "Quản lý vai trò",
-  "menu.prison": "Quản lý trại giam",
-  "menu.detainee": "Quản lý phạm nhân",
-  "menu.staff": "Quản lý cán bộ",
-  "menu.identity": "Quản lý danh bản",
-  "menu.fingerprint": "Quản lý chỉ bản",
-  "menu.report": "Báo cáo và thống kê",
+import type { Menu } from "@/i18n/type";
+
+const menu: Menu = {
+  index: "Trang chủ",
+  system: "Quản lý hệ thống",
+  user: "Quản lý người dùng",
+  role: "Quản lý vai trò",
+  prison: "Quản lý trại giam",
+  detainee: "Quản lý phạm nhân",
+  staff: "Quản lý cán bộ",
+  identity: "Quản lý danh bản",
+  fingerprint: "Quản lý chỉ bản",
+  report: "Báo cáo và thống kê",
 };
+
+export default menu;

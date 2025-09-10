@@ -71,8 +71,8 @@ export async function handleSessionExpiration(code: any): Promise<boolean> {
     (code === Codes.INVALID_ACCESS_TOKEN.code ||
       code === Codes.EXPIRED_TOKEN.code)
   ) {
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("TOKEN");
+    sessionStorage.removeItem("user");
     await confirmRelogin(
       String(i18n.global.t("common.session-expired-message"))
     );
@@ -104,7 +104,7 @@ export async function doPost(url: string, data?: any): Promise<any> {
 
 export async function doGet(url: string): Promise<any> {
   try {
-    if (localStorage.getItem("TOKEN") === null) {
+    if (sessionStorage.getItem("TOKEN") === null) {
       // Handle case where token is missing before the request
       // Consider redirecting to login here if necessary
       return { success: false, message: "No token found" };

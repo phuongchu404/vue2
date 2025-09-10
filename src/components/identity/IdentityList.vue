@@ -1,144 +1,134 @@
 <template>
   <div class="identity-list">
-    <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3">Quản lý danh bản</span>
-      </template>
-    </el-page-header>
+<!--    <el-page-header @back="$router.go(-1)">-->
+<!--      <template #content>-->
+<!--        <span class="text-large font-600 mr-3">Quản lý danh bản</span>-->
+<!--      </template>-->
+<!--    </el-page-header>-->
     <!-- Search Section -->
-    <el-card class="search-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="Mã phạm nhân">
-          <el-input
-            v-model="searchForm.detaineeId"
-            placeholder="Nhập mã phạm nhân..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Tên phạm nhân">
-          <el-input
-            v-model="searchForm.detaineeName"
-            placeholder="Nhập tên phạm nhân..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Đơn vị bắt">
-          <el-input
-            v-model="searchForm.arrestUnit"
-            placeholder="Nhập đơn vị bắt..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
-        </el-form-item>
+    <div class="search-section">
+      <el-form :model="searchForm" inline label-width="auto" label-position="left">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item :label="$t('identity.detaineeId')">
+              <el-input
+                  v-model="searchForm.detaineeId"
+                  :placeholder="$t('identity.placeholder.detaineeId')"
+                  clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="$t('identity.detaineeName')">
+              <el-input
+                  v-model="searchForm.detaineeName"
+                  :placeholder="$t('identity.placeholder.detaineeName')"
+                  clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item :label="$t('identity.arrestUnit')">
+              <el-input
+                  v-model="searchForm.arrestUnit"
+                  :placeholder="$t('identity.placeholder.arrestUnit')"
+                  clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item>
+              <el-button type="primary" @click="handleSearch" :icon="Search">
+                {{ $t('Search') }}
+              </el-button>
+              <el-button @click="handleReset" :icon="Refresh">
+                {{ $t('common.reset') }}
+              </el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
-    </el-card>
+    </div>
 
     <!-- Action Bar -->
-    <el-card class="action-card">
+    <div class="action-card">
       <div class="action-bar">
         <div>
           <el-button
-            type="primary"
-            @click="$router.push('/identity/add')"
-            :icon="Plus"
+              type="primary"
+              @click="$router.push('/identity/add')"
+              :icon="Plus"
           >
-            Tạo danh bản mới
+            {{ $t('common.add') }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            Xuất Excel
+            {{ $t('common.export') }}
           </el-button>
         </div>
         <div class="result-info">
-          Tổng số: {{ filteredRecords.length }} danh bản
+          {{ $t('common.total') }}: {{ filteredRecords.length }} {{ $t('common.unit') }}
         </div>
       </div>
-    </el-card>
+    </div>
 
     <!-- Data Table -->
-    <el-card>
-      <el-table
-        :data="paginatedRecords"
-        style="width: 100%"
-        v-loading="loading"
-        stripe
-        border
-      >
-        <el-table-column prop="id" label="ID" width="80" sortable />
-        <el-table-column prop="detainee_id" label="Mã phạm nhân" width="120" />
-        <el-table-column
-          prop="detainee_name"
-          label="Tên phạm nhân"
-          min-width="150"
-        />
-        <el-table-column prop="arrest_date" label="Ngày bắt" width="120">
-          <template #default="scope">
-            {{ formatDate(scope.row.arrest_date) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="arrest_unit"
-          label="Đơn vị bắt"
-          min-width="180"
-          show-overflow-tooltip
-        />
-        <el-table-column
-          prop="fp_classification"
-          label="Phân loại VT"
-          width="120"
-        />
-        <el-table-column label="Ảnh" width="100" align="center">
-          <template #default="scope">
-            <el-tag v-if="hasPhotos(scope.row)" type="success" size="small">
-              {{ getPhotoCount(scope.row) }}/3
-            </el-tag>
-            <el-tag v-else type="info" size="small"> 0/3 </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Ngày tạo" width="120">
-          <template #default="scope">
-            {{ formatDate(scope.row.created_at) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="Thao tác" width="200" fixed="right">
-          <template #default="scope">
-            <el-button size="small" @click="handleView(scope.row)" :icon="View">
-              Xem
-            </el-button>
-            <el-button
-              size="small"
-              type="primary"
-              @click="handleEdit(scope.row)"
-              :icon="Edit"
-            >
-              Sửa
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="handleDelete(scope.row)"
-              :icon="Delete"
-            >
-              Xóa
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+    <el-table
+      :data="paginatedRecords"
+      style="width: 100%"
+      v-loading="loading"
+      stripe
+      border
+    >
+      <el-table-column prop="id" :label="$t('identity.id')" width="80" sortable />
+      <el-table-column prop="detainee_id" :label="$t('identity.detaineeId')" width="170" />
+      <el-table-column prop="detainee_name" :label="$t('identity.detaineeName')" min-width="180" />
+      <el-table-column prop="arrest_date" :label="$t('identity.arrestDate')" width="140">
+        <template #default="scope">
+          {{ formatDate(scope.row.arrest_date) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="arrest_unit" :label="$t('identity.arrestUnit')" min-width="130" show-overflow-tooltip />
+      <el-table-column prop="fp_classification" :label="$t('identity.fpClassification')" width="150" />
+      <el-table-column :label="$t('identity.photo')" width="120" align="center">
+        <template #default="scope">
+          <el-tag v-if="hasPhotos(scope.row)" type="success" size="small">
+            {{ getPhotoCount(scope.row) }}/3
+          </el-tag>
+          <el-tag v-else type="info" size="small">0/3</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="created_at" :label="$t('common.createTime')" width="180">
+        <template #default="scope">
+          {{ formatDate(scope.row.created_at) }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
+        <template #default="scope">
+          <el-button size="small" type="primary"
+                     @click="handleEdit(scope.row)"
+                     :icon="Edit">
+            {{ $t('common.view') }}
+          </el-button>
+          <el-button size="small" type="primary" @click="handleEdit(scope.row)" :icon="Edit">
+            {{ $t('common.edit') }}
+          </el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.row)" :icon="Delete">
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
 
-      <!-- Pagination -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="filteredRecords.length"
-        layout="total, sizes, prev, pager, next, jumper"
-        class="pagination"
-      />
-    </el-card>
+    <!-- Pagination -->
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[10, 20, 50, 100]"
+      :total="filteredRecords.length"
+      layout="total, sizes, prev, pager, next, jumper"
+      class="pagination"
+    />
 
     <!-- Detail Dialog -->
     <el-dialog

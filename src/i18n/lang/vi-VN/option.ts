@@ -1,28 +1,18 @@
-export default {
-  "option.add": "Thêm",
-  "option.update": "Sửa",
-  "option.delete": "Xoá",
-  "option.lost": "Mất thẻ",
-  "option.query": "Tìm kiếm",
-  "option.page": "Trang",
-  "option.lock": "Khoá",
-  "option.unlock": "Mở khoá",
-  "option.resetPassword": "Đặt lại mật khẩu",
-  "option.account": "Tài khoản",
-  "option.emv": "EMV",
-  "option.assignRole": "Đặt vai trò",
-  "option.assignPermission": "Phân quyền",
-  "option.generateToken": "Tạo Token",
-  "option.queryProgress": "Tra cứu tình trạng",
-  "option.merchantInfo": "Thông tin cửa hàng",
-  "option.import":"Nhập",
-  "option.active": "Kích hoạt",
-  "option.inactive": "Hủy kích hoạt",
-  "license.upload":"Tải lên tệp chữ ký",
-  "option.upload":"Tải lên tệp chữ ký",
-  "option.return":"Trả thẻ",
-  "option.addVisitor":"Thêm khách",
-  "option.checkIn":"Đăng ký vào cửa",
-  "option.syn":"Đồng bộ",
-  "option.Detail":"Chi tiết",
-}
+import type { Option } from "@/i18n/type";
+
+const option: Option = {
+  add: "Thêm",
+  update: "Sửa",
+  delete: "Xoá",
+  query: "Tìm kiếm",
+  page: "Trang",
+  resetPassword: "Đặt lại mật khẩu",
+  account: "Tài khoản",
+  assignRole: "Đặt vai trò",
+  assignPermission: "Phân quyền",
+  import: "Nhập",
+  syn: "Đồng bộ",
+  detail: "Chi tiết",
+};
+
+export default option;

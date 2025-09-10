@@ -1,7 +1,10 @@
-export default {
-  "permission.menus": "Cây menu",
-  "permission.options": "Thao tác",
-  "permission.name": "Nút bấm",
-  "permission.description": "Mô tả",
-  "permission.url": "Đường dẫn",
-}
+import type { Permission } from "@/i18n/type";
+
+const permission: Permission = {
+  menus: "Cây menu",
+  options: "Thao tác",
+  description: "Mô tả",
+  url: "Đường dẫn",
+};
+
+export default permission;

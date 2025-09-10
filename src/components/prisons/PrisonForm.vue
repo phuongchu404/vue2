@@ -18,27 +18,27 @@
       >
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Mã trại giam" prop="code">
+            <el-form-item :label="t('prison.code')" prop="code">
               <el-input
                 v-model="form.code"
-                placeholder="Nhập mã trại giam..."
+                :placeholder="t('prison.placeholder.code')"
                 :disabled="isEdit"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Tên trại giam" prop="name">
+            <el-form-item :label="t('prison.name')" prop="name">
               <el-input
                 v-model="form.name"
-                placeholder="Nhập tên trại giam..."
+                :placeholder="t('prison.placeholder.name')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Số điện thoại" prop="phone">
+            <el-form-item :label="t('prison.phone')" prop="phone">
               <el-input
                 v-model="form.phone"
-                placeholder="Nhập số điện thoại..."
+                :placeholder="t('prison.placeholder.phone')"
               />
             </el-form-item>
           </el-col>
@@ -47,10 +47,10 @@
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="provinceId">
+            <el-form-item :label="t('prison.province')" prop="provinceId">
               <el-select
                 v-model="form.provinceId"
-                placeholder="Chọn tỉnh"
+                :placeholder="t('prison.placeholder.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -68,10 +68,10 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="wardId">
+            <el-form-item :label="t('prison.ward')" prop="wardId">
               <el-select
                 v-model="form.wardId"
-                placeholder="Chọn xã/phường"
+                :placeholder="t('prison.placeholder.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -88,10 +88,10 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="t('prison.address')" prop="address">
               <el-input
                 v-model="form.address"
-                placeholder="Số nhà, đường, thôn/xóm..."
+                :placeholder="t('prison.placeholder.address')"
                 clearable
               />
             </el-form-item>
@@ -100,18 +100,18 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Giám thị" prop="director">
+            <el-form-item :label="t('prison.director')" prop="director">
               <el-input
                 v-model="form.director"
-                placeholder="Nhập tên giám thị..."
+                :placeholder="t('prison.placeholder.director')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Phó giám thị" prop="deputyDirector">
+            <el-form-item :label="t('prison.deputyDirector')" prop="deputyDirector">
               <el-input
                 v-model="form.deputyDirector"
-                placeholder="Nhập tên phó giám thị..."
+                :placeholder="t('prison.placeholder.deputyDirector')"
               />
             </el-form-item>
           </el-col>
@@ -119,38 +119,36 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Sức chứa tối đa" prop="capacity">
-              <el-input-number
-                v-model="form.capacity"
-                :min="1"
-                :max="10000"
-                placeholder="Nhập sức chứa..."
-                style="width: 100%"
-              />
+            <el-form-item :label="t('prison.capacity')" prop="capacity">
+            <el-input-number
+              v-model="form.capacity"
+              :min="1"
+              :max="10000"
+              :placeholder="t('prison.placeholder.capacity')"
+              style="width: 100%"
+            />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item
-              label="Số phạm nhân hiện tại"
-              prop="currentPopulation"
-            >
+            <el-form-item :label="t('prison.currentPopulation')" prop="currentPopulation">
               <el-input-number
-                v-model="form.currentPopulation"
-                :min="0"
-                :max="form.capacity || 10000"
-                placeholder="Nhập số phạm nhân hiện tại..."
-                style="width: 100%"
+                  v-model="form.currentPopulation"
+                  :min="0"
+                  :max="form.capacity || 10000"
+                  :placeholder="t('prison.placeholder.currentPopulation')"
+                  style="width: 100%"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item label="Trạng thái" prop="isActive">
+        <el-form-item :label="t('prison.status')" prop="isActive">
           <el-radio-group v-model="form.isActive">
-            <el-radio label="ACTIVE" :value="true">Hoạt động</el-radio>
-            <el-radio label="INACTIVE" :value="false">Tạm dừng</el-radio>
+            <el-radio label="ACTIVE" :value="true">{{ t("prison.active") }}</el-radio>
+            <el-radio label="INACTIVE" :value="false">{{ t("prison.inactive") }}</el-radio>
           </el-radio-group>
         </el-form-item>
+
 
         <!-- <el-form-item label="Mô tả">
           <el-input
@@ -163,10 +161,10 @@
 
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+            {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
-          <el-button @click="handleReset">Làm mới</el-button>
-          <el-button @click="$router.go(-1)">Hủy</el-button>
+          <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
+          <el-button @click="$router.go(-1)">{{ t("common.cancel") }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -187,7 +185,10 @@ import type {
 } from "@/types/prison";
 import { useProvinceStore } from "@/stores/province";
 import { useWardStore } from "@/stores/ward";
+// import {ACTIVE, INACTIVE} from "@/constants/staff.ts";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const prisonStore = usePrisonStore();

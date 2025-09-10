@@ -77,14 +77,12 @@
         <template #default="scope">
           <el-button
             type="primary"
-            class="normal-btn btn-bluelight"
             :disabled="isButtonEnabled('system:user:update')"
             @click="handleEdit(scope.row)"
             >{{ $t("option.update") }}
           </el-button>
           <el-button
-            type="primary"
-            class="normal-btn btn-greenlight"
+            type="success"
             :disabled="
               isButtonEnabled('system:user:assign-roles') ||
               scope.row.userName === userNameLogin ||
@@ -94,8 +92,7 @@
             >{{ $t("user.allocateRole") }}
           </el-button>
           <el-button
-            type="primary"
-            class="normal-btn btn-red"
+            type="warning"
             :disabled="
               isButtonEnabled('system:user:reset-password') ||
               scope.row.userName === userNameLogin
@@ -104,8 +101,7 @@
             >{{ $t("user.resetPassword") }}
           </el-button>
           <el-button
-            type="primary"
-            class="normal-btn btn-red"
+            type="danger"
             :disabled="
               isButtonEnabled('system:user:delete') ||
               scope.row.userName === userNameLogin ||

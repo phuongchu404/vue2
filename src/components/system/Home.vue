@@ -27,11 +27,11 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="handleChangePassword">
-                      <el-icon><Edit /></el-icon>{{ $t("home.funpwd") }}
+                      <el-icon><Edit /></el-icon>{{ $t("home.funPassword") }}
                     </el-dropdown-item>
                     <el-dropdown-item divided @click="logout">
                       <el-icon><SwitchButton /></el-icon
-                      >{{ $t("home.funlogout") }}
+                      >{{ $t("home.funLogout") }}
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -50,7 +50,7 @@
         <el-aside width="auto" class="sidebar">
           <el-menu
             :default-active="$route.path"
-            unique-opened
+            unique-opene
             text-color="#7f8c8d"
             router
             class="sidebar-menu"
@@ -103,9 +103,10 @@
             <div class="router-view-container">
               <el-page-header @back="$router.go(-1)">
                 <template #content>
-                  <span class="text-large font-600 mr-3">{{
-                    $route.name
-                  }}</span>
+                  <span class="text-large font-600 mr-3">
+                    {{ $t(`route.${$route.meta?.title || $route.name}`) }}
+                  </span>
+
                 </template>
               </el-page-header>
               <RouterView v-slot="{ Component }">
@@ -126,7 +127,7 @@
 
     <!-- Change Password Dialog -->
     <el-dialog
-      :title="$t('home.funpwd')"
+      :title="$t('home.funPassword')"
       v-model="ui.dialogVisible"
       width="650px"
       center
@@ -140,7 +141,7 @@
         size="default"
         ref="editFormRef"
       >
-        <el-form-item :label="$t('home.pwdold')" prop="oldPassword">
+        <el-form-item :label="$t('home.passwordOld')" prop="oldPassword">
           <el-input
             type="password"
             v-model="editForm.oldPassword"
@@ -148,7 +149,7 @@
             class="edit-form-input"
           ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('home.pwdnew')" prop="newPassword">
+        <el-form-item :label="$t('home.passwordNew')" prop="newPassword">
           <el-input
             type="password"
             v-model="editForm.newPassword"
@@ -156,7 +157,7 @@
             class="edit-form-input"
           ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('home.pwdrpt')" prop="newPasswordAgain">
+        <el-form-item :label="$t('home.passwordRepeat')" prop="newPasswordAgain">
           <el-input
             type="password"
             v-model="editForm.newPasswordAgain"
@@ -224,13 +225,13 @@ const editForm = reactive<any>({});
 
 const editFormRules = reactive({
   oldPassword: [
-    { required: true, message: t("home.oldisnull"), trigger: "blur" },
+    { required: true, message: t("home.oldIsNull"), trigger: "blur" },
   ],
   newPassword: [
-    { required: true, message: t("home.newisnull"), trigger: "blur" },
+    { required: true, message: t("home.newIsNull"), trigger: "blur" },
   ],
   newPasswordAgain: [
-    { required: true, message: t("home.repeatnew"), trigger: "blur" },
+    { required: true, message: t("home.repeatNew"), trigger: "blur" },
     { validator: validatePasswordAgain, trigger: "blur" },
   ],
 });
@@ -242,11 +243,11 @@ const ui = reactive({
 // Methods
 function validatePasswordAgain(rule: any, value: any, callback: any) {
   if (value === "") {
-    callback(new Error(t("home.repeatnew")));
+    callback(new Error(t("home.repeatNew")));
   } else if (value !== editForm.newPassword) {
-    callback(new Error(t("home.notsame")));
+    callback(new Error(t("home.notSame")));
   } else if (value === editForm.oldPassword) {
-    callback(new Error(t("home.issame")));
+    callback(new Error(t("home.isSame")));
   } else {
     callback();
   }
@@ -277,7 +278,7 @@ const changePassword = async () => {
 
     try {
       await ElMessageBox.confirm(
-        t("home.change-pwd-confirm"),
+        t("home.changePasswordConfirm"),
         t("home.confirmTip"),
         { type: "warning" }
       );
@@ -289,10 +290,10 @@ const changePassword = async () => {
         if (result.code === 302) {
           ElMessage.warning(t("user.incorrectpassword"));
         } else {
-          ElMessage.warning(t("home.funpwdfal") + result.message);
+          ElMessage.warning(t("home.passwordFail") + result.message);
         }
       } else {
-        ElMessage.success(t("home.funpwdsuc"));
+        ElMessage.success(t("home.passwordSuccess"));
         ui.dialogVisible = false;
         forceLogout();
       }
@@ -305,19 +306,19 @@ const changePassword = async () => {
 };
 
 const forceLogout = async () => {
-  localStorage.removeItem("TOKEN");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("TOKEN");
+  sessionStorage.removeItem("user");
   router.push("/login");
 };
 
 const logout = async () => {
   try {
-    await ElMessageBox.confirm(t("home.logoutmessage"), t("home.confirmTip"), {
+    await ElMessageBox.confirm(t("home.logoutMessage"), t("home.confirmTip"), {
       type: "warning",
     });
 
-    localStorage.removeItem("TOKEN");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("TOKEN");
+    sessionStorage.removeItem("user");
     router.push("/login");
   } catch {
     // User cancelled
@@ -413,7 +414,6 @@ onMounted(() => {
   background: #ffffff;
   border-bottom: 1px solid #e4e7ed;
   height: 60px !important;
-  line-height: 60px;
   padding: 0;
 }
 
@@ -485,18 +485,14 @@ onMounted(() => {
 .el-menu-item,
 .el-sub-menu {
   color: var(--text-color) !important;
-  border-radius: 10px;
-  font-weight: 600 !important;
+  border-radius: 10px;  
+  font-weight: 600!important;
 }
 
 /* Active state */
 .el-menu-item.is-active,
 .el-submenu__title.is-active {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color) 0%,
-    var(--dark-primary-color) 100%
-  ) !important;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%) !important;
   color: var(--white) !important;
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
@@ -511,6 +507,7 @@ onMounted(() => {
 .el-submenu__title.is-active i {
   color: var(--white) !important;
 }
+
 
 /* Main Content */
 .main-content {

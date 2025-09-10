@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
   <div class="prison-list">
     <!-- <el-page-header @back="$router.go(-1)">
@@ -8,38 +9,52 @@
 
     <!-- Search Section -->
     <div class="search-section">
-      <el-form class="search-grid" :model="searchForm" inline>
-        <el-form-item label="Mã trại giam">
-          <el-input
-            v-model="searchForm.code"
-            placeholder="Nhập mã trại giam..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Tên trại giam">
-          <el-input
-            v-model="searchForm.name"
-            placeholder="Nhập tên trại giam..."
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="Trạng thái">
-          <el-select
-            style="width: 240px"
-            v-model="searchForm.isActive"
-            placeholder="Chọn trạng thái"
-            clearable
-          >
-            <el-option label="Hoạt động" :value="true" />
-            <el-option label="Tạm dừng" :value="false" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="onReset" :icon="Refresh">Làm mới</el-button>
-        </el-form-item>
+      <el-form :model="searchForm" inline label-width="auto" label-position="left">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item :label="t('prison.code')">
+              <el-input
+                  v-model="searchForm.code"
+                  :placeholder="t('prison.placeholder.code')"
+                  clearable
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item :label="t('prison.name')">
+              <el-input
+                  v-model="searchForm.name"
+                  :placeholder="t('prison.placeholder.name')"
+                  clearable
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item :label="t('prison.status')">
+              <el-select
+                  style="width: 194px;"
+                  v-model="searchForm.isActive"
+                  :placeholder="t('prison.placeholder.status')"
+                  clearable
+              >
+                <el-option :label="t('prison.active')" :value="true" />
+                <el-option :label="t('prison.inactive')" :value="false" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item>
+              <el-button type="primary" @click="onSearch" :icon="Search">
+                {{ t('Search') }}
+              </el-button>
+              <el-button @click="onReset" :icon="Refresh">
+                {{ t('common.reset') }}
+              </el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <!-- <div>
         <el-button
@@ -60,18 +75,19 @@
       <div class="action-bar">
         <div>
           <el-button
-            type="primary"
-            @click="$router.push('/prisons/add')"
-            :icon="Plus"
+              type="primary"
+              @click="$router.push('/prisons/add')"
+              :icon="Plus"
           >
-            Thêm trại giam mới
+            {{ t('common.add') }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            Xuất Excel
+            {{ t('common.export') }}
           </el-button>
         </div>
         <div class="result-info">
-          Tổng số: {{ prisonStore.getTotal }} trại giam
+          {{ t('common.total') }}: {{ prisonStore.getTotal }}
+          {{ t('common.unit') }}
         </div>
       </div>
     </div>
@@ -79,60 +95,45 @@
     <!-- Data Table -->
 
     <el-table
-      :data="prisons"
-      style="width: 100%"
-      v-loading="prisonStore.getLoading"
-      stripe
-      border
+        :data="prisons"
+        style="width: 100%"
+        v-loading="prisonStore.getLoading"
+        stripe
+        border
     >
-      <el-table-column
-        prop="code"
-        label="Mã trại giam"
-        width="145"
-        sortable
-        show-overflow-tooltip
-      />
-      <el-table-column prop="name" label="Tên trại giam" width="200" />
-      <el-table-column label="Địa chỉ" min-width="250" show-overflow-tooltip>
+      <el-table-column prop="code" :label="t('prison.code')" width="145" sortable fixed="left" />
+      <el-table-column prop="name" :label="t('prison.name')" width="200"/>
+      <el-table-column :label="t('prison.address')" min-width="250" show-overflow-tooltip>
         <template #default="scope">
           {{ scope.row.address }}, {{ scope.row.wardFullName }},
           {{ scope.row.provinceFullName }}
         </template>
       </el-table-column>
-      <el-table-column prop="director" label="Giám thị" width="150" />
-      <el-table-column label="Sức chứa" width="130" align="center">
+      <el-table-column prop="director" :label="t('prison.director')" width="150" />
+      <el-table-column :label="t('prison.capacity')" width="130" align="center">
         <template #default="scope">
-          <el-tag type="info"
-            >{{ scope.row.currentPopulation }}/{{ scope.row.capacity }}</el-tag
-          >
-        </template>
-      </el-table-column>
-      <el-table-column label="Tỷ lệ lấp đầy" width="150">
-        <template #default="scope">
-          <el-progress
-            :percentage="
-              Number(
-                (
-                  (scope.row.currentPopulation / scope.row.capacity) *
-                  100
-                ).toFixed(2)
-              )
-            "
-            :color="
-              getProgressColor(scope.row.currentPopulation / scope.row.capacity)
-            "
-          />
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" label="Điện thoại" width="130" />
-      <el-table-column label="Trạng thái" width="110" align="center">
-        <template #default="scope">
-          <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
-            {{ scope.row.isActive === true ? "Hoạt động" : "Tạm dừng" }}
+          <el-tag type="info">
+            {{ scope.row.currentPopulation }}/{{ scope.row.capacity }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Thao tác" width="160" fixed="right">
+      <el-table-column :label="t('prison.occupancyRate')" width="150">
+        <template #default="scope">
+          <el-progress
+              :percentage="Number(((scope.row.currentPopulation / scope.row.capacity) * 100).toFixed(2))"
+              :color="getProgressColor(scope.row.currentPopulation / scope.row.capacity)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" :label="t('prison.phone')" width="130" />
+      <el-table-column :label="t('prison.status')" width="110" align="center">
+        <template #default="scope">
+          <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
+            {{ scope.row.isActive === true ? t('prison.active') : t('prison.inactive') }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column :label="t('common.actions')" width="160" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View">
           </el-button>
@@ -168,75 +169,62 @@
 
     <!-- Detail Dialog -->
     <el-dialog
-      v-model="detailDialogVisible"
-      title="Chi tiết trại giam"
-      width="60%"
-      :before-close="handleDetailClose"
-      class="dialog"
+        v-model="detailDialogVisible"
+        :title="t('prison.detailTitle')"
+        width="60%"
+        :before-close="handleDetailClose"
+        class="dialog"
     >
       <div v-if="selectedPrison" class="detail-content">
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="Mã trại giam">{{
-            selectedPrison.code
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Tên trại giam">{{
-            selectedPrison.name
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Giám thị" :span="2">{{
-            selectedPrison.director
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Địa chỉ" :span="2"
-            >{{ selectedPrison.address }}, {{ selectedPrison.wardFullName }},
-            {{ selectedPrison.provinceFullName }}</el-descriptions-item
-          >
-          <el-descriptions-item label="Điện thoại">{{
-            selectedPrison.phone
-          }}</el-descriptions-item>
-          <el-descriptions-item label="Sức chứa tối đa"
-            >{{ selectedPrison.capacity }} người</el-descriptions-item
-          >
-          <el-descriptions-item label="Số phạm nhân hiện tại"
-            >{{ selectedPrison?.currentPopulation }} người</el-descriptions-item
-          >
-          <el-descriptions-item label="Tỷ lệ lấp đầy">
+          <el-descriptions-item :label="t('prison.code')">
+            {{ selectedPrison.code }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.name')">
+            {{ selectedPrison.name }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.director')" :span="2">
+            {{ selectedPrison.director }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.address')" :span="2">
+            {{ selectedPrison.address }}, {{ selectedPrison.wardFullName }},
+            {{ selectedPrison.provinceFullName }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.phone')">
+            {{ selectedPrison.phone }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.capacity')">
+            {{ selectedPrison.capacity }} {{ t('prison.people') }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.currentPopulation')">
+            {{ selectedPrison?.currentPopulation }} {{ t('prison.people') }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.occupancyRate')">
             <el-progress
-              :percentage="
-                selectedPrison?.currentPopulation && selectedPrison?.capacity
-                  ? Number(
-                      (
-                        (selectedPrison.currentPopulation /
-                          selectedPrison.capacity) *
-                        100
-                      ).toFixed(2)
-                    )
-                  : 0
-              "
-              :color="
-                getProgressColor(
-                  (selectedPrison?.currentPopulation || 0) /
-                    (selectedPrison?.capacity || 1)
-                )
-              "
+                :percentage="selectedPrison?.currentPopulation && selectedPrison?.capacity
+                ? Number(((selectedPrison.currentPopulation / selectedPrison.capacity) * 100).toFixed(2))
+                : 0"
+                :color="getProgressColor((selectedPrison?.currentPopulation || 0) / (selectedPrison?.capacity || 1))"
             />
           </el-descriptions-item>
-          <el-descriptions-item label="Trạng thái">
-            <el-tag
-              :type="selectedPrison.isActive === true ? 'success' : 'danger'"
-            >
-              {{ selectedPrison.isActive === true ? "Hoạt động" : "Tạm dừng" }}
+          <el-descriptions-item :label="t('prison.status')">
+            <el-tag :type="selectedPrison.isActive === true ? 'success' : 'danger'">
+              {{ selectedPrison.isActive === true ? t('prison.active') : t('prison.inactive') }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="Ngày tạo">{{
-            formatDate(selectedPrison.createdAt)
-          }}</el-descriptions-item>
+          <el-descriptions-item :label="t('common.createTime')">
+            {{ formatDate(selectedPrison.createdAt) }}
+          </el-descriptions-item>
         </el-descriptions>
       </div>
 
       <template #footer>
-        <el-button @click="detailDialogVisible = false">Đóng</el-button>
-        <el-button type="primary" @click="handleEdit(selectedPrison)"
-          >Chỉnh sửa</el-button
-        >
+        <el-button @click="detailDialogVisible = false">
+          {{ t('common.close') }}
+        </el-button>
+        <el-button type="primary" @click="handleEdit(selectedPrison)">
+          {{ t('common.ok') }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -301,7 +289,7 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
+  ElMessage.info(t('common.exportUpdating'));
 };
 const handleView = (prison: any) => {
   selectedPrison.value = prison;
@@ -326,7 +314,7 @@ const search = async (extra?: Partial<PageQuery>) => {
     prisons.value = prisonStore.getPrisons || [];
   } catch (error) {
     // console.error("Error fetching prison list:", error);
-    ElMessage.error("Có lỗi xảy ra khi tải danh sách trại giam!");
+    ElMessage.error(t('common.dataFail'));
   } finally {
     loading.value = false;
   }
@@ -419,5 +407,17 @@ const onDelete = async (id: number) => {
 
 .detail-content {
   padding: 20px 0;
+}
+
+::v-deep(.el-table__fixed),
+::v-deep(.el-table__fixed-right) {
+  z-index: 3 !important;
+  background: #fff;
+  height: 100%;
+}
+
+::v-deep(.el-table__fixed-header-wrapper),
+::v-deep(.el-table__fixed-body-wrapper) {
+  background: #fff;
 }
 </style>

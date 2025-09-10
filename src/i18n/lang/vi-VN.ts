@@ -7,15 +7,23 @@ import common from "./vi-VN/common";
 import option from "./vi-VN/option";
 import menu from "./vi-VN/menu";
 import profile from "./vi-VN/profile";
+import staff from "./vi-VN/staff";
+import prison from "./vi-VN/prison";
+import route from "./vi-VN/route";
+import identity from "./vi-VN/identity";
 
 export default {
-  ...menu,
-  ...option,
-  ...common,
-  ...login,
-  ...home,
-  ...user,
-  ...role,
-  ...permission,
-  ...profile,
+  route,
+  menu,
+  option,
+  common,
+  login,
+  home,
+  user,
+  role,
+  permission,
+  profile,
+  staff,
+  prison,
+  identity,
 };

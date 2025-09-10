@@ -72,10 +72,11 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ElMessage, type FormInstance } from "element-plus";
-import * as Utils from "../../utils";
+import { useAuthStore } from "@/stores/login";
 
 const { t } = useI18n();
 const router = useRouter();
+const authStore = useAuthStore();
 
 // Refs
 const loginFormRef = ref<FormInstance>();
@@ -98,14 +99,14 @@ const loginFormRules = reactive({
   username: [
     {
       required: true,
-      message: t("login.userisnull"),
+      message: t("login.userIsNull"),
       trigger: "blur",
     },
   ],
   password: [
     {
       required: true,
-      message: t("login.pwdisnull"),
+      message: t("login.passwordIsNull"),
       trigger: "blur",
     },
   ],
@@ -129,16 +130,14 @@ const showPassword = () => {
 const doLogin = async () => {
   try {
     await loginFormRef.value?.validate();
-    const record = loginForm;
-    const ret = await Utils.doPost("/api/sessions/login", record);
-    console.log(ret);
+    const ret = await authStore.login(loginForm);
+
     if (ret.success) {
       if (ret.code === "0") {
-        sessionStorage.setItem("user", JSON.stringify(ret.data));
         router.push({ path: "/" });
       } else {
         ui.otpVisible = true;
-        ElMessage.info(t("login.otptip"));
+        ElMessage.info(t("login.OTPtip"));
       }
     } else {
       ElMessage.warning(t("Login info is incorrect"));
@@ -149,9 +148,8 @@ const doLogin = async () => {
 };
 
 // Lifecycle
-onMounted(async () => {
-  localStorage.removeItem("TOKEN");
-  localStorage.removeItem("user");
+onMounted(() => {
+  authStore.logout();
 });
 </script>
 

@@ -1,38 +1,36 @@
 <template>
   <div class="fingerprint-management">
-    <div class="header">
-      <h2>👆 Quản Lý Chỉ Bản</h2>
-      <p>Quản lý vân tay và thông tin chỉ bản phạm nhân</p>
-    </div>
+<!--    <div class="header">-->
+<!--      <h2>👆 Quản Lý Chỉ Bản</h2>-->
+<!--      <p>Quản lý vân tay và thông tin chỉ bản phạm nhân</p>-->
+<!--    </div>-->
 
     <!-- Tìm kiếm -->
     <div class="search-section">
-      <h3>🔍 Tìm Kiếm Chỉ Bản</h3>
-      <div class="search-grid">
-        <div class="form-group">
-          <label>Mã phạm nhân</label>
-          <input
-            type="text"
-            v-model="searchForm.detaineeCode"
-            placeholder="Nhập mã phạm nhân..."
-            @input="handleSearch"
-          />
-        </div>
-        <div class="form-group">
-          <label>Họ và tên</label>
-          <input
-            type="text"
-            v-model="searchForm.detaineeName"
-            placeholder="Nhập họ và tên..."
-            @input="handleSearch"
-          />
-        </div>
-        <div class="form-group">
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" @click="searchFingerprintCards">
-            🔍 Tìm Kiếm
-          </button>
-        </div>
+<!--      <h3>🔍 Tìm Kiếm Chỉ Bản</h3>-->
+      <div class="form-group">
+        <label>Mã phạm nhân</label>
+        <input
+          type="text"
+          v-model="searchForm.detaineeCode"
+          placeholder="Nhập mã phạm nhân..."
+          @input="handleSearch"
+        />
+      </div>
+      <div class="form-group">
+        <label>Họ và tên</label>
+        <input
+          type="text"
+          v-model="searchForm.detaineeName"
+          placeholder="Nhập họ và tên..."
+          @input="handleSearch"
+        />
+      </div>
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" @click="searchFingerprintCards">
+          🔍 Tìm Kiếm
+        </button>
       </div>
     </div>
 
@@ -542,7 +540,6 @@ onMounted(() => {
   font-size: 1.1rem;
 }
 
-.search-section,
 .form-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);

@@ -9,23 +9,23 @@
         @submit.prevent="handleSubmit"
       >
         <!-- Thông tin cơ bản -->
-        <el-divider content-position="left">Thông tin cơ bản</el-divider>
+        <el-divider content-position="left">{{ t('staff.basicInfo') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Số hồ sơ" prop="profileNumber">
+            <el-form-item :label="t('staff.profileNumber')" prop="profileNumber">
               <el-input
-                v-model="form.profileNumber"
-                placeholder="Nhập số hồ sơ..."
+                  v-model="form.profileNumber"
+                  :placeholder="t('staff.profileNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item v-if="isEdit" label="Mã cán bộ">
+            <el-form-item v-if="isEdit" :label="t('staff.staffCode')">
               <el-input
-                v-model="form.staffCode"
-                :disabled="isEdit"
-                placeholder="Nhập mã cán bộ..."
+                  v-model="form.staffCode"
+                  :disabled="isEdit"
+                  :placeholder="t('staff.staffCode')"
               />
             </el-form-item>
           </el-col>
@@ -33,21 +33,21 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Họ và tên" prop="fullName">
+            <el-form-item :label="t('staff.fullName')" prop="fullName">
               <el-input
-                v-model="form.fullName"
-                placeholder="Nhập họ và tên..."
+                  v-model="form.fullName"
+                  :placeholder="t('staff.fullName')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Giới tính" prop="gender">
-              <el-select v-model="form.gender" placeholder="Chọn giới tính">
+            <el-form-item :label="t('staff.gender')" prop="gender">
+              <el-select v-model="form.gender" :placeholder="t('staff.gender')">
                 <el-option
-                  v-for="option in genderOptions"
-                  :key="option.value"
-                  :label="option.label"
-                  :value="option.value"
+                    v-for="option in genderOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                 />
               </el-select>
             </el-form-item>
@@ -56,22 +56,22 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Ngày sinh">
+            <el-form-item :label="t('staff.dateOfBirth')">
               <el-date-picker
-                v-model="form.dateOfBirth"
-                type="date"
-                placeholder="Chọn ngày sinh"
-                style="width: 100%"
-                format="DD/MM/YYYY"
-                value-format="YYYY-MM-DD"
+                  v-model="form.dateOfBirth"
+                  type="date"
+                  :placeholder="t('staff.dateOfBirth')"
+                  style="width: 100%"
+                  format="DD/MM/YYYY"
+                  value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Nơi sinh">
+            <el-form-item :label="t('staff.placeOfBirth')">
               <el-input
-                v-model="form.placeOfBirth"
-                placeholder="Nhập nơi sinh..."
+                  v-model="form.placeOfBirth"
+                  :placeholder="t('staff.placeOfBirth')"
               />
             </el-form-item>
           </el-col>
@@ -79,84 +79,82 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Dân tộc" prop="ethnicityId">
+            <el-form-item :label="t('staff.ethnicity')" prop="ethnicityId">
               <el-select
-                v-model="form.ethnicityId"
-                placeholder="Chọn dân tộc"
+                  v-model="form.ethnicityId"
+                  :placeholder="t('staff.ethnicity')"
               >
                 <el-option
-                  v-for="option in ethnicities"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in ethnicities"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Tôn giáo">
+            <el-form-item :label="t('staff.religion')">
               <el-select
-                v-model="form.religionId"
-                placeholder="Chọn tôn giáo"
+                  v-model="form.religionId"
+                  :placeholder="t('staff.religion')"
               >
                 <el-option
-                  v-for="option in religions"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in religions"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Số CCCD/CMND" prop="idNumber">
+            <el-form-item :label="t('staff.idNumber')" prop="idNumber">
               <el-input
-                v-model="form.idNumber"
-                placeholder="Nhập số CCCD/CMND..."
+                  v-model="form.idNumber"
+                  :placeholder="t('staff.idNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Ngày cấp">
+            <el-form-item :label="t('staff.idIssueDate')">
               <el-date-picker
-                v-model="form.idIssueDate"
-                type="date"
-                placeholder="Chọn ngày cấp"
-                style="width: 100%"
-                format="DD/MM/YYYY"
-                value-format="YYYY-MM-DD"
+                  v-model="form.idIssueDate"
+                  type="date"
+                  :placeholder="t('staff.idIssueDate')"
+                  style="width: 100%"
+                  format="DD/MM/YYYY"
+                  value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item label="Nơi cấp">
-          <el-input v-model="form.idIssuePlace" placeholder="Nhập nơi cấp..." />
+        <el-form-item :label="t('staff.idIssuePlace')">
+          <el-input v-model="form.idIssuePlace" :placeholder="t('staff.idIssuePlace')" />
         </el-form-item>
 
-        
         <!-- Thông tin liên hệ -->
-        <el-divider content-position="left">Thông tin liên hệ</el-divider>
+        <el-divider content-position="left">{{ t('staff.contactInfo') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Số điện thoại" prop="phone">
+            <el-form-item :label="t('staff.phone')" prop="phone">
               <el-input
-                v-model="form.phone"
-                placeholder="Nhập số điện thoại..."
+                  v-model="form.phone"
+                  :placeholder="t('staff.phone')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Email">
+            <el-form-item :label="t('staff.email')">
               <el-input
-                v-model="form.email"
-                type="email"
-                placeholder="Nhập email..."
+                  v-model="form.email"
+                  type="email"
+                  :placeholder="t('staff.email')"
               />
             </el-form-item>
           </el-col>
@@ -164,18 +162,18 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Người liên hệ khẩn cấp">
+            <el-form-item :label="t('staff.emergencyContact')">
               <el-input
-                v-model="form.emergencyContact"
-                placeholder="Nhập tên người liên hệ..."
+                  v-model="form.emergencyContact"
+                  :placeholder="t('staff.emergencyContact')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="SĐT liên hệ khẩn cấp">
+            <el-form-item :label="t('staff.emergencyPhone')">
               <el-input
-                v-model="form.emergencyPhone"
-                placeholder="Nhập số điện thoại..."
+                  v-model="form.emergencyPhone"
+                  :placeholder="t('staff.emergencyPhone')"
               />
             </el-form-item>
           </el-col>
@@ -204,24 +202,24 @@
           </el-col>
         </el-row> -->
 
-        <el-divider content-position="left">Địa chỉ thường trú</el-divider>
+        <el-divider content-position="left">{{ t('staff.permanentAddress') }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="permanentProvinceId">
+            <el-form-item :label="t('staff.province')" prop="permanentProvinceId">
               <el-select
-                v-model="form.permanentProvinceId"
-                placeholder="Chọn tỉnh"
-                filterable
-                clearable
-                style="width: 100%"
-                @change="onPermanentProvinceChange"
+                  v-model="form.permanentProvinceId"
+                  :placeholder="t('staff.province')"
+                  filterable
+                  clearable
+                  style="width: 100%"
+                  @change="onPermanentProvinceChange"
               >
                 <el-option
-                  v-for="p in permanentProvinces"
-                  :key="p.code"
-                  :label="p.name"
-                  :value="p.code"
+                    v-for="p in permanentProvinces"
+                    :key="p.code"
+                    :label="p.name"
+                    :value="p.code"
                 />
               </el-select>
             </el-form-item>
@@ -229,44 +227,44 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="permanentWardId">
+            <el-form-item :label="t('staff.ward')" prop="permanentWardId">
               <el-select
-                v-model="form.permanentWardId"
-                placeholder="Chọn xã/phường"
-                filterable
-                clearable
-                style="width: 100%"
-                :disabled="!form.permanentProvinceId"
+                  v-model="form.permanentWardId"
+                  :placeholder="t('staff.ward')"
+                  filterable
+                  clearable
+                  style="width: 100%"
+                  :disabled="!form.permanentProvinceId"
               >
                 <el-option
-                  v-for="w in permanentWards"
-                  :key="w.code"
-                  :label="w.name"
-                  :value="w.code"
+                    v-for="w in permanentWards"
+                    :key="w.code"
+                    :label="w.name"
+                    :value="w.code"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="t('staff.address')" prop="address">
               <el-input
-                v-model="form.permanentAddress"
-                placeholder="Số nhà, đường, thôn/xóm..."
-                clearable
+                  v-model="form.permanentAddress"
+                  :placeholder="t('staff.detailAddress')"
+                  clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Địa chỉ tạm trú</el-divider>
+        <el-divider content-position="left">{{ t('staff.temporaryAddress') }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item label="Tỉnh/Thành" prop="temporaryProvinceId">
+            <el-form-item :label="t('staff.province')" prop="temporaryProvinceId">
               <el-select
                 v-model="form.temporaryProvinceId"
-                placeholder="Chọn tỉnh"
+                :placeholder="t('staff.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -284,10 +282,10 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item label="Xã/Phường" prop="temporaryWardId">
+            <el-form-item :label="t('staff.ward')" prop="temporaryWardId">
               <el-select
                 v-model="form.temporaryWardId"
-                placeholder="Chọn xã/phường"
+                :placeholder="t('staff.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -304,57 +302,57 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item label="Địa chỉ" prop="address">
+            <el-form-item :label="t('staff.address')" prop="address">
               <el-input
-                v-model="form.temporaryAddress"
-                placeholder="Số nhà, đường, thôn/xóm..."
-                clearable
+                  v-model="form.temporaryAddress"
+                  :placeholder="t('staff.detailAddress')"
+                  clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
         <!-- Thông tin công việc -->
-        <el-divider content-position="left">Thông tin công việc</el-divider>
+        <el-divider content-position="left">{{ t('staff.jobInfo') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Cấp bậc" prop="rank">
-              <el-input v-model="form.rank" placeholder="Nhập cấp bậc..." />
+            <el-form-item :label="t('staff.rank')" prop="rank">
+              <el-input v-model="form.rank" :placeholder="t('staff.rank')" />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Phòng ban">
+            <el-form-item :label="t('staff.department')">
               <el-select
-                v-model="form.departmentId"
-                placeholder="Chọn phòng ban"
-                filterable
-                clearable
-                style="width: 100%"
-                :disabled="!form.detentionCenterId"
+                  v-model="form.departmentId"
+                  :placeholder="t('staff.department')"
+                  filterable
+                  clearable
+                  style="width: 100%"
+                  :disabled="!form.detentionCenterId"
               >
                 <el-option
-                  v-for="d in departments"
-                  :key="d.id"
-                  :label="d.name"
-                  :value="d.id"
+                    v-for="d in departments"
+                    :key="d.id"
+                    :label="d.name"
+                    :value="d.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Chức vụ">
+            <el-form-item :label="t('staff.position')">
               <el-select
-                v-model="form.positionId"
-                placeholder="Chọn chức vụ"
-                filterable
-                clearable
-                style="width: 100%"
+                  v-model="form.positionId"
+                  :placeholder="t('staff.position')"
+                  filterable
+                  clearable
+                  style="width: 100%"
               >
                 <el-option
-                  v-for="d in positions"
-                  :key="d.id"
-                  :label="d.name"
-                  :value="d.id"
+                    v-for="d in positions"
+                    :key="d.id"
+                    :label="d.name"
+                    :value="d.id"
                 />
               </el-select>
             </el-form-item>
@@ -363,62 +361,58 @@
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Trại giam">
+            <el-form-item :label="t('staff.prison')">
               <el-select
-                v-model="form.detentionCenterId"
-                placeholder="Chọn trại giam"
-                @change="onDetentionCenterChange"
+                  v-model="form.detentionCenterId"
+                  :placeholder="t('staff.prison')"
+                  @change="onDetentionCenterChange"
               >
                 <el-option
-                  v-for="prison in prisons"
-                  :key="prison.id"
-                  :label="prison.name"
-                  :value="prison.id"
+                    v-for="prison in prisons"
+                    :key="prison.id"
+                    :label="prison.name"
+                    :value="prison.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="Trình độ học vấn">
+            <el-form-item :label="t('staff.educationLevel')">
               <el-select
-                v-model="form.educationLevelId"
-                placeholder="Chọn trình độ"
+                  v-model="form.educationLevelId"
+                  :placeholder="t('staff.educationLevel')"
               >
                 <el-option
-                  v-for="option in educationLevels"
-                  :key="option.id"
-                  :label="option.name"
-                  :value="option.id"
+                    v-for="option in educationLevels"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
                 />
               </el-select>
             </el-form-item>
-            
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item v-if="isEdit" label="Trạng thái" prop="status">
-              <el-select v-model="form.status" placeholder="Chọn trạng thái">
+            <el-form-item v-if="isEdit" :label="t('staff.status')" prop="status">
+              <el-select v-model="form.status" :placeholder="t('staff.status')">
                 <el-option
-                  v-for="option in statusOptions"
-                  :key="option.value"
-                  :label="option.label"
-                  :value="option.value"
+                    v-for="option in statusOptions"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
                 />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item v-if="isEdit" label="Hoạt động">
+        <el-form-item v-if="isEdit" :label="t('staff.isActive')">
           <el-switch
-            v-model="form.isActive"
-            class="ml-2"
-            inline-prompt
-            style="
-              --el-switch-on-color: #13ce66;
-              --el-switch-off-color: #ff4949;
-            "
-            active-text="Đang hoạt động"
-            inactive-text="Không hoạt động"
+              v-model="form.isActive"
+              class="ml-2"
+              inline-prompt
+              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949;"
+              :active-text="t('staff.active')"
+              :inactive-text="t('staff.inactive')"
           />
           <!-- <el-switch
             v-model="form.isActive"
@@ -430,10 +424,10 @@
         <!-- Buttons -->
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+            {{ isEdit ? t('common.update') : t('common.add') }}
           </el-button>
-          <el-button @click="handleReset">Làm mới</el-button>
-          <el-button @click="$router.go(-1)">Hủy</el-button>
+          <el-button @click="handleReset">{{ t('common.reset') }}</el-button>
+          <el-button @click="$router.go(-1)">{{ t('common.cancel') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -524,36 +518,36 @@ const temporaryWards = ref<Ward[]>([]);
 // Validation rules
 const rules: FormRules = {
   staffCode: [
-    { required: true, message: "Vui lòng nhập mã cán bộ", trigger: "blur" },
+    { required: true, message: t('staff.validation.required.code'), trigger: "blur" },
     {
       min: 3,
       max: 20,
-      message: "Mã cán bộ phải từ 3-20 ký tự",
+      message: t('staff.validation.length.code'),
       trigger: "blur",
     },
   ],
   fullName: [
-    { required: true, message: "Vui lòng nhập họ và tên", trigger: "blur" },
-    { min: 2, max: 50, message: "Họ tên phải từ 2-50 ký tự", trigger: "blur" },
+    { required: true, message: t('staff.validation.required.name'), trigger: "blur" },
+    { min: 2, max: 50, message: t('staff.validation.length.fullName'), trigger: "blur" },
   ],
   gender: [
-    { required: true, message: "Vui lòng chọn giới tính", trigger: "change" },
+    { required: true, message: t('staff.validation.required.gender'), trigger: "change" },
   ],
   phone: [
-    { required: true, message: "Vui lòng nhập số điện thoại", trigger: "blur" },
+    { required: true, message: t('staff.validation.required.phone'), trigger: "blur" },
     {
       pattern: /^[0-9]{10,11}$/,
-      message: "Số điện thoại không hợp lệ",
+      message: t('staff.validation.pattern.phone'),
       trigger: "blur",
     },
   ],
-  email: [{ type: "email", message: "Email không hợp lệ", trigger: "blur" }],
-  rank: [{ required: true, message: "Vui lòng nhập cấp bậc", trigger: "blur" }],
+  email: [{ type: "email", message: t('staff.validation.pattern.email'), trigger: "blur" }],
+  rank: [{ required: true, message: t('staff.validation.required.rank'), trigger: "blur" }],
   detentionCenterId: [
-    { required: true, message: "Vui lòng chọn trại giam", trigger: "change" },
+    { required: true, message: t('staff.validation.required.detentionCenter'), trigger: "change" },
   ],
   status: [
-    { required: true, message: "Vui lòng chọn trạng thái", trigger: "change" },
+    { required: true, message: t('staff.validation.required.status'), trigger: "change" },
   ],
 };
 
@@ -632,7 +626,7 @@ const loadData = async () => {
     if (staff) {
       Object.assign(form, staff);
     } else {
-      ElMessage.error("Không tìm thấy thông tin trại giam!");
+      ElMessage.error(t('common.unspecified'));
       router.push("/staff");
     }
   }

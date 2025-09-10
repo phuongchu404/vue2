@@ -27,3 +27,10 @@ export const statusOptions: Option[] = [
   { label: "Nghỉ hưu", value: Status.RETIRED },
   { label: "Chuyển công tác", value: Status.TRANSFERRED },
 ];
+
+export const DetaineeStatus: Option[] = [
+  { label: "Đang giam giữ", value: "DETAINED" },
+  { label: "Đã thả", value: "RELEASED" },
+  { label: "Chuyển trại", value: "TRANSFERRED" },
+  { label: "Đã chết", value: "DECEASED" },
+];

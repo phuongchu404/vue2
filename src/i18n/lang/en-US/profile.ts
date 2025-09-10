@@ -1,18 +1,23 @@
-export default {
-  "profile.infotitle": "User Information",
-  "profile.username": "User Name",
-  "profile.realname": "Real Name",
-  "profile.roles": "Roles",
-  "profile.lastlogin": "Last login",
-  "profile.twostepstatus": "2-step authentication",
-  "profile.twosteptitle": "Activate 2-step authentication",
-  "profile.tiprow1": "User Authy to scan activation code.",
-  "profile.tiprow2": "Enter the Authy OTP：",
-  "profile.otp": "OTP：",
-  "profile.otpisnull": "Please enter OTP",
-  "profile.activatetip": "2-step authentication is not activated！",
-  "profile.confirmactivatetip": "Activate 2-step authentication will remove old Authy account, if 2-step authentication was activated previously. Do you want to reactivate？",
-  "profile.activatefaliedtip": "Failed to activate！",
-  "profile.activatefalieddetailtip": "Failed to activate！Reason：",
-  "profile.activatesuccesstip": "Activate successfully。OTP will be required in next login.",
-}
+import type { Profile } from "@/i18n/type";
+
+const profile: Profile = {
+  infotitle: "User Information",
+  username: "Username",
+  realname: "Full Name",
+  roles: "Roles",
+  lastlogin: "Last Login",
+  twostepstatus: "Two-Step Verification",
+  twosteptitle: "Enable Two-Step Verification",
+  tiprow1: "Use Authy to scan the QR code to activate",
+  tiprow2: "Authy will return an OTP code, please enter it here: ",
+  otp: "OTP Code: ",
+  otpisnull: "Please enter the OTP",
+  activatetip: "Two-step verification has not been activated!",
+  confirmactivatetip:
+    "If you have previously activated this feature, this new activation will deactivate your old Authy account! Do you want to activate again?",
+  activatefaliedtip: "Activation failed!",
+  activatefalieddetailtip: "Activation failed! Reason: ",
+  activatesuccesstip: "Activation successful!",
+};
+
+export default profile;

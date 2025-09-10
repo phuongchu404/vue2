@@ -2,17 +2,17 @@
   <div>
     <!--Query Form  -->
     <div class="search-section">
-      <!-- <header>{{ $t("Search") }}</header> -->
+      <!-- <header>{{ t("Search") }}</header> -->
       <el-form
         :inline="true"
         :model="queryForm"
         class="demo-form-inline"
         label-width="170px"
       >
-        <el-form-item :label="$t('role.roleName')">
+        <el-form-item :label="t('role.roleName')">
           <el-input
             v-model="queryForm.roleName"
-            :placeholder="$t('role.roleName')"
+            :placeholder="t('role.roleName')"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -22,7 +22,7 @@
             :disabled="isButtonEnabled('system:user:select')"
             :icon="Search"
           >
-            {{ $t("option.query") }}
+            {{ t("option.query") }}
           </el-button>
         </el-form-item>
         <el-form-item align="right">
@@ -32,15 +32,15 @@
             :disabled="isButtonEnabled('system:role:insert')"
             :icon="Plus"
           >
-            <span>{{ $t("option.add") }}</span>
+            <span>{{ t("option.add") }}</span>
           </el-button>
           <el-button
-            type="primary"
+            type="success"
             @click="handleSynchronizePermission"
             :disabled="isButtonEnabled('system:role:insert')"
             :icon="Refresh"
           >
-            <span>{{ $t("option.syn") }}</span>
+            <span>{{ t("option.syn") }}</span>
           </el-button>
         </el-form-item>
       </el-form>
@@ -56,57 +56,52 @@
       <el-table-column
         type="index"
         prop="id"
-        :label="$t('common.index')"
+        :label="t('common.index')"
         width="90"
       ></el-table-column>
       <el-table-column
         prop="roleName"
-        :label="$t('role.roleName')"
+        :label="t('role.roleName')"
         min-width="80"
       ></el-table-column>
       <el-table-column
         prop="description"
-        :label="$t('role.description')"
+        :label="t('role.description')"
       ></el-table-column>
       <el-table-column
         prop="createTime"
-        :label="$t('common.createTime')"
+        :label="t('common.createTime')"
         width="230"
         :formatter="defaultTimeFormatter"
       ></el-table-column>
       <el-table-column
         prop="updateTime"
-        :label="$t('common.updateTime')"
+        :label="t('common.updateTime')"
         width="230"
         :formatter="defaultTimeFormatter"
       ></el-table-column>
-      <el-table-column :label="$t('common.option')" width="350">
+      <el-table-column :label="t('common.option')" width="350">
         <template #default="{ row }">
           <el-button
             type="primary"
-            class="normal-btn btn-bluelight"
             @click="handleEdit(row)"
             :disabled="isButtonEnabledByUser(row, 'system:role:update')"
-            >{{ $t("option.update") }}
+            >{{ t("option.update") }}
           </el-button>
           <el-button
-            size="small"
-            type="primary"
-            class="normal-btn btn-greenlight"
+            type="success"
             @click="handleAuthorize(row)"
             :disabled="
               isButtonEnabledByUser(row, 'system:role:assign-permission')
             "
           >
-            {{ $t("common.authorize") }}
+            {{ t("common.authorize") }}
           </el-button>
           <el-button
-            size="small"
-            type="primary"
-            class="normal-btn btn-red"
+            type="danger"
             @click="handleDelete(row)"
             :disabled="isButtonEnabledByUser(row, 'system:role:delete')"
-            >{{ $t("option.delete") }}
+            >{{ t("option.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -123,7 +118,7 @@
     />
 
     <el-dialog
-      :title="ui.addRecord ? $t('role.add') : $t('role.update')"
+      :title="ui.addRecord ? t('role.add') : t('role.update')"
       v-model="ui.dialogVisible"
       width="40%"
       class="dialog"
@@ -135,31 +130,31 @@
         style="padding-right: 50px"
         ref="formRef"
       >
-        <el-form-item :label="$t('role.roleName')" prop="roleName">
+        <el-form-item :label="t('role.roleName')" prop="roleName">
           <el-input
             v-model="form.roleName"
             autofocus
             :disabled="!ui.addRecord"
           ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('role.description')" prop="description">
+        <el-form-item :label="t('role.description')" prop="description">
           <el-input v-model="form.description"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="ui.dialogVisible = false">{{
-            $t("common.cancel")
+            t("common.cancel")
           }}</el-button>
           <el-button type="primary" @click="handleSaveOrUpdate()">{{
-            $t("common.ok")
+            t("common.ok")
           }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <el-dialog
-      :title="$t('common.authorize')"
+      :title="t('common.authorize')"
       v-model="ui.permsDialogVisible"
       @open="loadPermsDialogData"
       class="dialog"
@@ -167,10 +162,10 @@
       <el-row :gutter="20">
         <el-col :push="15" style="margin-bottom: 10px">
           <el-button @click="selectAll()" class="button-no-focus"
-            >{{ $t("common.select-all") }}
+            >{{ t("common.select-all") }}
           </el-button>
           <el-button @click="selectNone()" class="button-no-focus"
-            >{{ $t("common.select-none") }}
+            >{{ t("common.select-none") }}
           </el-button>
         </el-col>
       </el-row>
@@ -191,10 +186,10 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="ui.permsDialogVisible = false">{{
-            $t("common.cancel")
+            t("common.cancel")
           }}</el-button>
           <el-button type="primary" @click="handlePermsUpdate()">{{
-            $t("common.ok")
+            t("common.ok")
           }}</el-button>
         </div>
       </template>

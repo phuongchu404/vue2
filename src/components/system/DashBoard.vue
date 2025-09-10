@@ -1,12 +1,12 @@
 <template>
   <div class="dashboard">
-    <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3"
-          >Trang chủ - Tổng quan hệ thống</span
-        >
-      </template>
-    </el-page-header>
+<!--    <el-page-header @back="$router.go(-1)">-->
+<!--      <template #content>-->
+<!--        <span class="text-large font-600 mr-3"-->
+<!--          >Trang chủ - Tổng quan hệ thống</span-->
+<!--        >-->
+<!--      </template>-->
+<!--    </el-page-header>-->
 
     <!-- Statistics Cards -->
     <el-row :gutter="20" class="stats-row">

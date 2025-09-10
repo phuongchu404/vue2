@@ -115,7 +115,7 @@ export const usePrisonStore = defineStore("prison1", () => {
 });
 
 // Detainee Store
-export const useDetaineeStore = defineStore("detainee", () => {
+export const useDetaineeStore = defineStore("detainee1", () => {
   const detainees = ref([
     {
       id: 1,

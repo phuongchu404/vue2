@@ -1,22 +1,25 @@
-export default {
-  "home.funpwd": "Change password",
-  "home.funlogout": "Logout",
-  "home.userinfo": "User Information",
-  "home.pwdold": "Old password",
-  "home.pwdnew": "New password",
-  "home.pwdrpt": "Re enter new password",
-  "home.oldisnull": "Please enter old password！",
-  "home.newisnull": "Please enter new password！",
-  "home.repeatnew": "Please repeate new password！",
-  "home.notsame": "New password not matched！",
-  "home.issame": "New password must be different from old password！",
-  "home.funpwdsuc": "Change password successfully！",
-  "home.funpwdfal": "Fail to change password！Reason：",
-  "home.logoutmessage": "Are you sure to logout？",
-  "home.confirmTip": "Confirmation",
-  "home.title": "ERMS Management",
-  "home.authentication": "Fail to authentication password!",
-  "home.change-pwd-confirm": "Are you sure to change password? You will be logged out automatically after changing password!",
-  "reportCheckIn/CheckOut":"Statistical In/Out",
-  "reportVisitor":"Visitor Information"
-}
+import { Home } from "@/i18n/type";
+
+const home: Home = {
+  funPassword: "Change Password",
+  funLogout: "Logout",
+  userInfo: "User Information",
+  passwordOld: "Old Password",
+  passwordNew: "New Password",
+  passwordRepeat: "Repeat New Password",
+  oldIsNull: "Please enter the old password",
+  newIsNull: "Please enter the new password",
+  repeatNew: "Please enter the new password again",
+  notSame: "The two password entries do not match",
+  isSame: "The new password must be different from the old password",
+  passwordSuccess: "Password changed successfully",
+  passwordFail: "Password change failed! Reason: ",
+  logoutMessage: "Are you sure you want to log out?",
+  confirmTip: "Reminder",
+  title: "Management Panel",
+  authentication: "Password authentication failed!",
+  changePasswordConfirm:
+    "Are you sure you want to change the password? You will be automatically logged out after the password is changed!",
+};
+
+export default home;

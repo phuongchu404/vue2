@@ -1,11 +1,16 @@
-export default {
-  "login.userid": "User ID",
-  "login.password": "Password",
-  "login.otp": "OTP",
-  "login.login": "Login",
-  "login.userisnull": "Please enter User ID",
-  "login.pwdisnull": "Please enter password",
-  "login.otptip": "2-step authentication is enabled, please enter OPT!",
-  "login.loginfailed": "Login failed！",
-  "message" : "Please enter this info",
-}
+import type { Login } from "@/i18n/type";
+
+const login: Login = {
+  userId: "Username",
+  password: "Password",
+  otp: "OTP",
+  login: "Login",
+  userIsNull: "Please enter this information",
+  passwordIsNull: "Please enter this information",
+  OTPtip: "Two-factor authentication is enabled, please enter the OTP code",
+  loginFailed:
+    "Login failed. Please check your login information and try again.",
+  message: "Please enter this information",
+};
+
+export default login;

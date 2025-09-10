@@ -7,15 +7,23 @@ import common from "./en-US/common";
 import option from "./en-US/option";
 import menu from "./en-US/menu";
 import profile from "./en-US/profile";
+import staff from "./en-US/staff";
+import prison from "./en-US/prison";
+import route from "./en-US/route";
+import identity from "./en-US/identity";
 
 export default {
-  ...menu,
-  ...option,
-  ...common,
-  ...login,
-  ...home,
-  ...user,
-  ...role,
-  ...permission,
-  ...profile,
+  route,
+  menu,
+  option,
+  common,
+  login,
+  home,
+  user,
+  role,
+  permission,
+  profile,
+  staff,
+  prison,
+  identity,
 };
