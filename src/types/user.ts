@@ -14,6 +14,7 @@ export interface User {
   phoneNumber?: string;
   createUser?: string;
   description?: string;
+  detentionCenterId?: number;
 }
 
 export interface UserState {

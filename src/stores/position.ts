@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
 import { ElMessage } from "element-plus";
 import { PositionService } from "@/services/position";
-import type {
-  Position, PositionState
-} from "@/types/position";
+import type { Position, PositionState } from "@/types/position";
 import type { ServiceResult } from "@/types/common";
 
 export const usePositionStore = defineStore("position", {
@@ -15,7 +13,7 @@ export const usePositionStore = defineStore("position", {
 
   getters: {
     getPositions: (state): Position[] | undefined => state.positions,
-    getLoading: (state): boolean => state.loading,
+    getLoading: (state): boolean => state.loading ?? false,
     getError: (state): string | undefined => state.error,
   },
 
@@ -41,8 +39,6 @@ export const usePositionStore = defineStore("position", {
         this.loading = false;
       }
     },
-
-    
   },
 
   // persist: true,

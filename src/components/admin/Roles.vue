@@ -28,7 +28,7 @@
         <el-form-item align="right">
           <el-button
             type="primary"
-            @click="handleAdd"
+            @click="handleAdd()"
             :disabled="isButtonEnabled('system:role:insert')"
             :icon="Plus"
           >
@@ -36,7 +36,7 @@
           </el-button>
           <el-button
             type="success"
-            @click="handleSynchronizePermission"
+            @click="handleSynchronizePermission()"
             :disabled="isButtonEnabled('system:role:insert')"
             :icon="Refresh"
           >
@@ -230,11 +230,13 @@ import type {
 } from "@/types/rolePermission";
 import { useRoleStore } from "@/stores/role";
 import { useRolePermissionStore } from "@/stores/rolePermission";
+import { usePermissionStore } from "@/stores/permission";
 
 const { t } = useI18n();
 const appStore = useAppStore();
 const roleStore = useRoleStore();
 const rolePermissionStore = useRolePermissionStore();
+const permissionStore = usePermissionStore();
 
 // Refs
 const formRef = ref<FormInstance>();
@@ -391,8 +393,6 @@ const handleSaveOrUpdate = async () => {
         }
       } else {
         const payload: UpdateRoleRequest = { ...form };
-        console.log(payload);
-        console.log(form);
         await roleStore.updateRole(form.id as number, payload);
         if (roleStore.getSuccess) {
           ui.dialogVisible = false;
@@ -413,16 +413,31 @@ const handleAuthorize = async (rowData: any) => {
 };
 
 const loadPermsDialogData = async () => {
-  const permissions: any = nav.getPermissionTree();
+  await permissionStore.getAllMenus();
+  const permissions: any = nav.getPermissionTree(
+    permissionStore.getPermissions
+  );
   allPermissions.value = permissions;
   const selectedPermissions = await loadAllPermsByRoleId(permsForm.roleId);
   treeRef.value?.setCheckedKeys(selectedPermissions);
 };
 
 const handlePermsUpdate = async () => {
-  const keys = treeRef.value
-    ?.getCheckedKeys()
-    .concat(treeRef.value?.getHalfCheckedKeys());
+  const checkedKeys = treeRef.value?.getCheckedKeys() || [];
+  const halfCheckedKeys = treeRef.value?.getHalfCheckedKeys() || [];
+  let keys = checkedKeys.concat(halfCheckedKeys);
+
+  const permissionMapping = nav.createMenuPermissionMapping();
+
+  const autoIncludedApiPermissions = [];
+  for (const key of keys) {
+    if (permissionMapping.has(key)) {
+      autoIncludedApiPermissions.push(...permissionMapping.get(key));
+    }
+  }
+
+  keys = [...new Set([...keys, ...autoIncludedApiPermissions])];
+
   const oldPerms = permsForm.oldPerms;
   if (keys.length === oldPerms.length) {
     const oldPermsSet = new Set(oldPerms);
@@ -451,15 +466,16 @@ const handlePermsUpdate = async () => {
 };
 
 const handleSynchronizePermission = async () => {
-  const result = await Utils.doPost(
-    "/api/admin/permissions",
-    nav.getPermissions()
-  );
-  if (result.success) {
-    ElMessage.success(t("common.updateSuccess"));
-  } else {
-    ElMessage.warning(t("common.updateFail") + t(result.message));
-  }
+  await permissionStore.synchronize(nav.getPermissions());
+  // const result = await Utils.doPost(
+  //   "/api/admin/permissions",
+  //   nav.getPermissions()
+  // );
+  // if (result.success) {
+  //   ElMessage.success(t("common.updateSuccess"));
+  // } else {
+  //   ElMessage.warning(t("common.updateFail") + t(result.message));
+  // }
 };
 
 const loadAllPermsByRoleId = async (roleId: any) => {

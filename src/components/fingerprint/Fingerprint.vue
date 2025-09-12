@@ -1,13 +1,8 @@
 <template>
   <div class="fingerprint-management">
-<!--    <div class="header">-->
-<!--      <h2>👆 Quản Lý Chỉ Bản</h2>-->
-<!--      <p>Quản lý vân tay và thông tin chỉ bản phạm nhân</p>-->
-<!--    </div>-->
-
     <!-- Tìm kiếm -->
     <div class="search-section">
-<!--      <h3>🔍 Tìm Kiếm Chỉ Bản</h3>-->
+      <!--      <h3>🔍 Tìm Kiếm Chỉ Bản</h3>-->
       <div class="form-group">
         <label>Mã phạm nhân</label>
         <input

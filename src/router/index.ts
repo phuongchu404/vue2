@@ -17,8 +17,9 @@ import StaffForm from "@/components/staff/StaffForm.vue";
 import IdentityList from "@/components/identity/IdentityList.vue";
 import IdentityForm from "@/components/identity/IdentityForm.vue";
 import Fingerprint from "@/components/fingerprint/Fingerprint.vue";
-// import FingerprintForm from '@/components/fingerprint/FingerprintForm.vue'
+//  import FingerprintForm from '@/components/fingerprint/FingerprintForm.vue'
 import Reports from "@/components/report/ReportsStatistics.vue";
+import Finger from "@/components/other/finger.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -40,13 +41,13 @@ export const routes: Array<RouteRecordRaw> = [
         name: "Users",
         path: "/users",
         component: Users,
-        meta: { title: "users" }
+        meta: { title: "users" },
       },
       {
         name: "Roles",
         path: "/roles",
         component: Roles,
-        meta: { title: "roles" }
+        meta: { title: "roles" },
       },
       {
         name: "Permissions",
@@ -57,19 +58,19 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/prisons",
         name: "PrisonList",
         component: PrisonList,
-        meta: { title: "prisonList" }
+        meta: { title: "prisonList" },
       },
       {
         path: "/prisons/add",
         name: "PrisonAdd",
         component: PrisonForm,
-        meta: { title: "prisonAdd" }
+        meta: { title: "prisonAdd" },
       },
       {
         path: "/prisons/edit/:id",
         name: "PrisonEdit",
         component: PrisonForm,
-        meta: { title: "prisonEdit" }
+        meta: { title: "prisonEdit" },
       },
       {
         path: "/detainees",
@@ -81,20 +82,19 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/detainees/add",
         name: "DetaineeAdd",
         component: DetaineeForm,
-        meta: { title: "detaineeAdd" }
+        meta: { title: "detaineeAdd" },
       },
       {
         path: "/detainees/edit/:id",
         name: "DetaineeEdit",
         component: DetaineeForm,
-        meta: { title: "detaineeEdit" }
+        meta: { title: "detaineeEdit" },
       },
       {
         path: "/staff",
         name: "StaffList",
         component: StaffList,
-        meta: { title: "staffList" }
-
+        meta: { title: "staffList" },
       },
       {
         path: "/staff/add",
@@ -106,19 +106,19 @@ export const routes: Array<RouteRecordRaw> = [
         path: "/staff/edit/:id",
         name: "StaffEdit",
         component: StaffForm,
-         meta: { title: "staffEdit" },
+        meta: { title: "staffEdit" },
       },
       {
         path: "/identity",
         name: "IdentityList",
         component: IdentityList,
-         meta: { title: "identityList" },
+        meta: { title: "identityList" },
       },
       {
         path: "/identity/add",
         name: "IdentityAdd",
         component: IdentityForm,
-         meta: { title: "identityAdd" },
+        meta: { title: "identityAdd" },
       },
       {
         path: "/identity/edit/:id",

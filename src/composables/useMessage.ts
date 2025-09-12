@@ -18,8 +18,6 @@ export function useMessage() {
         closeOnClickModal: false,
         closeOnPressEscape: false,
       });
-
-      console.log("User confirmed:", result);
       return result;
     } catch (error) {
       console.log("User cancelled:", error);

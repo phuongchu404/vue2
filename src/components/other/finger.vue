@@ -4,7 +4,12 @@
     style="width: 100%; padding-top: 50px; max-width: 1900px"
   >
     <div>
-      <el-form :model="form" :rules="formRules" label-width="130px" ref="form">
+      <el-form
+        :model="form"
+        :rules="formRules"
+        label-width="130px"
+        ref="formRef"
+      >
         <el-row>
           <el-col style="margin-left: 50px; width: 45%; float: left">
             <el-form-item :label="$t('user.realName')" prop="fullName">
@@ -51,7 +56,7 @@
                 style="width: 180px"
                 v-model="form.dateOfBirth"
                 type="date"
-                value-format="dd-MM-yyyy"
+                value-format="YYYY-MM-DD"
               >
               </el-date-picker>
             </el-form-item>
@@ -82,7 +87,7 @@
                 style="width: 180px"
                 v-model="form.dateOfIssuance"
                 type="date"
-                value-format="dd-MM-yyyy"
+                value-format="YYYY-MM-DD"
               >
               </el-date-picker>
             </el-form-item>
@@ -95,13 +100,13 @@
                 style="width: 180px"
                 v-model="form.dateOfExpiry"
                 type="date"
-                value-format="dd-MM-yyyy"
+                value-format="YYYY-MM-DD"
               >
               </el-date-picker>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row style="margin: 30px">
+        <!-- <el-row style="margin: 30px">
           <el-col
             style="
               width: 47%;
@@ -143,7 +148,7 @@
               <el-button
                 type="success"
                 :loading="ui.loading"
-                @click.native="handleFace()"
+                @click="handleFace()"
                 >{{ $t("Chụp ảnh") }}
               </el-button>
             </div>
@@ -165,12 +170,12 @@
                 type="success"
                 :loading="ui.loading"
                 disabled
-                @click.native="handleFace()"
+                @click="handleFace()"
                 >{{ $t("enrollment.irisScan") }}
               </el-button>
             </div>
           </el-col>
-        </el-row>
+        </el-row> -->
         <el-row>
           <div style="margin: 30px">
             <el-select
@@ -625,45 +630,507 @@
         </el-row>
       </el-form>
     </div>
-    <div
-      slot="footer"
-      class="dialog-footer"
-      style="margin-top: 50px; display: flex; justify-content: center"
-    >
-      <el-button @click.native="clear(true)">{{
-        $t("common.reset")
-      }}</el-button>
-      <el-button type="primary" @click.native="handleSaveOrUpdate()">{{
-        $t("common.ok")
-      }}</el-button>
-    </div>
   </div>
 </template>
-<script lang="ts">
-import Vue from "vue";
-import Component from "vue-class-component";
-import * as Utils from "../../utils";
-import i18n from "../i18n";
-import moment from "moment";
+
+<script setup lang="ts">
+import { ref, reactive, onMounted, computed } from "vue";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+} from "element-plus";
+import { useI18n } from "vue-i18n";
 import axios from "axios";
+import moment from "moment";
 
-@Component
-export default class Employee extends Vue {
-  ui = {
-    loading: false,
-    addRecord: false,
-    dialogVisible: false,
-    scanLoading: false,
+const { t } = useI18n();
+
+// Reactive data
+const ui = reactive({
+  loading: false,
+  addRecord: false,
+  dialogVisible: false,
+  scanLoading: false,
+});
+
+const faceLoading = ref(false);
+const leftFingerLoading = ref(false);
+const rightFingerLoading = ref(false);
+const twoThumbsLoading = ref(false);
+const oneFingerLoading = ref(false);
+const indexOfHandleOneFinger = ref(1);
+
+const form = reactive({
+  fullName: "",
+  idNumber: "",
+  dateOfBirth: null,
+  gender: "",
+  placeOfBirth: "",
+  address: "",
+  issuedBy: "",
+  dateOfIssuance: null,
+  dateOfExpiry: null,
+});
+
+const genders = [
+  { key: 1, value: "Nam" },
+  { key: 2, value: "Nữ" },
+];
+
+const enrollmentImage = ref<any[]>([]);
+const device = ref({
+  key: "scannerFourFinger",
+  value: "RealScan-10",
+});
+
+const listDevice = ref<any[]>([]);
+const listIndexOfFinger = [
+  { index: 1, label: t("enrollment.rightThumb") },
+  { index: 2, label: t("enrollment.rightIndexFinger") },
+  { index: 3, label: t("enrollment.rightMiddleFinger") },
+  { index: 4, label: t("enrollment.rightRingFinger") },
+  { index: 5, label: t("enrollment.rightLittleFinger") },
+  { index: 6, label: t("enrollment.leftThumb") },
+  { index: 7, label: t("enrollment.leftIndexFinger") },
+  { index: 8, label: t("enrollment.leftMiddleFinger") },
+  { index: 9, label: t("enrollment.leftRingFinger") },
+  { index: 10, label: t("enrollment.leftLittleFinger") },
+];
+
+const faceImage = reactive({
+  index: 11,
+  imageWSQ: "",
+  imageJPG: "",
+});
+
+const leftImage = reactive({
+  index: 0,
+  imageWSQ: "",
+  imageJPG: "",
+});
+
+const rightImage = reactive({
+  index: 0,
+  imageWSQ: "",
+  imageJPG: "",
+});
+
+const twoThumbsImage = reactive({
+  index: 0,
+  imageWSQ: "",
+  imageJPG: "",
+});
+
+const fingerImage = ref("");
+// Form validation
+const validateCardId = (rule: any, value: any, callback: any) => {
+  const str = value.toString();
+  if (str.length != 12) {
+    callback(new Error(t("enrollment.idNumberMustBe12Number")));
+  } else {
+    callback();
+  }
+};
+
+const formRules = reactive<FormRules>({
+  fullName: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  idNumber: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+    { validator: validateCardId, trigger: "blur" },
+  ],
+  dateOfBirth: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  gender: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  placeOfBirth: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  address: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  issuedBy: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  dateOfIssuance: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+  dateOfExpiry: [
+    { required: true, message: t("user.inputRealName"), trigger: "blur" },
+  ],
+});
+
+const formRef = ref<FormInstance>();
+let socket: WebSocket | null = null;
+
+// Methods
+const convertBase64ToImage = (base64: string) => {
+  if (base64.trim() !== "") {
+    return `data:image/jpeg;base64,${base64}`;
+  } else {
+    return "";
+  }
+};
+
+const getNameOfListFinger = (index: number) => {
+  switch (index) {
+    case 1:
+      return t("enrollment.thumbFinger");
+    case 2:
+      return t("enrollment.indexFinger");
+    case 3:
+      return t("enrollment.middleFinger");
+    case 4:
+      return t("enrollment.ringFinger");
+    case 5:
+      return t("enrollment.littleFinger");
+    case 6:
+      return t("enrollment.thumbFinger");
+    case 7:
+      return t("enrollment.indexFinger");
+    case 8:
+      return t("enrollment.middleFinger");
+    case 9:
+      return t("enrollment.ringFinger");
+    case 10:
+      return t("enrollment.littleFinger");
+    default:
+      return "";
+  }
+};
+
+const getListDevice = async () => {
+  // try {
+  //   const result = await axios.get('http://localhost:7171/devices')
+  //   if (result.data.success) {
+  //     listDevice.value = Object.entries(result.data.data).map(([key, value]) => ({ key, value }))
+  //   }
+  // } catch (error) {
+  //   console.error('Failed to get devices:', error)
+  // }
+  listDevice.value = [
+    { key: "scannerFourFinger", value: "Thiết bị 4 ngón" },
+    { key: "scannerOneFinger", value: "Thiết bị mống mắt" },
+  ];
+  device.value = listDevice.value[0];
+};
+
+const wsDisconnect = async () => {
+  if (socket) {
+    socket.close();
+    socket = null;
+  }
+};
+
+const handleRightFinger = async () => {
+  rightFingerLoading.value = true;
+  ui.loading = true;
+  await wsDisconnect();
+
+  socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
+  socket.onopen = () => {
+    console.log("connected");
+    socket?.send(JSON.stringify(4));
   };
-  faceLoading = false;
-  leftFingerLoading = false;
-  rightFingerLoading = false;
-  twoThumbsLoading = false;
-  oneFingerLoading = false;
 
-  indexOfHandleOneFinger = 1;
+  socket.onerror = () => {
+    console.log("Right Finger - connected failed");
+    ui.loading = false;
+    rightFingerLoading.value = false;
+    ElMessage.warning("Connect Client Failed.");
+  };
 
-  form = {
+  socket.onmessage = (data: any) => {
+    const arr = data.data;
+    const obj = JSON.parse(arr);
+    if (obj) {
+      if (obj.image) {
+        rightImage.imageJPG = obj.image;
+        return;
+      }
+      if (!obj.image && obj.imagesFinger) {
+        deleteOldIndexInArr(obj.imagesFinger);
+        obj.imagesFinger.forEach((image: any) => {
+          if (image.index == 0 && image.imageWSQ) {
+            Object.assign(rightImage, image);
+          }
+          if (image.index !== 0 && image.imageWSQ) {
+            enrollmentImage.value = enrollmentImage.value.concat(image);
+          }
+        });
+        enrollmentImage.value.sort((a, b) => a.index - b.index);
+        ElMessage.success(t("enrollment.scanRightFourFingerSuccessfully"));
+        ui.loading = false;
+        rightFingerLoading.value = false;
+        return;
+      }
+    }
+  };
+};
+
+const handleLeftFinger = async () => {
+  ui.loading = true;
+  leftFingerLoading.value = true;
+  await wsDisconnect();
+
+  socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
+  socket.onopen = () => {
+    console.log("connected");
+    socket?.send(JSON.stringify(3));
+  };
+
+  socket.onerror = () => {
+    console.log("left finger - connected failed");
+    ui.loading = false;
+    leftFingerLoading.value = false;
+    ElMessage.warning("Connect Client Failed.");
+  };
+
+  socket.onmessage = (data: any) => {
+    const arr = data.data;
+    const obj = JSON.parse(arr);
+    if (obj) {
+      if (obj.image) {
+        leftImage.imageJPG = obj.image;
+        return;
+      }
+      if (!obj.image && obj.imagesFinger) {
+        deleteOldIndexInArr(obj.imagesFinger);
+        obj.imagesFinger.forEach((image: any) => {
+          if (image.index == 0 && image.imageWSQ) {
+            Object.assign(leftImage, image);
+          }
+          if (image.index !== 0 && image.imageWSQ) {
+            enrollmentImage.value = enrollmentImage.value.concat(image);
+          }
+        });
+        enrollmentImage.value.sort((a, b) => a.index - b.index);
+        ElMessage.success(t("enrollment.scanLeftFourFingerSuccessfully"));
+        ui.loading = false;
+        leftFingerLoading.value = false;
+        return;
+      }
+    }
+  };
+};
+
+const handleTwoThumbsFingers = async () => {
+  twoThumbsLoading.value = true;
+  ui.loading = true;
+  await wsDisconnect();
+
+  socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
+  socket.onopen = () => {
+    console.log("connected");
+    socket?.send(JSON.stringify(5));
+  };
+
+  socket.onerror = () => {
+    console.log("two thumbs - connected failed");
+    ui.loading = false;
+    twoThumbsLoading.value = false;
+    ElMessage.warning("Connect Client Failed.");
+  };
+
+  socket.onmessage = (data: any) => {
+    const arr = data.data;
+    const obj = JSON.parse(arr);
+    if (obj) {
+      if (obj.image) {
+        twoThumbsImage.imageJPG = obj.image;
+        return;
+      }
+      if (!obj.image && obj.imagesFinger) {
+        deleteOldIndexInArr(obj.imagesFinger);
+        obj.imagesFinger.forEach((image: any) => {
+          if (image.index == 0 && image.imageWSQ) {
+            Object.assign(twoThumbsImage, image);
+          }
+          if (image.index !== 0 && image.imageWSQ) {
+            enrollmentImage.value = enrollmentImage.value.concat(image);
+          }
+        });
+        enrollmentImage.value.sort((a, b) => a.index - b.index);
+        ElMessage.success(t("enrollment.scanTwoThumbsFingerSuccessfully"));
+        ui.loading = false;
+        twoThumbsLoading.value = false;
+        return;
+      }
+    }
+  };
+};
+
+const handleOneFinger = async () => {
+  oneFingerLoading.value = true;
+  ui.loading = true;
+  await wsDisconnect();
+
+  socket = new WebSocket("ws://localhost:7171/one-finger-enroll");
+  socket.onopen = () => {
+    console.log("connected");
+  };
+
+  socket.onerror = () => {
+    console.log("one finger - connected failed");
+    ui.loading = false;
+    oneFingerLoading.value = false;
+    ElMessage.warning("Connect Client Failed.");
+  };
+
+  socket.onmessage = (data: any) => {
+    const arr = data.data;
+    const obj = JSON.parse(arr);
+    if (obj) {
+      if (obj.quality == 0) {
+        if (obj.verifyResponse && obj.verifyResponse.success == false) {
+          return ElMessage.warning(obj.verifyResponse.message);
+        }
+        return (fingerImage.value = obj.image);
+      }
+      if (obj.quality > 0) {
+        const newObj = {
+          index: indexOfHandleOneFinger.value,
+          imageWSQ: obj.image,
+          imageJPG: obj.image,
+        };
+        fingerImage.value = obj.image;
+        enrollmentImage.value = enrollmentImage.value.filter(
+          (data) => data.index != newObj.index
+        );
+        enrollmentImage.value = enrollmentImage.value.concat(newObj);
+        enrollmentImage.value.sort((a, b) => a.index - b.index);
+        ui.loading = false;
+        oneFingerLoading.value = false;
+        return ElMessage.success(t("enrollment.scanFingerSuccessfully"));
+      }
+    }
+  };
+};
+
+const deleteOldIndexInArr = (newArr: any) => {
+  enrollmentImage.value = enrollmentImage.value.filter(
+    (obj) => !newArr.some((objOfNewArr: any) => obj.index == objOfNewArr.index)
+  );
+};
+
+const handleFace = async () => {
+  faceLoading.value = true;
+  ui.loading = true;
+  await wsDisconnect();
+  faceImage.imageJPG = "";
+  faceImage.imageWSQ = "";
+
+  socket = new WebSocket("ws://localhost:7171/face-detection-ws");
+  socket.onopen = () => {
+    console.log("connected");
+  };
+
+  socket.onerror = () => {
+    console.log("Face - connected failed");
+    ui.loading = false;
+    faceLoading.value = false;
+    ElMessage.warning("Connect Client Failed.");
+  };
+
+  socket.onmessage = (data: any) => {
+    const arr = data.data;
+    const obj = JSON.parse(arr);
+    if (obj) {
+      faceImage.imageJPG = obj.image;
+      if (obj.quality > 0) {
+        faceImage.imageJPG = obj.image;
+        faceImage.imageWSQ = obj.image;
+        socket?.close();
+        ui.loading = false;
+        faceLoading.value = false;
+        return ElMessage.success(t("enrollment.takeFaceImageSuccessfully"));
+      }
+    }
+  };
+};
+
+const validateForm = async (): Promise<boolean> => {
+  if (!formRef.value) return false;
+  try {
+    await formRef.value.validate();
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const handleSaveOrUpdate = async () => {
+  const validated = await validateForm();
+  if (!validated) return;
+
+  let warningMessage = "";
+  if (!faceImage.imageJPG && !faceImage.imageWSQ) {
+    return ElMessage.success(t("enrollment.pleaseVerifyFace"));
+  }
+
+  for (const data of listIndexOfFinger) {
+    const obj = enrollmentImage.value.find(
+      (item: any) => item.index === data.index
+    );
+    if (!obj || obj.imageWSQ == "") {
+      warningMessage = t("enrollment.missingFingerprint") + data.label;
+      ElMessage.warning(warningMessage);
+    }
+  }
+
+  if (warningMessage !== "") {
+    return;
+  }
+
+  let newArr: any[] = [];
+  newArr = newArr.concat(faceImage);
+  newArr = newArr.concat(leftImage);
+  newArr = newArr.concat(rightImage);
+  newArr = newArr.concat(twoThumbsImage);
+  newArr = newArr.concat(enrollmentImage.value);
+
+  const record: any = {
+    fullName: form.fullName,
+    idNumber: form.idNumber,
+    dateOfBirth: form.dateOfBirth,
+    gender: form.gender,
+    placeOfBirth: form.placeOfBirth,
+    address: form.address,
+    issuedBy: form.issuedBy,
+    dateOfIssuance: form.dateOfIssuance,
+    dateOfExpiry: form.dateOfExpiry,
+    enrollmentImageRequests: newArr,
+  };
+
+  try {
+    // Replace with your actual API call
+    const result = await axios.post("/api/admin/enrollment/save", record);
+    if (!result.data.success) {
+      ElMessage.warning(t("common.insertFail") + t(result.data.message));
+    } else {
+      await clear(false);
+      ElMessage.success(t("common.insertSuccess"));
+      ui.dialogVisible = false;
+    }
+  } catch (error) {
+    ElMessage.error("Save failed");
+  }
+};
+
+const clear = async (isNotification: boolean) => {
+  faceLoading.value = false;
+  leftFingerLoading.value = false;
+  rightFingerLoading.value = false;
+  twoThumbsLoading.value = false;
+  oneFingerLoading.value = false;
+  ui.loading = false;
+
+  Object.assign(form, {
     fullName: "",
     idNumber: "",
     dateOfBirth: null,
@@ -673,482 +1140,28 @@ export default class Employee extends Vue {
     issuedBy: "",
     dateOfIssuance: null,
     dateOfExpiry: null,
-  };
-  genders = [
-    { key: 1, value: "Nam" },
-    { key: 1, value: "Nữ" },
-  ];
-  enrollmentImage: any[] = [];
+  });
 
-  device = {
-    key: "scannerFourFinger",
-    value: "RealScan-10",
-  };
-  listDevice: any[] = [];
-  listIndexOfFinger = [
-    { index: 1, label: String(i18n.t("enrollment.rightThumb")) },
-    { index: 2, label: String(i18n.t("enrollment.rightIndexFinger")) },
-    { index: 3, label: String(i18n.t("enrollment.rightMiddleFinger")) },
-    { index: 4, label: String(i18n.t("enrollment.rightRingFinger")) },
-    { index: 5, label: String(i18n.t("enrollment.rightLittleFinger")) },
-    { index: 6, label: String(i18n.t("enrollment.leftThumb")) },
-    { index: 7, label: String(i18n.t("enrollment.leftIndexFinger")) },
-    { index: 8, label: String(i18n.t("enrollment.leftMiddleFinger")) },
-    { index: 9, label: String(i18n.t("enrollment.leftRingFinger")) },
-    { index: 10, label: String(i18n.t("enrollment.leftLittleFinger")) },
-  ];
-  faceImage = {
-    index: 11,
-    imageWSQ: "",
-    imageJPG: "",
-  };
-  leftImage = {
-    index: 0,
-    imageWSQ: "",
-    imageJPG: "",
-  };
-  rightImage = {
-    index: 0,
-    imageWSQ: "",
-    imageJPG: "",
-  };
-  twoThumbsImage = {
-    index: 0,
-    imageWSQ: "",
-    imageJPG: "",
-  };
-  fingerImage = "";
-  eyeImage =
-    "https://png.pngtree.com/png-clipart/20230924/original/pngtree-black-vector-logo-depicting-retina-scan-concept-with-an-eye-scanning-png-image_12678533.png";
+  enrollmentImage.value = [];
+  faceImage.imageJPG = "";
+  faceImage.imageWSQ = "";
+  leftImage.imageJPG = "";
+  leftImage.imageWSQ = "";
+  rightImage.imageJPG = "";
+  rightImage.imageWSQ = "";
+  twoThumbsImage.imageJPG = "";
+  twoThumbsImage.imageWSQ = "";
 
-  formRules = {
-    fullName: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    idNumber: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-      { validator: this.validateCardId, trigger: "blur" },
-    ],
-    dateOfBirth: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    gender: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    placeOfBirth: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    address: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    issuedBy: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    dateOfIssuance: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-    dateOfExpiry: [
-      {
-        required: true,
-        message: i18n.t("user.inputRealName"),
-        trigger: "blur",
-      },
-    ],
-  };
+  await wsDisconnect();
 
-  socket: any;
-  image = "";
-
-  convertBase64ToImage(base64: string) {
-    if (base64.trim() !== "") {
-      return `data:image/jpeg;base64,${base64}`;
-    } else {
-      return "";
-    }
+  if (isNotification) {
+    ElMessage.success(t("enrollment.resetSuccess"));
   }
+};
 
-  getNameOfListFinger(index: number) {
-    switch (index) {
-      case 1:
-        return String(i18n.t("enrollment.thumbFinger"));
-      case 2:
-        return String(i18n.t("enrollment.indexFinger"));
-      case 3:
-        return String(i18n.t("enrollment.middleFinger"));
-      case 4:
-        return String(i18n.t("enrollment.ringFinger"));
-      case 5:
-        return String(i18n.t("enrollment.littleFinger"));
-      case 6:
-        return String(i18n.t("enrollment.thumbFinger"));
-      case 7:
-        return String(i18n.t("enrollment.indexFinger"));
-      case 8:
-        return String(i18n.t("enrollment.middleFinger"));
-      case 9:
-        return String(i18n.t("enrollment.ringFinger"));
-      case 10:
-        return String(i18n.t("enrollment.littleFinger"));
-      default:
-        return "";
-    }
-  }
-
-  validateCardId(rule: any, value: any, callback: any) {
-    var str = value.toString();
-    if (str.length != 12) {
-      callback(new Error(String(i18n.t("enrollment.idNumberMustBe12Number"))));
-    } else {
-      callback();
-    }
-  }
-
-  async getListDevice() {
-    let result = await axios.get("http://localhost:7171/devices");
-    if (result.data.success) {
-      this.listDevice = Object.entries(result.data.data).map(
-        ([key, value]) => ({ key, value })
-      );
-    }
-  }
-
-  async wsDisconnect() {
-    if (this.socket) {
-      await this.socket.close();
-    }
-  }
-
-  async handleRightFinger() {
-    this.rightFingerLoading = true;
-    this.ui.loading = true;
-    await this.wsDisconnect();
-    this.socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
-    this.socket.onopen = () => {
-      console.log("connected");
-      this.socket.send(JSON.stringify(4));
-    };
-    this.socket.onerror = () => {
-      console.log("Right Finger - connected failed");
-      this.ui.loading = false;
-      this.rightFingerLoading = false;
-      Utils.showWarning("Connect Client Failed.");
-    };
-    this.socket.onmessage = (data: any) => {
-      let arr = data.data as any;
-      var obj = JSON.parse(arr);
-      if (obj) {
-        if (obj.image) return (this.rightImage.imageJPG = obj.image);
-        if (!obj.image && obj.imagesFinger) {
-          this.deleteOldIndexInArr(obj.imagesFinger);
-          obj.imagesFinger.forEach((image: any) => {
-            if (image.index == 0 && image.imageWSQ) {
-              this.rightImage = image;
-            }
-            if (image.index !== 0 && image.imageWSQ) {
-              this.enrollmentImage = this.enrollmentImage.concat(image);
-            }
-          });
-          this.enrollmentImage.sort((a, b) => a.index - b.index);
-          Utils.showSuccess(
-            String(i18n.t("enrollment.scanRightFourFingerSuccessfully"))
-          );
-          this.ui.loading = false;
-          this.rightFingerLoading = false;
-          return;
-        }
-      }
-    };
-  }
-
-  async handleLeftFinger() {
-    this.ui.loading = true;
-    this.leftFingerLoading = true;
-    await this.wsDisconnect();
-    this.socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
-    this.socket.onopen = () => {
-      console.log("connected");
-      this.socket.send(JSON.stringify(3));
-    };
-    this.socket.onerror = () => {
-      console.log("left finger - connected failed");
-      this.ui.loading = false;
-      this.leftFingerLoading = false;
-      Utils.showWarning("Connect Client Failed.");
-    };
-    this.socket.onmessage = (data: any) => {
-      let arr = data.data as any;
-      var obj = JSON.parse(arr);
-      if (obj) {
-        if (obj.image) return (this.leftImage.imageJPG = obj.image);
-        if (!obj.image && obj.imagesFinger) {
-          this.deleteOldIndexInArr(obj.imagesFinger);
-          obj.imagesFinger.forEach((image: any) => {
-            if (image.index == 0 && image.imageWSQ) {
-              this.leftImage = image;
-            }
-            if (image.index !== 0 && image.imageWSQ) {
-              this.enrollmentImage = this.enrollmentImage.concat(image);
-            }
-          });
-          this.enrollmentImage.sort((a, b) => a.index - b.index);
-          Utils.showSuccess(
-            String(i18n.t("enrollment.scanLeftFourFingerSuccessfully"))
-          );
-          this.ui.loading = false;
-          this.leftFingerLoading = false;
-          return;
-        }
-      }
-    };
-  }
-
-  async handleTwoThumbsFingers() {
-    this.twoThumbsLoading = true;
-    this.ui.loading = true;
-    await this.wsDisconnect();
-    this.socket = new WebSocket("ws://localhost:7171/four-finger-enroll");
-    this.socket.onopen = () => {
-      console.log("connected");
-      this.socket.send(JSON.stringify(5));
-    };
-    this.socket.onerror = () => {
-      console.log("left finger - connected failed");
-      this.ui.loading = false;
-      this.twoThumbsLoading = false;
-      Utils.showWarning("Connect Client Failed.");
-    };
-    this.socket.onmessage = (data: any) => {
-      let arr = data.data as any;
-      var obj = JSON.parse(arr);
-      if (obj) {
-        if (obj.image) return (this.twoThumbsImage.imageJPG = obj.image);
-        if (!obj.image && obj.imagesFinger) {
-          this.deleteOldIndexInArr(obj.imagesFinger);
-          obj.imagesFinger.forEach((image: any) => {
-            if (image.index == 0 && image.imageWSQ) {
-              this.twoThumbsImage = image;
-            }
-            if (image.index !== 0 && image.imageWSQ) {
-              this.enrollmentImage = this.enrollmentImage.concat(image);
-            }
-          });
-          this.enrollmentImage.sort((a, b) => a.index - b.index);
-          Utils.showSuccess(
-            String(i18n.t("enrollment.scanTwoThumbsFingerSuccessfully"))
-          );
-          this.ui.loading = false;
-          this.twoThumbsLoading = false;
-          return;
-        }
-      }
-    };
-  }
-
-  async handleOneFinger() {
-    this.oneFingerLoading = true;
-    this.ui.loading = true;
-    await this.wsDisconnect();
-    this.socket = new WebSocket("ws://localhost:7171/one-finger-enroll");
-    this.socket.onopen = () => {
-      console.log("connected");
-    };
-    this.socket.onerror = () => {
-      console.log("left finger - connected failed");
-      this.ui.loading = false;
-      this.oneFingerLoading = false;
-      Utils.showWarning("Connect Client Failed.");
-    };
-    this.socket.onmessage = (data: any) => {
-      let arr = data.data as any;
-      var obj = JSON.parse(arr);
-      if (obj) {
-        if (obj.quality == 0) {
-          if (obj.verifyResponse && obj.verifyResponse.success == false) {
-            return Utils.showWarning(obj.verifyResponse.message);
-          }
-          return (this.fingerImage = obj.image);
-        }
-        if (obj.quality > 0) {
-          let newObj = {
-            index: this.indexOfHandleOneFinger,
-            imageWSQ: obj.image,
-            imageJPG: obj.image,
-          };
-          this.fingerImage = obj.image;
-          this.enrollmentImage = this.enrollmentImage.filter(
-            (data) => data.index != newObj.index
-          );
-          this.enrollmentImage = this.enrollmentImage.concat(newObj);
-          this.enrollmentImage.sort((a, b) => a.index - b.index);
-          this.ui.loading = false;
-          this.oneFingerLoading = false;
-          return Utils.showSuccess(
-            String(i18n.t("enrollment.scanFingerSuccessfully"))
-          );
-        }
-      }
-    };
-  }
-
-  deleteOldIndexInArr(newArr: any) {
-    this.enrollmentImage = this.enrollmentImage.filter(
-      (obj) =>
-        !newArr.some((objOfNewArr: any) => obj.index == objOfNewArr.index)
-    );
-  }
-
-  async handleFace() {
-    this.faceLoading = true;
-    this.ui.loading = true;
-    await this.wsDisconnect();
-    this.faceImage.imageJPG = "";
-    this.faceImage.imageWSQ = "";
-    this.socket = new WebSocket("ws://localhost:7171/face-detection-ws");
-    this.socket.onopen = () => {
-      console.log("connected");
-    };
-    this.socket.onerror = () => {
-      console.log("Face - connected failed");
-      this.ui.loading = false;
-      this.faceLoading = false;
-      Utils.showWarning("Connect Client Failed.");
-    };
-    this.socket.onmessage = (data: any) => {
-      let arr = data.data as any;
-      var obj = JSON.parse(arr);
-      if (obj) {
-        this.faceImage.imageJPG = obj.image;
-        if (obj.quality > 0) {
-          this.faceImage.imageJPG = obj.image;
-          this.faceImage.imageWSQ = obj.image;
-          this.socket.close();
-          this.ui.loading = false;
-          this.faceLoading = false;
-          return Utils.showSuccess(
-            String(i18n.t("enrollment.takeFaceImageSuccessfully"))
-          );
-        }
-      }
-    };
-  }
-
-  async handleSaveOrUpdate() {
-    let validated = await Utils.validateForm(this.$refs.form);
-    if (!validated) return;
-    let warningMessage = "";
-    if (!this.faceImage.imageJPG && !this.faceImage.imageWSQ) {
-      return await Utils.showSuccess(
-        String(i18n.t("enrollment.pleaseVerifyFace"))
-      );
-    }
-    for (const data of this.listIndexOfFinger) {
-      let obj = this.enrollmentImage.find(
-        (item: any) => item.index === data.index
-      );
-      if (!obj || obj.imageWSQ == "") {
-        warningMessage =
-          String(i18n.t("enrollment.missingFingerprint")) + data.label;
-        await Utils.showWarning(warningMessage);
-      }
-    }
-    if (warningMessage !== "") {
-      return;
-    }
-    let newArr: any[] = [];
-    newArr = newArr.concat(this.faceImage);
-    newArr = newArr.concat(this.leftImage);
-    newArr = newArr.concat(this.rightImage);
-    newArr = newArr.concat(this.twoThumbsImage);
-    newArr = newArr.concat(this.enrollmentImage);
-    let record: any = {};
-    record.fullName = this.form.fullName;
-    record.idNumber = this.form.idNumber;
-    record.dateOfBirth = this.form.dateOfBirth;
-    record.gender = this.form.gender;
-    record.placeOfBirth = this.form.placeOfBirth;
-    record.address = this.form.address;
-    record.issuedBy = this.form.issuedBy;
-    record.dateOfIssuance = this.form.dateOfIssuance;
-    record.dateOfExpiry = this.form.dateOfExpiry;
-    record.enrollmentImageRequests = newArr;
-    let result = await Utils.doPost(this, "/api/admin/enrollment/save", record);
-    if (!result.success) {
-      Utils.showWarning(
-        String(i18n.t("common.insertFail")) + String(i18n.t(result.message))
-      );
-    } else {
-      await this.clear(false);
-      Utils.showSuccess(String(i18n.t("common.insertSuccess")));
-      this.ui.dialogVisible = false;
-    }
-  }
-
-  async clear(isNotification: boolean) {
-    this.faceLoading = false;
-    this.leftFingerLoading = false;
-    this.rightFingerLoading = false;
-    this.twoThumbsLoading = false;
-    this.oneFingerLoading = false;
-    this.ui.loading = false;
-    this.form.fullName = "";
-    this.form.idNumber = "";
-    this.form.dateOfBirth = null;
-    this.form.gender = "";
-    this.form.placeOfBirth = "";
-    this.form.address = "";
-    this.form.issuedBy = "";
-    this.form.dateOfIssuance = null;
-    this.form.dateOfExpiry = null;
-    this.enrollmentImage = [];
-    this.faceImage.imageJPG = "";
-    this.faceImage.imageWSQ = "";
-    this.leftImage.imageJPG = "";
-    this.leftImage.imageWSQ = "";
-    this.rightImage.imageJPG = "";
-    this.rightImage.imageWSQ = "";
-    this.twoThumbsImage.imageJPG = "";
-    this.twoThumbsImage.imageWSQ = "";
-    await this.wsDisconnect();
-    if (isNotification)
-      return Utils.showSuccess(String(i18n.t("enrollment.resetSuccess")));
-  }
-
-  async mounted() {
-    await this.getListDevice();
-  }
-}
+onMounted(async () => {
+  await getListDevice();
+});
 </script>
 <style scoped lang="scss">
 .activation-tab {
@@ -1174,32 +1187,10 @@ export default class Employee extends Vue {
 
 .dialog-info {
   text-align: right;
-  padding-bottom: 5%;
+  padding-bottom: 5px;
 }
 
-.dialog-content {
-  padding-left: 2%;
-}
-
-.buttun-input {
-  display: inline-block;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  background: #fff;
-  border: 1px solid #dcdfe6;
-  color: #606266;
-  -webkit-appearance: none;
-  text-align: center;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  outline: 0;
-  margin: 0;
-  -webkit-transition: 0.1s;
-  transition: 0.1s;
-  font-weight: 500;
-  padding: 12px 20px;
-  font-size: 14px;
-  border-radius: 4px;
+.text-danger {
+  color: #e02d2d;
 }
 </style>

@@ -20,6 +20,10 @@ const user: User = {
   incorrectpassword: "Incorrect password.",
   password: "Password",
   ResetPassword: "Change Password",
+  email: "Email",
+  phoneNumber: "Phone Number",
+  description: "Description",
+  selectDetentionCenter: "Please select detention center",
 };
 
 export default user;

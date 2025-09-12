@@ -56,10 +56,12 @@
         </el-row>
 
         <el-form-item>
-          <el-button type="primary" @click="onSearch" :icon="Search"
-            >{{ $t('common.Search') }}</el-button
-          >
-          <el-button @click="onReset" :icon="Refresh">{{ $t('common.reset') }}</el-button>
+          <el-button type="primary" @click="onSearch" :icon="Search">{{
+            $t("common.Search")
+          }}</el-button>
+          <el-button @click="onReset" :icon="Refresh">{{
+            $t("common.reset")
+          }}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -73,14 +75,15 @@
             @click="$router.push('/detainees/add')"
             :icon="Plus"
           >
-            {{ $t('common.add') }}
+            {{ $t("common.add") }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            {{ $t('common.export') }}
+            {{ $t("common.export") }}
           </el-button>
         </div>
         <div class="result-info">
-          {{ $t('common.total') }}: {{ detaineeStore.getTotal }} {{ $t('common.unit') }}
+          {{ $t("common.total") }}: {{ detaineeStore.getTotal }}
+          {{ $t("common.unit") }}
         </div>
       </div>
     </div>
@@ -98,7 +101,8 @@
         prop="detaineeCode"
         :label="$t('detainee.code')"
         width="160"
-        sortable show-overflow-tooltip
+        sortable
+        show-overflow-tooltip
       />
       <el-table-column
         align="center"
@@ -116,7 +120,8 @@
         align="center"
         prop="dateOfBirth"
         :label="$t('detainee.dateOfBirth')"
-        width="135" show-overflow-tooltip
+        width="135"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ formatDate(scope.row.dateOfBirth) }}
@@ -126,13 +131,15 @@
         align="center"
         prop="idNumber"
         :label="$t('detainee.idNumber')"
-        width="150" show-overflow-tooltip
+        width="150"
+        show-overflow-tooltip
       />
       <el-table-column
         align="center"
         prop="detentionDate"
         :label="$t('detainee.detentionDate')"
-        width="120" show-overflow-tooltip
+        width="120"
+        show-overflow-tooltip
       >
         <template #default="scope">
           {{ formatDate(scope.row.detentionDate) }}
@@ -150,7 +157,11 @@
         min-width="200"
         show-overflow-tooltip
       />
-      <el-table-column :label="$t('detainee.status')" width="150" align="center">
+      <el-table-column
+        :label="$t('detainee.status')"
+        width="150"
+        align="center"
+      >
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}
@@ -159,8 +170,7 @@
       </el-table-column>
       <el-table-column :label="$t('common.actions')" width="200" fixed="right">
         <template #default="scope">
-          <el-button  @click="handleView(scope.row)" :icon="View">
-          </el-button>
+          <el-button @click="handleView(scope.row)" :icon="View"> </el-button>
           <el-button
             type="primary"
             @click="handleEdit(scope.row.id)"
@@ -191,7 +201,7 @@
         goto: t('el.pagination.goto'),
         pagesize: t('el.pagination.pagesize'),
         total: t('el.pagination.total'),
-        pageClassifier: t('el.pagination.pageClassifier')
+        pageClassifier: t('el.pagination.pageClassifier'),
       }"
     />
 
@@ -280,19 +290,31 @@
                 {{ getStatusText(selectedDetainee.status) }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('detainee.permanentAddress')" :span="2">
+            <el-descriptions-item
+              :label="$t('detainee.permanentAddress')"
+              :span="2"
+            >
               {{ permanentFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('detainee.temporaryAddress')" :span="2">
+            <el-descriptions-item
+              :label="$t('detainee.temporaryAddress')"
+              :span="2"
+            >
               {{ temporaryFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('detainee.currentAddress')" :span="2">
+            <el-descriptions-item
+              :label="$t('detainee.currentAddress')"
+              :span="2"
+            >
               {{ currentFullAddress }}
             </el-descriptions-item>
             <el-descriptions-item :label="$t('detainee.charges')" :span="2">
               {{ selectedDetainee.charges || "-" }}
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('detainee.sentenceDuration')" :span="2">
+            <el-descriptions-item
+              :label="$t('detainee.sentenceDuration')"
+              :span="2"
+            >
               {{ selectedDetainee.sentenceDuration || "-" }}
             </el-descriptions-item>
             <el-descriptions-item :label="$t('detainee.courtName')" :span="2">
@@ -312,10 +334,12 @@
       </div>
 
       <template #footer>
-        <el-button @click="detailDialogVisible = false">{{ $t('common.close') }}</el-button>
-        <el-button type="primary" @click="handleEdit(selectedDetainee?.id)"
-          >{{ $t('common.edit') }}</el-button
-        >
+        <el-button @click="detailDialogVisible = false">{{
+          $t("common.close")
+        }}</el-button>
+        <el-button type="primary" @click="handleEdit(selectedDetainee?.id)">{{
+          $t("common.edit")
+        }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -405,7 +429,7 @@ const currentFullAddress = computed(() => {
   ].filter((v) => !!(typeof v === "string" ? v.trim() : v));
   return parts.length ? parts.join(", ") : "-";
 });
-const handleEdit = (id:any) => {
+const handleEdit = (id: any) => {
   router.push(`/detainees/edit/${id}`);
 };
 
@@ -415,11 +439,10 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info(t('common.exportUpdating'));
+  ElMessage.info(t("common.exportUpdating"));
 };
 const handleView = (staff: any) => {
   selectedDetainee.value = staff;
-  console.log(selectedDetainee.value);
   detailDialogVisible.value = true;
 };
 
@@ -445,8 +468,6 @@ const search = async (extra?: Partial<PageQuery>) => {
     loading.value = false;
   }
 };
-
-
 
 const getStatusType = (status: any) => {
   const typeMap = {

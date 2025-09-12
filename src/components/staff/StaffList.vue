@@ -1,11 +1,5 @@
 <template>
   <div class="staff-list">
-    <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3">Quản lý cán bộ</span>
-      </template>
-    </el-page-header>
-
     <!-- Search Section -->
     <div class="search-section">
       <el-form :model="searchForm" label-width="100px" label-position="left">
@@ -13,18 +7,18 @@
           <el-col :span="8">
             <el-form-item :label="t('staff.code')">
               <el-input
-                  v-model="searchForm.staffCode"
-                  :placeholder="t('staff.placeholder.code')"
-                  clearable
+                v-model="searchForm.staffCode"
+                :placeholder="t('staff.placeholder.code')"
+                clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item :label="t('staff.fullName')">
               <el-input
-                  v-model="searchForm.fullName"
-                  :placeholder="t('staff.placeholder.fullName')"
-                  clearable
+                v-model="searchForm.fullName"
+                :placeholder="t('staff.placeholder.fullName')"
+                clearable
               />
             </el-form-item>
           </el-col>
@@ -34,23 +28,23 @@
           <el-col :span="8">
             <el-form-item :label="t('staff.rank')">
               <el-input
-                  v-model="searchForm.rank"
-                  :placeholder="t('staff.placeholder.rank')"
-                  clearable
+                v-model="searchForm.rank"
+                :placeholder="t('staff.placeholder.rank')"
+                clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item :label="t('staff.status')">
               <el-select
-                  v-model="searchForm.status"
-                  :placeholder="t('common.inputStatus')"
+                v-model="searchForm.status"
+                :placeholder="t('common.inputStatus')"
               >
                 <el-option
-                    v-for="option in statusOptions"
-                    :key="option.value"
-                    :label="option.label"
-                    :value="option.value"
+                  v-for="option in statusOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
                 />
               </el-select>
             </el-form-item>
@@ -58,13 +52,12 @@
         </el-row>
         <el-form-item>
           <el-button type="primary" @click="onSearch" :icon="Search">
-            {{ t('common.Search') }}
+            {{ t("common.Search") }}
           </el-button>
           <el-button @click="onReset" :icon="Refresh">
-            {{ t('common.reset') }}
+            {{ t("common.reset") }}
           </el-button>
         </el-form-item>
-
       </el-form>
     </div>
 
@@ -72,40 +65,48 @@
       <div class="action-bar">
         <div>
           <el-button
-              type="primary"
-              @click="$router.push('/staff/add')"
-              :icon="Plus"
+            type="primary"
+            @click="$router.push('/staff/add')"
+            :icon="Plus"
           >
-            {{ t('common.add') }}
+            {{ t("common.add") }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            {{ t('common.export') }}
+            {{ t("common.export") }}
           </el-button>
         </div>
         <div class="result-info">
-          {{ t('common.total') }}: {{ staffStore.getTotal }}
-          {{ t('common.unit')}}
+          {{ t("common.total") }}: {{ staffStore.getTotal }}
+          {{ t("common.unit") }}
         </div>
       </div>
     </div>
 
     <!-- Data Table -->
     <el-table
-        :data="staffs"
-        style="width: 100%"
-        v-loading="loading"
-        stripe
-        border
+      :data="staffs"
+      style="width: 100%"
+      v-loading="loading"
+      stripe
+      border
     >
       <el-table-column
-          prop="staffCode"
-          :label="t('staff.code')"
-          width="130"
-          sortable
-          fixed="left"
+        prop="staffCode"
+        :label="t('staff.code')"
+        width="130"
+        sortable
+        fixed="left"
       />
-      <el-table-column prop="fullName" :label="t('staff.fullName')" min-width="150" />
-      <el-table-column prop="idNumber" :label="t('staff.idNumber')" min-width="170" />
+      <el-table-column
+        prop="fullName"
+        :label="t('staff.fullName')"
+        min-width="150"
+      />
+      <el-table-column
+        prop="idNumber"
+        :label="t('staff.idNumber')"
+        min-width="170"
+      />
       <el-table-column :label="t('staff.gender')" width="120">
         <template #default="{ row }">
           {{ getGenderLabel(row.gender) }}
@@ -114,10 +115,10 @@
       <el-table-column prop="rank" :label="t('staff.rank')" width="120" />
       <el-table-column prop="phone" :label="t('staff.phone')" width="130" />
       <el-table-column
-          prop="email"
-          :label="t('staff.email')"
-          min-width="120"
-          show-overflow-tooltip
+        prop="email"
+        :label="t('staff.email')"
+        min-width="120"
+        show-overflow-tooltip
       />
       <el-table-column :label="t('staff.status')" width="130" align="center">
         <template #default="scope">
@@ -126,20 +127,24 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" min-width="160" fixed="right">
+      <el-table-column
+        :label="t('common.actions')"
+        min-width="160"
+        fixed="right"
+      >
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View" />
           <el-button
-              size="small"
-              type="primary"
-              @click="handleEdit(scope.row)"
-              :icon="Edit"
+            size="small"
+            type="primary"
+            @click="handleEdit(scope.row)"
+            :icon="Edit"
           />
           <el-button
-              size="small"
-              type="danger"
-              @click="onDelete(scope.row.id)"
-              :icon="Delete"
+            size="small"
+            type="danger"
+            @click="onDelete(scope.row.id)"
+            :icon="Delete"
           />
         </template>
       </el-table-column>
@@ -147,82 +152,88 @@
 
     <!-- Pagination -->
     <el-pagination
-        v-model:current-page="page"
-        v-model:page-size="size"
-        :total="staffStore.getTotal"
-        layout="total, sizes, prev, pager, next, jumper"
-        :page-sizes="[10, 20, 50, 100]"
-        @size-change="onSizeChange"
-        @current-change="onPageChange"
-        class="pagination"
+      v-model:current-page="page"
+      v-model:page-size="size"
+      :total="staffStore.getTotal"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 50, 100]"
+      @size-change="onSizeChange"
+      @current-change="onPageChange"
+      class="pagination"
     />
 
     <!-- Detail Dialog -->
     <el-dialog
-        v-model="detailDialogVisible"
-        :title="t('staff.detailTitle')"
-        width="60%"
-        class="dialog"
+      v-model="detailDialogVisible"
+      :title="t('staff.detailTitle')"
+      width="60%"
+      class="dialog"
     >
       <div v-if="selectedStaff" class="space-y-6">
         <!-- Section 1: Basic Info -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">{{ t('staff.basicInfo') }}</h5>
+            <h5 class="m-0">{{ t("staff.basicInfo") }}</h5>
           </template>
           <el-descriptions :column="2" border>
             <el-descriptions-item :label="t('staff.fullName')" :span="2">{{
-                selectedStaff.fullName
-              }}</el-descriptions-item>
+              selectedStaff.fullName
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.code')">{{
-                selectedStaff.staffCode
-              }}</el-descriptions-item>
+              selectedStaff.staffCode
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.profileNumber')">{{
-                selectedStaff.profileNumber || "-"
-              }}</el-descriptions-item>
+              selectedStaff.profileNumber || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.gender')">{{
-                getGenderLabel(selectedStaff.gender)
-              }}</el-descriptions-item>
+              getGenderLabel(selectedStaff.gender)
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.dateOfBirth')">{{
-                formatDate(selectedStaff.dateOfBirth)
-              }}</el-descriptions-item>
+              formatDate(selectedStaff.dateOfBirth)
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.placeOfBirth')">{{
-                selectedStaff.placeOfBirth
-              }}</el-descriptions-item>
+              selectedStaff.placeOfBirth
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.idNumber')">{{
-                selectedStaff.idNumber || "-"
-              }}</el-descriptions-item>
+              selectedStaff.idNumber || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.idIssueDate')">{{
-                selectedStaff.idIssueDate || "-"
-              }}</el-descriptions-item>
+              selectedStaff.idIssueDate || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.idIssuePlace')">{{
-                selectedStaff.idIssuePlace || "-"
-              }}</el-descriptions-item>
+              selectedStaff.idIssuePlace || "-"
+            }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
 
         <!-- Section 2: Liên lạc -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">{{ t('staff.contactInfo') }}</h5>
+            <h5 class="m-0">{{ t("staff.contactInfo") }}</h5>
           </template>
           <el-descriptions :column="2" border>
             <el-descriptions-item :label="t('staff.email')" :span="2">{{
-                selectedStaff.email || "-"
-              }}</el-descriptions-item>
+              selectedStaff.email || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.phone')">{{
-                selectedStaff.phone || "-"
-              }}</el-descriptions-item>
+              selectedStaff.phone || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.emergencyPhone')">{{
-                selectedStaff.emergencyPhone || "-"
-              }}</el-descriptions-item>
+              selectedStaff.emergencyPhone || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.emergencyContact')">{{
-                selectedStaff.emergencyContact || "-"
-              }}</el-descriptions-item>
-            <el-descriptions-item :label="t('staff.permanentAddress')" :span="2">
+              selectedStaff.emergencyContact || "-"
+            }}</el-descriptions-item>
+            <el-descriptions-item
+              :label="t('staff.permanentAddress')"
+              :span="2"
+            >
               {{ permanentFullAddress }}
             </el-descriptions-item>
-            <el-descriptions-item :label="t('staff.temporaryAddress')" :span="2">
+            <el-descriptions-item
+              :label="t('staff.temporaryAddress')"
+              :span="2"
+            >
               {{ temporaryFullAddress }}
             </el-descriptions-item>
           </el-descriptions>
@@ -231,46 +242,45 @@
         <!-- Section 3: Công việc -->
         <el-card class="rounded-xl mb-2">
           <template #header>
-            <h5 class="m-0">{{ t('staff.jobInfo') }}</h5>
+            <h5 class="m-0">{{ t("staff.jobInfo") }}</h5>
           </template>
           <el-descriptions :column="2" border>
             <el-descriptions-item :label="t('staff.rank')">{{
-                selectedStaff.rank || "-"
-              }}</el-descriptions-item>
+              selectedStaff.rank || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.department')">{{
-                selectedStaff.departmentName || "-"
-              }}</el-descriptions-item>
+              selectedStaff.departmentName || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.position')">{{
-                selectedStaff.positionName || "-"
-              }}</el-descriptions-item>
+              selectedStaff.positionName || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.education')">{{
-                selectedStaff.educationLevelName || "-"
-              }}</el-descriptions-item>
+              selectedStaff.educationLevelName || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.detentionCenter')">{{
-                selectedStaff.detentionCenterName || "-"
-              }}</el-descriptions-item>
+              selectedStaff.detentionCenterName || "-"
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.status')">
               <el-tag :type="getStatusType(selectedStaff.status)">
                 {{ getStatusText(selectedStaff.status) }}
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item :label="t('common.createTime')">{{
-                formatDate(selectedStaff.createdAt)
-              }}</el-descriptions-item>
+              formatDate(selectedStaff.createdAt)
+            }}</el-descriptions-item>
             <el-descriptions-item :label="t('common.updateTime')">{{
-                formatDate(selectedStaff.updatedAt)
-              }}</el-descriptions-item>
+              formatDate(selectedStaff.updatedAt)
+            }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
       </div>
 
-
       <template #footer>
         <el-button @click="handleDetailClose()">
-          {{ t('common.close') }}
+          {{ t("common.close") }}
         </el-button>
         <el-button type="primary" @click="handleEdit(selectedStaff)">
-          {{ t('common.edit') }}
+          {{ t("common.edit") }}
         </el-button>
       </template>
     </el-dialog>
@@ -331,7 +341,7 @@ const formatDate = (dateStr: any) => {
 
 const getGenderLabel = (value: any) => {
   const option = genderOptions.find((opt) => opt.value === value);
-  return option ? option.label : t('common.unspecified');
+  return option ? option.label : t("common.unspecified");
 };
 
 const permanentFullAddress = computed(() => {
@@ -350,7 +360,7 @@ const temporaryFullAddress = computed(() => {
     selectedStaff.value?.temporaryProvinceFullName,
   ].filter((v) => !!(typeof v === "string" ? v.trim() : v));
   return parts.length ? parts.join(", ") : "-";
-})
+});
 const handleEdit = (staff: any) => {
   router.push(`/staff/edit/${staff.id}`);
 };
@@ -361,11 +371,10 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info(t('common.exportUpdating'));
+  ElMessage.info(t("common.exportUpdating"));
 };
 const handleView = (staff: any) => {
   selectedStaff.value = staff;
-  console.log(selectedStaff.value);
   detailDialogVisible.value = true;
 };
 
@@ -385,7 +394,7 @@ const search = async (extra?: Partial<PageQuery>) => {
 
     staffs.value = staffStore.getStaffs || [];
   } catch (error) {
-    ElMessage.error(t('common.dataFail'));
+    ElMessage.error(t("common.dataFail"));
   } finally {
     loading.value = false;
   }

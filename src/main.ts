@@ -38,7 +38,6 @@ axios.interceptors.request.use((config: any) => {
     localStorage.getItem("LANG") || window.navigator.language;
   const token = sessionStorage.getItem("TOKEN");
   if (token) {
-    console.log("token", token);
     config.headers["x-access-token"] = token;
   }
   return config;
@@ -96,7 +95,6 @@ app.use(i18n);
 import { useAuthStore } from "@/stores/login";
 const authStore = useAuthStore();
 authStore.loadFromSession();
-
 
 // Mount app
 app.mount("#app");

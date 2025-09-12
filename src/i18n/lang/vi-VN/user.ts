@@ -20,6 +20,10 @@ const user: User = {
   incorrectpassword: "Mật khẩu không chính xác.",
   password: "Mật khẩu",
   ResetPassword: "Đổi mật khẩu",
+  email: "Email",
+  phoneNumber: "Số điện thoại",
+  description: "Mô tả",
+  selectDetentionCenter: "Hãy chọn trại giam",
 };
 
 export default user;

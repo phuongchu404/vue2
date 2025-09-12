@@ -1,11 +1,80 @@
 import { t } from "@/i18n";
-export default {
+import type { MenuItem } from "./../menutype";
+export const prison: MenuItem = {
   tag: "prison",
   leaf: true,
   path: "/prisons",
   type: "menu",
-  whiteList: false,
+  isWhiteList: false,
   name: t("menu.prison"),
   icon: "el-icon-fa-users",
-  options: [],
+  children: [],
+  permissions: [
+    {
+      tag: "prison:search",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/detention-center/search",
+      method: "GET",
+    },
+    {
+      tag: "prison:insert",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.add"),
+      pattern: "/api/admin/detention-center/create",
+      method: "POST",
+    },
+    {
+      tag: "prison:update",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.update"),
+      pattern: "/api/admin/detention-center/{id}",
+      method: "PUT",
+    },
+    {
+      tag: "prison:delete",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.delete"),
+      pattern: "/api/admin/detention-center/{id}",
+      method: "DELETE",
+    },
+    {
+      tag: "prison:select:ward:provinceCode",
+      type: "api",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/ward/{provinceCode}",
+      method: "GET",
+    },
+    {
+      tag: "prison:select:ward:provinceCode",
+      type: "api",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/ward/{provinceCode}",
+      method: "GET",
+    },
+    {
+      tag: "prison:select:province:all",
+      type: "api",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/province/all",
+      method: "GET",
+    },
+  ],
 };
+// export default {
+//   tag: "prison",
+//   leaf: true,
+//   path: "/prisons",
+//   type: "menu",
+//   isWhiteList: false,
+//   name: t("menu.prison"),
+//   icon: "el-icon-fa-users",
+//   options: [],
+// };

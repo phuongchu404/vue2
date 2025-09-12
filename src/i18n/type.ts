@@ -401,4 +401,105 @@ export interface User {
   incorrectpassword: string;
   password: string;
   ResetPassword: string;
+  email: string;
+  phoneNumber: string;
+  description: string;
+  selectDetentionCenter: string;
+}
+
+export interface Detainee {
+  // Titles
+  title: string;
+  detailTitle: string;
+  addNew: string;
+
+  // Fields
+  code: string;
+  profileNumber: string;
+  fullName: string;
+  aliasName: string;
+  idNumber: string;
+  gender: string;
+  dateOfBirth: string;
+  placeOfBirth: string;
+  idIssueDate: string;
+  idIssuePlace: string;
+  nationality: string;
+  ethnicity: string;
+  religion: string;
+  occupation: string;
+  fatherName: string;
+  motherName: string;
+  spouseName: string;
+  detentionCenter: string;
+  detentionDate: string;
+  expectedReleaseDate: string;
+  actualReleaseDate: string;
+  caseNumber: string;
+  cellNumber: string;
+  charges: string;
+  sentenceDuration: string;
+  courtName: string;
+  notes: string;
+  permanentAddress: string;
+  permanentProvince: string;
+  permanentWard: string;
+  addressDetail: string;
+  temporaryAddress: string;
+  temporaryProvince: string;
+  temporaryWard: string;
+  currentAddress: string;
+  currentProvince: string;
+  currentWard: string;
+  createdAt: string;
+  updatedAt: string;
+  status: string;
+
+  // Section Labels
+  section: {
+    basicInfo: string;
+    identity: string;
+    permanent: string;
+    temporary: string;
+    current: string;
+    detention: string;
+  };
+
+  // Placeholders
+  placeholder: {
+    code: string;
+    profileNumber: string;
+    fullName: string;
+    aliasName: string;
+    idNumber: string;
+    gender: string;
+    dateOfBirth: string;
+    placeOfBirth: string;
+    idIssueDate: string;
+    idIssuePlace: string;
+    nationality: string;
+    ethnicity: string;
+    religion: string;
+    occupation: string;
+    fatherName: string;
+    motherName: string;
+    spouseName: string;
+    detentionCenter: string;
+    detentionDate: string;
+    expectedReleaseDate: string;
+    actualReleaseDate: string;
+    caseNumber: string;
+    cellNumber: string;
+    charges: string;
+    sentenceDuration: string;
+    courtName: string;
+    notes: string;
+    status: string;
+    permanentAddress: string;
+    temporaryAddress: string;
+    currentAddress: string;
+    province: string;
+    ward: string;
+    addressDetail: string;
+  };
 }

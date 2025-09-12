@@ -108,7 +108,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="t('prison.deputyDirector')" prop="deputyDirector">
+            <el-form-item
+              :label="t('prison.deputyDirector')"
+              prop="deputyDirector"
+            >
               <el-input
                 v-model="form.deputyDirector"
                 :placeholder="t('prison.placeholder.deputyDirector')"
@@ -120,23 +123,26 @@
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
             <el-form-item :label="t('prison.capacity')" prop="capacity">
-            <el-input-number
-              v-model="form.capacity"
-              :min="1"
-              :max="10000"
-              :placeholder="t('prison.placeholder.capacity')"
-              style="width: 100%"
-            />
+              <el-input-number
+                v-model="form.capacity"
+                :min="1"
+                :max="10000"
+                :placeholder="t('prison.placeholder.capacity')"
+                style="width: 100%"
+              />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="t('prison.currentPopulation')" prop="currentPopulation">
+            <el-form-item
+              :label="t('prison.currentPopulation')"
+              prop="currentPopulation"
+            >
               <el-input-number
-                  v-model="form.currentPopulation"
-                  :min="0"
-                  :max="form.capacity || 10000"
-                  :placeholder="t('prison.placeholder.currentPopulation')"
-                  style="width: 100%"
+                v-model="form.currentPopulation"
+                :min="0"
+                :max="form.capacity || 10000"
+                :placeholder="t('prison.placeholder.currentPopulation')"
+                style="width: 100%"
               />
             </el-form-item>
           </el-col>
@@ -144,11 +150,14 @@
 
         <el-form-item :label="t('prison.status')" prop="isActive">
           <el-radio-group v-model="form.isActive">
-            <el-radio label="ACTIVE" :value="true">{{ t("prison.active") }}</el-radio>
-            <el-radio label="INACTIVE" :value="false">{{ t("prison.inactive") }}</el-radio>
+            <el-radio label="ACTIVE" :value="true">{{
+              t("prison.active")
+            }}</el-radio>
+            <el-radio label="INACTIVE" :value="false">{{
+              t("prison.inactive")
+            }}</el-radio>
           </el-radio-group>
         </el-form-item>
-
 
         <!-- <el-form-item label="Mô tả">
           <el-input
@@ -164,7 +173,9 @@
             {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
           <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
-          <el-button @click="$router.go(-1)">{{ t("common.cancel") }}</el-button>
+          <el-button @click="$router.go(-1)">{{
+            t("common.cancel")
+          }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -312,12 +323,9 @@ const onProvinceChange = async (code: string) => {
 // Methods
 const loadData = async () => {
   if (isEdit.value) {
-    console.log(route.params.id);
     const prison = await prisonStore.fetchDetail(Number(route.params.id));
-    console.log(prison);
     if (prison) {
       Object.assign(form, prison);
-      console.log(form);
     } else {
       ElMessage.error("Không tìm thấy thông tin trại giam!");
       router.push("/prisons");
@@ -375,7 +383,6 @@ const handleSubmit = async () => {
           provinceId: form.provinceId,
           wardId: form.wardId,
         };
-        console.log(payload);
         await prisonStore.createPrison(payload);
       }
       router.push("/prisons");

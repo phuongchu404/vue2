@@ -9,23 +9,28 @@
 
     <!-- Search Section -->
     <div class="search-section">
-      <el-form :model="searchForm" inline label-width="auto" label-position="left">
+      <el-form
+        :model="searchForm"
+        inline
+        label-width="auto"
+        label-position="left"
+      >
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item :label="t('prison.code')">
               <el-input
-                  v-model="searchForm.code"
-                  :placeholder="t('prison.placeholder.code')"
-                  clearable
+                v-model="searchForm.code"
+                :placeholder="t('prison.placeholder.code')"
+                clearable
               />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item :label="t('prison.name')">
               <el-input
-                  v-model="searchForm.name"
-                  :placeholder="t('prison.placeholder.name')"
-                  clearable
+                v-model="searchForm.name"
+                :placeholder="t('prison.placeholder.name')"
+                clearable
               />
             </el-form-item>
           </el-col>
@@ -34,10 +39,10 @@
           <el-col :span="8">
             <el-form-item :label="t('prison.status')">
               <el-select
-                  style="width: 194px;"
-                  v-model="searchForm.isActive"
-                  :placeholder="t('prison.placeholder.status')"
-                  clearable
+                style="width: 194px"
+                v-model="searchForm.isActive"
+                :placeholder="t('prison.placeholder.status')"
+                clearable
               >
                 <el-option :label="t('prison.active')" :value="true" />
                 <el-option :label="t('prison.inactive')" :value="false" />
@@ -47,10 +52,10 @@
           <el-col :span="8">
             <el-form-item>
               <el-button type="primary" @click="onSearch" :icon="Search">
-                {{ t('common.Search') }}
+                {{ t("common.Search") }}
               </el-button>
               <el-button @click="onReset" :icon="Refresh">
-                {{ t('common.reset') }}
+                {{ t("common.reset") }}
               </el-button>
             </el-form-item>
           </el-col>
@@ -75,19 +80,19 @@
       <div class="action-bar">
         <div>
           <el-button
-              type="primary"
-              @click="$router.push('/prisons/add')"
-              :icon="Plus"
+            type="primary"
+            @click="$router.push('/prisons/add')"
+            :icon="Plus"
           >
-            {{ t('common.add') }}
+            {{ t("common.add") }}
           </el-button>
           <el-button type="success" @click="handleExport" :icon="Download">
-            {{ t('common.export') }}
+            {{ t("common.export") }}
           </el-button>
         </div>
         <div class="result-info">
-          {{ t('common.total') }}: {{ prisonStore.getTotal }}
-          {{ t('common.unit') }}
+          {{ t("common.total") }}: {{ prisonStore.getTotal }}
+          {{ t("common.unit") }}
         </div>
       </div>
     </div>
@@ -95,21 +100,35 @@
     <!-- Data Table -->
 
     <el-table
-        :data="prisons"
-        style="width: 100%"
-        v-loading="prisonStore.getLoading"
-        stripe
-        border
+      :data="prisons"
+      style="width: 100%"
+      v-loading="prisonStore.getLoading"
+      stripe
+      border
     >
-      <el-table-column prop="code" :label="t('prison.code')" width="145" sortable fixed="left" />
-      <el-table-column prop="name" :label="t('prison.name')" width="200"/>
-      <el-table-column :label="t('prison.address')" min-width="250" show-overflow-tooltip>
+      <el-table-column
+        prop="code"
+        :label="t('prison.code')"
+        width="145"
+        sortable
+        fixed="left"
+      />
+      <el-table-column prop="name" :label="t('prison.name')" width="200" />
+      <el-table-column
+        :label="t('prison.address')"
+        min-width="250"
+        show-overflow-tooltip
+      >
         <template #default="scope">
           {{ scope.row.address }}, {{ scope.row.wardFullName }},
           {{ scope.row.provinceFullName }}
         </template>
       </el-table-column>
-      <el-table-column prop="director" :label="t('prison.director')" width="150" />
+      <el-table-column
+        prop="director"
+        :label="t('prison.director')"
+        width="150"
+      />
       <el-table-column :label="t('prison.capacity')" width="130" align="center">
         <template #default="scope">
           <el-tag type="info">
@@ -120,8 +139,17 @@
       <el-table-column :label="t('prison.occupancyRate')" width="150">
         <template #default="scope">
           <el-progress
-              :percentage="Number(((scope.row.currentPopulation / scope.row.capacity) * 100).toFixed(2))"
-              :color="getProgressColor(scope.row.currentPopulation / scope.row.capacity)"
+            :percentage="
+              Number(
+                (
+                  (scope.row.currentPopulation / scope.row.capacity) *
+                  100
+                ).toFixed(2)
+              )
+            "
+            :color="
+              getProgressColor(scope.row.currentPopulation / scope.row.capacity)
+            "
           />
         </template>
       </el-table-column>
@@ -129,7 +157,11 @@
       <el-table-column :label="t('prison.status')" width="110" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
-            {{ scope.row.isActive === true ? t('prison.active') : t('prison.inactive') }}
+            {{
+              scope.row.isActive === true
+                ? t("prison.active")
+                : t("prison.inactive")
+            }}
           </el-tag>
         </template>
       </el-table-column>
@@ -169,11 +201,11 @@
 
     <!-- Detail Dialog -->
     <el-dialog
-        v-model="detailDialogVisible"
-        :title="t('prison.detailTitle')"
-        width="60%"
-        :before-close="handleDetailClose"
-        class="dialog"
+      v-model="detailDialogVisible"
+      :title="t('prison.detailTitle')"
+      width="60%"
+      :before-close="handleDetailClose"
+      class="dialog"
     >
       <div v-if="selectedPrison" class="detail-content">
         <el-descriptions :column="2" border>
@@ -194,22 +226,41 @@
             {{ selectedPrison.phone }}
           </el-descriptions-item>
           <el-descriptions-item :label="t('prison.capacity')">
-            {{ selectedPrison.capacity }} {{ t('prison.people') }}
+            {{ selectedPrison.capacity }} {{ t("prison.people") }}
           </el-descriptions-item>
           <el-descriptions-item :label="t('prison.currentPopulation')">
-            {{ selectedPrison?.currentPopulation }} {{ t('prison.people') }}
+            {{ selectedPrison?.currentPopulation }} {{ t("prison.people") }}
           </el-descriptions-item>
           <el-descriptions-item :label="t('prison.occupancyRate')">
             <el-progress
-                :percentage="selectedPrison?.currentPopulation && selectedPrison?.capacity
-                ? Number(((selectedPrison.currentPopulation / selectedPrison.capacity) * 100).toFixed(2))
-                : 0"
-                :color="getProgressColor((selectedPrison?.currentPopulation || 0) / (selectedPrison?.capacity || 1))"
+              :percentage="
+                selectedPrison?.currentPopulation && selectedPrison?.capacity
+                  ? Number(
+                      (
+                        (selectedPrison.currentPopulation /
+                          selectedPrison.capacity) *
+                        100
+                      ).toFixed(2)
+                    )
+                  : 0
+              "
+              :color="
+                getProgressColor(
+                  (selectedPrison?.currentPopulation || 0) /
+                    (selectedPrison?.capacity || 1)
+                )
+              "
             />
           </el-descriptions-item>
           <el-descriptions-item :label="t('prison.status')">
-            <el-tag :type="selectedPrison.isActive === true ? 'success' : 'danger'">
-              {{ selectedPrison.isActive === true ? t('prison.active') : t('prison.inactive') }}
+            <el-tag
+              :type="selectedPrison.isActive === true ? 'success' : 'danger'"
+            >
+              {{
+                selectedPrison.isActive === true
+                  ? t("prison.active")
+                  : t("prison.inactive")
+              }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item :label="t('common.createTime')">
@@ -220,10 +271,10 @@
 
       <template #footer>
         <el-button @click="detailDialogVisible = false">
-          {{ t('common.close') }}
+          {{ t("common.close") }}
         </el-button>
         <el-button type="primary" @click="handleEdit(selectedPrison)">
-          {{ t('common.ok') }}
+          {{ t("common.ok") }}
         </el-button>
       </template>
     </el-dialog>
@@ -289,7 +340,7 @@ const handleDetailClose = () => {
 };
 
 const handleExport = () => {
-  ElMessage.info(t('common.exportUpdating'));
+  ElMessage.info(t("common.exportUpdating"));
 };
 const handleView = (prison: any) => {
   selectedPrison.value = prison;
@@ -308,13 +359,12 @@ const search = async (extra?: Partial<PageQuery>) => {
       isActive: searchForm.isActive ?? undefined,
       ...extra,
     } as PageQuery;
-    console.log(request);
     await prisonStore.fetchList(request);
 
     prisons.value = prisonStore.getPrisons || [];
   } catch (error) {
     // console.error("Error fetching prison list:", error);
-    ElMessage.error(t('common.dataFail'));
+    ElMessage.error(t("common.dataFail"));
   } finally {
     loading.value = false;
   }

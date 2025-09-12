@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElNotification } from "element-plus";
 import { PermissionService } from "@/services/permission";
 import type { ServiceResult } from "@/types/common";
 
 export const usePermissionStore = defineStore("permission", {
   state: () => ({
-    permissions: undefined,
+    permissions: [] as string[],
   }),
 
   getters: {
@@ -20,7 +20,7 @@ export const usePermissionStore = defineStore("permission", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || "synchronize failed");
         }
 
         ElMessage.success("Created successfully");
@@ -28,6 +28,26 @@ export const usePermissionStore = defineStore("permission", {
         const msg =
           e?.response?.data?.message || e?.message || "Create prison failed";
         ElMessage.error(msg);
+        // ElNotification.error(msg);
+        throw e;
+      } finally {
+      }
+    },
+    async getAllMenus() {
+      try {
+        const res: ServiceResult<string[]> =
+          await PermissionService.getAllMenus();
+
+        if (!res.success) {
+          throw new Error(res.message || "synchronize failed");
+        }
+
+        this.permissions = res.data as string[];
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Create prison failed";
+        ElMessage.error(msg);
+        // ElNotification.error(msg);
         throw e;
       } finally {
       }

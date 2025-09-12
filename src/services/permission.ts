@@ -1,7 +1,7 @@
 import * as Utils from "../utils";
 export const PermissionService = {
   async getAllMenus() {
-    const res = Utils.doGet(`/api/sessions/permissions`);
+    const res = Utils.doGet(`/api/sessions/permission/tag`);
     return res;
   },
 

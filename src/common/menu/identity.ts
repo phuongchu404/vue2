@@ -1,11 +1,72 @@
 import { t } from "@/i18n";
-export default {
+import { MenuItem } from "./../menutype";
+export const identity: MenuItem = {
   tag: "identity-record",
   leaf: true,
   path: "/identity",
   type: "menu",
-  whiteList: false,
+  isWhiteList: false,
   name: t("menu.identity"),
   icon: "el-icon-fa-users",
-  options: [],
+  children: [],
+  permissions: [
+    {
+      tag: "identity:search",
+      type: "button",
+      isWhiteList: true,
+      name: t("option.query"),
+      pattern: "/api/admin/identity-record",
+      method: "GET",
+    },
+    {
+      tag: "identity:insert",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.add"),
+      pattern: "/api/admin/identity-record/create",
+      method: "POST",
+    },
+    {
+      tag: "identity:update",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.update"),
+      pattern: "/api/admin/identity-record/update/{id}",
+      method: "PUT",
+    },
+    {
+      tag: "identity:delete",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.delete"),
+      pattern: "/api/admin/identity-record/{id}",
+      method: "DELETE",
+    },
+    {
+      tag: "identity:detail",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/identity-record/{id}",
+      method: "GET",
+    },
+    {
+      tag: "identity:select:detainee:all",
+      type: "api",
+      isWhiteList: false,
+      name: t("option.query"),
+      pattern: "/api/admin/ward/{provinceCode}",
+      method: "GET",
+    },
+  ],
 };
+// export default {
+//   tag: "identity-record",
+//   leaf: true,
+//   path: "/identity",
+//   type: "menu",
+//   isWhiteList: false,
+//   name: t("menu.identity"),
+//   icon: "el-icon-fa-users",
+//   options: [],
+// };

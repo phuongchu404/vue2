@@ -10,7 +10,7 @@ export const RolePermissionService = {
     roleId: number,
     payload: UpdatePermissionByRoleIdRequest
   ) {
-    const res = await Utils.doPut(`/api/admin/permissions/${roleId}`, payload);
+    const res = await Utils.doPut(`/api/admin/roleperms/${roleId}`, payload);
     return res;
   },
 };

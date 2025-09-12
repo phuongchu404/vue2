@@ -106,7 +106,6 @@
                   <span class="text-large font-600 mr-3">
                     {{ $t(`route.${$route.meta?.title || $route.name}`) }}
                   </span>
-
                 </template>
               </el-page-header>
               <RouterView v-slot="{ Component }">
@@ -157,7 +156,10 @@
             class="edit-form-input"
           ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('home.passwordRepeat')" prop="newPasswordAgain">
+        <el-form-item
+          :label="$t('home.passwordRepeat')"
+          prop="newPasswordAgain"
+        >
           <el-input
             type="password"
             v-model="editForm.newPasswordAgain"
@@ -371,7 +373,7 @@ const availButtons = async () => {
 
 const hiddenMenus = (menus: any[], tags: string[]) => {
   for (const menu of menus) {
-    if (menu.whiteList) {
+    if (menu.isWhiteList) {
       menu.hidden = false;
     } else {
       menu.hidden = !compareTag(menu.tag, tags);
@@ -485,14 +487,18 @@ onMounted(() => {
 .el-menu-item,
 .el-sub-menu {
   color: var(--text-color) !important;
-  border-radius: 10px;  
-  font-weight: 600!important;
+  border-radius: 10px;
+  font-weight: 600 !important;
 }
 
 /* Active state */
 .el-menu-item.is-active,
 .el-submenu__title.is-active {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-primary-color) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--dark-primary-color) 100%
+  ) !important;
   color: var(--white) !important;
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
@@ -507,7 +513,6 @@ onMounted(() => {
 .el-submenu__title.is-active i {
   color: var(--white) !important;
 }
-
 
 /* Main Content */
 .main-content {

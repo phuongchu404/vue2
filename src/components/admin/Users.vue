@@ -36,11 +36,7 @@
       </el-form>
     </div>
 
-    <el-table
-      :data="users"
-      align="center"
-      border
-    >
+    <el-table :data="users" align="center" border>
       <el-table-column
         type="index"
         prop="id"
@@ -50,28 +46,33 @@
       <el-table-column
         prop="userName"
         :label="$t('user.userName')"
-        min-width="80" show-overflow-tooltip
+        min-width="80"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="roles"
         :label="$t('user.roles')"
-        :formatter="rolesFormatter" show-overflow-tooltip
+        :formatter="rolesFormatter"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="realName"
-        :label="$t('user.realName')" show-overflow-tooltip
+        :label="$t('user.realName')"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="createTime"
         :label="$t('common.createTime')"
         width="180"
-        :formatter="defaultTimeFormatter" show-overflow-tooltip
+        :formatter="defaultTimeFormatter"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="updateTime"
         :label="$t('common.updateTime')"
         width="180"
-        :formatter="defaultTimeFormatter" show-overflow-tooltip
+        :formatter="defaultTimeFormatter"
+        show-overflow-tooltip
       ></el-table-column>
       <el-table-column fixed="right" :label="$t('common.option')" width="500">
         <template #default="scope">
@@ -130,12 +131,7 @@
       width="40%"
       class="dialog"
     >
-      <el-form
-        :model="form"
-        :rules="rules"
-        label-width="130px"
-        ref="formRef"
-      >
+      <el-form :model="form" :rules="rules" label-width="130px" ref="formRef">
         <el-form-item :label="$t('user.userName')" prop="userName">
           <el-input
             v-model="form.userName"
@@ -146,14 +142,30 @@
         <el-form-item :label="$t('user.realName')" prop="realName">
           <el-input v-model="form.realName"></el-input>
         </el-form-item>
+        <el-form-item
+          :label="t('detainee.detentionCenter')"
+          prop="detentionCenterId"
+        >
+          <el-select
+            v-model="form.detentionCenterId"
+            :placeholder="t('detainee.placeholder.detentionCenter')"
+          >
+            <el-option
+              v-for="prison in prisonStore.getPrisons"
+              :key="prison.id"
+              :label="prison.name"
+              :value="prison.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="$t('user.email')" prop="mail">
-          <el-input v-model="form.mail" ></el-input>
+          <el-input v-model="form.mail"></el-input>
         </el-form-item>
         <el-form-item :label="$t('user.phoneNumber')" prop="phoneNumber">
-          <el-input v-model="form.phoneNumber" ></el-input>
+          <el-input v-model="form.phoneNumber"></el-input>
         </el-form-item>
-        <el-form-item :label="$t('user.description')" >
-          <el-input type="textarea" v-model="form.description" ></el-input>
+        <el-form-item :label="$t('user.description')">
+          <el-input type="textarea" v-model="form.description"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -181,7 +193,11 @@
         ref="passwordFormRef"
       >
         <el-form-item :label="$t('user.password')" prop="password">
-          <el-input v-model="password.password" type="password" show-password></el-input>
+          <el-input
+            v-model="password.password"
+            type="password"
+            show-password
+          ></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -231,7 +247,12 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+} from "element-plus";
 import * as Utils from "../../utils";
 import {
   Search,
@@ -243,12 +264,19 @@ import {
   Delete,
 } from "@element-plus/icons-vue";
 import { useUserStore } from "@/stores/user";
-import type { PageQuery, User, ResetPassword, CreateUserRequest, UpdateUserRequest } from "@/types/user";
+import type {
+  PageQuery,
+  User,
+  ResetPassword,
+  CreateUserRequest,
+  UpdateUserRequest,
+} from "@/types/user";
 import type { Role } from "@/types/role";
-import type {UpdateRoleByUserIdRequest} from "@/types/userRole";
+import type { UpdateRoleByUserIdRequest } from "@/types/userRole";
 import { useRoleStore } from "@/stores/role";
 import { useUserRoleStore } from "@/stores/userRole";
-import { useMessage } from '@/composables/useMessage';
+import { useMessage } from "@/composables/useMessage";
+import { usePrisonStore } from "@/stores/prison";
 
 const { messageInfoPassword } = useMessage();
 
@@ -257,6 +285,7 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const roleStore = useRoleStore();
 const userRoleStore = useUserRoleStore();
+const prisonStore = usePrisonStore();
 
 // Refs
 const formRef = ref<FormInstance>();
@@ -291,25 +320,34 @@ const rolesForm = reactive({
   oldRoles: [""],
   selectedRoles: [],
 });
-const form = reactive<Partial<User>>({ 
-  id: undefined, 
-  userName: "", 
+const form = reactive<Partial<User>>({
+  id: undefined,
+  userName: "",
   realName: "",
   mail: "",
   phoneNumber: "",
-  description: "", });
+  description: "",
+  detentionCenterId: undefined,
+});
 
-  // Rules
-const rules:FormRules = {
+// Rules
+const rules: FormRules = {
   userName: [
     { required: true, message: t("user.inputUserName"), trigger: "blur" },
   ],
   realName: [
     { required: true, message: t("user.inputRealName"), trigger: "blur" },
   ],
+  detentionCenterId: [
+    {
+      required: true,
+      message: t("user.inputDetentionCenter"),
+      trigger: "blur",
+    },
+  ],
 };
 
-const passwordRules:FormRules = {
+const passwordRules: FormRules = {
   password: [
     { required: true, message: t("user.inputUserName"), trigger: "blur" },
   ],
@@ -337,7 +375,6 @@ const isButtonEnabled = (buttonName: string) => {
   const state = appStore.buttons.has(buttonName);
   return !state;
 };
-
 
 const handleAdd = async () => {
   // Utils.clearValidateForm(formRef.value);
@@ -376,8 +413,8 @@ const handleSaveOrUpdate = async () => {
       if (!valid) return;
       if (ui.addRecord) {
         const payload: CreateUserRequest = { ...form };
-        let result:string | undefined = await userStore.createUser(payload);
-        if(userStore.getSuccess) {
+        let result: string | undefined = await userStore.createUser(payload);
+        if (userStore.getSuccess) {
           messageInfoPassword(
             `<span>${t(
               "user.resetPasswordSuccess"
@@ -385,16 +422,15 @@ const handleSaveOrUpdate = async () => {
           );
           ui.dialogVisible = false;
         }
-    } else {
-      const payload: UpdateUserRequest = { ...form };
-      await userStore.updateUser(form.id as number, payload);
-      if(userStore.getSuccess) {
-        ui.dialogVisible = false;
+      } else {
+        const payload: UpdateUserRequest = { ...form };
+        await userStore.updateUser(form.id as number, payload);
+        if (userStore.getSuccess) {
+          ui.dialogVisible = false;
+        }
       }
-    }
-    await  loadTableData();
+      await loadTableData();
     });
-    
   } catch {
     // Validation failed
   }
@@ -410,7 +446,6 @@ const loadTableData = async (extra?: Partial<PageQuery>) => {
       userName: queryForm.userName?.trim() ?? null,
       ...extra,
     } as PageQuery;
-    console.log(request);
     await userStore.listPage(request);
 
     users.value = userStore.getUsers || [];
@@ -419,6 +454,10 @@ const loadTableData = async (extra?: Partial<PageQuery>) => {
   } finally {
     loading.value = false;
   }
+};
+
+const getAllPrisons = async () => {
+  await prisonStore.getAll();
 };
 
 const onSearch = () => {
@@ -467,7 +506,7 @@ const handleResetPassword = async () => {
 
 const loadAllRoles = async () => {
   await roleStore.getAll();
-  if(roleStore.getRoles) {
+  if (roleStore.getRoles) {
     allRoles.value = roleStore.getRoles;
   }
 };
@@ -494,17 +533,17 @@ const handleRolesUpdate = async () => {
   rolesForm.selectedRoles = keys;
   const payload: UpdateRoleByUserIdRequest = { ...rolesForm };
   if (rolesForm.userId !== undefined && rolesForm.userId !== null) {
-  await userRoleStore.updateRoleByUserId(rolesForm.userId as number, payload);
-} 
+    await userRoleStore.updateRoleByUserId(rolesForm.userId as number, payload);
+  }
   if (userRoleStore.getSuccess) {
-    
     ui.rolesDialogVisible = false;
-  } 
+  }
   await loadTableData();
 };
 
 // Lifecycle
 onMounted(async () => {
+  await getAllPrisons();
   await loadTableData();
   const userString = sessionStorage.getItem("user");
   if (userString) {

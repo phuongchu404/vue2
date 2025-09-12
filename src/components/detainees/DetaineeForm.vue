@@ -2,29 +2,38 @@
   <div class="detainee-form">
     <el-card class="form-card">
       <el-form
-          ref="formRef"
-          :model="form"
-          :rules="rules"
-          label-width="140px"
-          @submit.prevent="handleSubmit"
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="140px"
+        @submit.prevent="handleSubmit"
       >
         <!-- Basic Info -->
-        <el-divider content-position="left">{{ $t('detainee.section.basicInfo') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.section.basicInfo")
+        }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('detainee.profileNumber')" prop="profileNumber">
+            <el-form-item
+              :label="t('detainee.profileNumber')"
+              prop="profileNumber"
+            >
               <el-input
-                  v-model="form.profileNumber"
-                  :placeholder="$t('detainee.placeholder.profileNumber')"
+                v-model="form.profileNumber"
+                :placeholder="t('detainee.placeholder.profileNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item v-if="isEdit" :label="$t('detainee.code')" prop="detaineeCode">
+            <el-form-item
+              v-if="isEdit"
+              :label="t('detainee.code')"
+              prop="detaineeCode"
+            >
               <el-input
-                  v-model="form.detaineeCode"
-                  :placeholder="$t('detainee.placeholder.code')"
-                  :disabled="isEdit"
+                v-model="form.detaineeCode"
+                :placeholder="t('detainee.placeholder.code')"
+                :disabled="isEdit"
               />
             </el-form-item>
           </el-col>
@@ -32,18 +41,18 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('detainee.fullName')" prop="fullName">
+            <el-form-item :label="t('detainee.fullName')" prop="fullName">
               <el-input
-                  v-model="form.fullName"
-                  :placeholder="$t('detainee.placeholder.fullName')"
+                v-model="form.fullName"
+                :placeholder="t('detainee.placeholder.fullName')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('detainee.aliasName')">
+            <el-form-item :label="t('detainee.aliasName')">
               <el-input
-                  v-model="form.aliasName"
-                  :placeholder="$t('detainee.placeholder.aliasName')"
+                v-model="form.aliasName"
+                :placeholder="t('detainee.placeholder.aliasName')"
               />
             </el-form-item>
           </el-col>
@@ -51,119 +60,127 @@
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.gender')" prop="gender">
-              <el-select v-model="form.gender" :placeholder="$t('detainee.placeholder.gender')">
+            <el-form-item :label="t('detainee.gender')" prop="gender">
+              <el-select
+                v-model="form.gender"
+                :placeholder="t('detainee.placeholder.gender')"
+              >
                 <el-option
-                    v-for="option in genderOptions"
-                    :key="option.value"
-                    :label="option.label"
-                    :value="option.value"
+                  v-for="option in genderOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.dateOfBirth')" prop="dateOfBirth">
+            <el-form-item :label="t('detainee.dateOfBirth')" prop="dateOfBirth">
               <el-date-picker
-                  v-model="form.dateOfBirth"
-                  type="date"
-                  :placeholder="$t('detainee.placeholder.dateOfBirth')"
-                  style="width: 100%"
-                  format="DD/MM/YYYY"
-                  value-format="YYYY-MM-DD"
+                v-model="form.dateOfBirth"
+                type="date"
+                :placeholder="t('detainee.placeholder.dateOfBirth')"
+                style="width: 100%"
+                format="DD/MM/YYYY"
+                value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.placeOfBirth')">
+            <el-form-item :label="t('detainee.placeOfBirth')">
               <el-input
-                  v-model="form.placeOfBirth"
-                  :placeholder="$t('detainee.placeholder.placeOfBirth')"
+                v-model="form.placeOfBirth"
+                :placeholder="t('detainee.placeholder.placeOfBirth')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
         <!-- Identity -->
-        <el-divider content-position="left">{{ $t('detainee.section.identity') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.section.identity")
+        }}</el-divider>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.idNumber')" prop="idNumber">
+            <el-form-item :label="t('detainee.idNumber')" prop="idNumber">
               <el-input
-                  v-model="form.idNumber"
-                  :placeholder="$t('detainee.placeholder.idNumber')"
+                v-model="form.idNumber"
+                :placeholder="t('detainee.placeholder.idNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.idIssueDate')">
+            <el-form-item :label="t('detainee.idIssueDate')">
               <el-date-picker
-                  v-model="form.idIssueDate"
-                  type="date"
-                  :placeholder="$t('detainee.placeholder.idIssueDate')"
-                  style="width: 100%"
-                  format="DD/MM/YYYY"
-                  value-format="YYYY-MM-DD"
+                v-model="form.idIssueDate"
+                type="date"
+                :placeholder="t('detainee.placeholder.idIssueDate')"
+                style="width: 100%"
+                format="DD/MM/YYYY"
+                value-format="YYYY-MM-DD"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.idIssuePlace')">
+            <el-form-item :label="t('detainee.idIssuePlace')">
               <el-input
-                  v-model="form.idIssuePlace"
-                  :placeholder="$t('detainee.placeholder.idIssuePlace')"
+                v-model="form.idIssuePlace"
+                :placeholder="t('detainee.placeholder.idIssuePlace')"
               />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.nationality')" prop="nationalityId">
+            <el-form-item
+              :label="t('detainee.nationality')"
+              prop="nationalityId"
+            >
               <el-select
-                  v-model="form.nationalityId"
-                  filterable
-                  clearable
-                  :placeholder="$t('detainee.placeholder.nationality')"
+                v-model="form.nationalityId"
+                filterable
+                clearable
+                :placeholder="t('detainee.placeholder.nationality')"
               >
                 <el-option
-                    v-for="option in countries"
-                    :key="option.id"
-                    :label="option.name"
-                    :value="option.id"
+                  v-for="option in countries"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.ethnicity')">
+            <el-form-item :label="t('detainee.ethnicity')">
               <el-select
-                  v-model="form.ethnicityId"
-                  filterable
-                  clearable
-                  :placeholder="$t('detainee.placeholder.ethnicity')"
+                v-model="form.ethnicityId"
+                filterable
+                clearable
+                :placeholder="t('detainee.placeholder.ethnicity')"
               >
                 <el-option
-                    v-for="option in ethnicities"
-                    :key="option.id"
-                    :label="option.name"
-                    :value="option.id"
+                  v-for="option in ethnicities"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.religion')">
+            <el-form-item :label="t('detainee.religion')">
               <el-select
-                  v-model="form.religionId"
-                  filterable
-                  clearable
-                  :placeholder="$t('detainee.placeholder.religion')"
+                v-model="form.religionId"
+                filterable
+                clearable
+                :placeholder="t('detainee.placeholder.religion')"
               >
                 <el-option
-                    v-for="option in religions"
-                    :key="option.id"
-                    :label="option.name"
-                    :value="option.id"
+                  v-for="option in religions"
+                  :key="option.id"
+                  :label="option.name"
+                  :value="option.id"
                 />
               </el-select>
             </el-form-item>
@@ -171,25 +188,34 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.fatherName')">
-              <el-input v-model="form.fatherName" :placeholder="$t('detainee.placeholder.fatherName')" />
+            <el-form-item :label="t('detainee.fatherName')">
+              <el-input
+                v-model="form.fatherName"
+                :placeholder="t('detainee.placeholder.fatherName')"
+              />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.motherName')">
-              <el-input v-model="form.motherName" :placeholder="$t('detainee.placeholder.motherName')" />
+            <el-form-item :label="t('detainee.motherName')">
+              <el-input
+                v-model="form.motherName"
+                :placeholder="t('detainee.placeholder.motherName')"
+              />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.spouseName')">
-              <el-input v-model="form.spouseName" :placeholder="$t('detainee.placeholder.spouseName')" />
+            <el-form-item :label="t('detainee.spouseName')">
+              <el-input
+                v-model="form.spouseName"
+                :placeholder="t('detainee.placeholder.spouseName')"
+              />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item :label="$t('detainee.occupation')">
+        <el-form-item :label="t('detainee.occupation')">
           <el-input
             v-model="form.occupation"
-            :placeholder="$t('detainee.placeholder.occupation')"
+            :placeholder="t('detainee.placeholder.occupation')"
           />
         </el-form-item>
 
@@ -202,14 +228,19 @@
           />
         </el-form-item> -->
 
-        <el-divider content-position="left">{{ $t('detainee.section.permanent') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.section.permanent")
+        }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.permanentProvince')" prop="permanentProvinceId">
+            <el-form-item
+              :label="t('detainee.permanentProvince')"
+              prop="permanentProvinceId"
+            >
               <el-select
                 v-model="form.permanentProvinceId"
-                :placeholder="$t('detainee.placeholder.province')"
+                :placeholder="t('detainee.placeholder.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -227,10 +258,13 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.permanentWard')" prop="permanentWardId">
+            <el-form-item
+              :label="t('detainee.permanentWard')"
+              prop="permanentWardId"
+            >
               <el-select
                 v-model="form.permanentWardId"
-                :placeholder="$t('detainee.placeholder.ward')"
+                :placeholder="t('detainee.placeholder.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -247,24 +281,29 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item :label="$t('permanentAddress')" prop="address">
+            <el-form-item :label="t('detainee.addressDetail')" prop="address">
               <el-input
                 v-model="form.permanentAddress"
-                :placeholder="$t('detainee.placeholder.permanentAddress')"
+                :placeholder="t('detainee.placeholder.addressDetail')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">{{ $t('detainee.section.temporary') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.section.temporary")
+        }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.temporaryProvince')" prop="temporaryProvinceId">
+            <el-form-item
+              :label="t('detainee.temporaryProvince')"
+              prop="temporaryProvinceId"
+            >
               <el-select
                 v-model="form.temporaryProvinceId"
-                :placeholder="$t('detainee.placeholder.temporaryProvince')"
+                :placeholder="t('detainee.placeholder.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -282,10 +321,13 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.temporaryWard')" prop="temporaryWardId">
+            <el-form-item
+              :label="t('detainee.temporaryWard')"
+              prop="temporaryWardId"
+            >
               <el-select
                 v-model="form.temporaryWardId"
-                :placeholder="$t('detainee.placeholder.temporaryWard')"
+                :placeholder="t('detainee.placeholder.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -302,24 +344,29 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item :label="$t('detainee.temporaryAddress')" prop="address">
+            <el-form-item :label="t('detainee.addressDetail')" prop="address">
               <el-input
                 v-model="form.temporaryAddress"
-                :placeholder="$t('detainee.placeholder.temporaryAddress')"
+                :placeholder="t('detainee.placeholder.addressDetail')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">{{ $t('detainee.section.currentAddress') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.currentAddress")
+        }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.currentProvince')" prop="currentProvinceId">
+            <el-form-item
+              :label="t('detainee.currentProvince')"
+              prop="currentProvinceId"
+            >
               <el-select
                 v-model="form.currentProvinceId"
-                :placeholder="$t('detainee.placeholder.currentProvince')"
+                :placeholder="t('detainee.placeholder.province')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -337,10 +384,13 @@
 
           <!-- Chọn Xã -->
           <el-col :span="7">
-            <el-form-item :label="$t('detainee.currentWard')" prop="currentWardId">
+            <el-form-item
+              :label="t('detainee.currentWard')"
+              prop="currentWardId"
+            >
               <el-select
                 v-model="form.currentWardId"
-                :placeholder="$t('detainee.placeholder.currentWard')"
+                :placeholder="t('detainee.placeholder.ward')"
                 filterable
                 clearable
                 style="width: 100%"
@@ -357,25 +407,30 @@
           </el-col>
           <!-- Địa chỉ cụ thể -->
           <el-col :span="10">
-            <el-form-item :label="$t('detainee.currentAddress')" prop="address">
+            <el-form-item :label="t('detainee.addressDetail')" prop="address">
               <el-input
                 v-model="form.currentAddress"
-                :placeholder="$t('detainee.placeholder.currentAddress')"
+                :placeholder="t('detainee.placeholder.addressDetail')"
                 clearable
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">{{ $t('detainee.section.detention') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("detainee.section.detention")
+        }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.detentionDate')" prop="detentionDate">
+            <el-form-item
+              :label="t('detainee.detentionDate')"
+              prop="detentionDate"
+            >
               <el-date-picker
                 v-model="form.detentionDate"
                 type="date"
-                :placeholder="$t('detainee.placeholder.detentionDate')"
+                :placeholder="t('detainee.placeholder.detentionDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -383,11 +438,14 @@
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.expectedReleaseDate')" prop="expectedReleaseDate">
+            <el-form-item
+              :label="t('detainee.expectedReleaseDate')"
+              prop="expectedReleaseDate"
+            >
               <el-date-picker
                 v-model="form.expectedReleaseDate"
                 type="date"
-                :placeholder="$t('detainee.placeholder.expectedReleaseDate')"
+                :placeholder="t('detainee.placeholder.expectedReleaseDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -395,11 +453,14 @@
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.actualReleaseDate')">
+            <el-form-item
+              :label="t('detainee.actualReleaseDate')"
+              label-width="150px"
+            >
               <el-date-picker
                 v-model="form.actualReleaseDate"
                 type="date"
-                :placeholder="$t('detainee.placeholder.actualReleaseDate')"
+                :placeholder="t('detainee.placeholder.actualReleaseDate')"
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
@@ -409,26 +470,26 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.sentenceDuration')">
+            <el-form-item :label="t('detainee.sentenceDuration')">
               <el-input
                 v-model="form.sentenceDuration"
-                :placeholder="$t('detainee.placeholder.sentenceDuration')"
+                :placeholder="t('detainee.placeholder.sentenceDuration')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.caseNumber')">
+            <el-form-item :label="t('detainee.caseNumber')">
               <el-input
                 v-model="form.caseNumber"
-                :placeholder="$t('detainee.placeholder.caseNumber')"
+                :placeholder="t('detainee.placeholder.caseNumber')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('detainee.cellNumber')">
+            <el-form-item :label="t('detainee.cellNumber')">
               <el-input
                 v-model="form.cellNumber"
-                :placeholder="$t('detainee.placeholder.cellNumber')"
+                :placeholder="t('detainee.placeholder.cellNumber')"
               />
             </el-form-item>
           </el-col>
@@ -436,8 +497,16 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('detainee.detentionCenter')" prop="detentionCenterId">
-              <el-select v-model="form.detentionCenterId"  :placeholder="$t('detainee.placeholder.detentionCenter')">
+            <el-form-item
+              :label="t('detainee.detentionCenter')"
+              prop="detentionCenterId"
+            >
+              <el-select
+                v-model="form.detentionCenterId"
+                :placeholder="t('detainee.placeholder.detentionCenter')"
+                clearable
+                filterable
+              >
                 <el-option
                   v-for="prison in prisons"
                   :key="prison.id"
@@ -448,10 +517,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('detainee.status')" prop="status">
+            <el-form-item :label="t('detainee.status')" prop="status">
               <el-select
                 v-model="form.status"
-                :placeholder="$t('detainee.placeholder.status')"
+                :placeholder="t('detainee.placeholder.status')"
                 clearable
               >
                 <el-option
@@ -465,30 +534,32 @@
           </el-col>
         </el-row>
 
-        <el-form-item :label="$t('detainee.charges')">
+        <el-form-item :label="t('detainee.charges')">
           <el-input
             v-model="form.charges"
             type="textarea"
             :rows="3"
-            :placeholder="$t('detainee.placeholder.charges')"
+            :placeholder="t('detainee.placeholder.charges')"
           />
         </el-form-item>
 
-        <el-form-item :label="$t('detainee.notes')">
+        <el-form-item :label="t('detainee.notes')">
           <el-input
             v-model="form.notes"
             type="textarea"
             :rows="3"
-            :placeholder="$t('detainee.placeholder.notes')"
+            :placeholder="t('detainee.placeholder.notes')"
           />
         </el-form-item>
 
         <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSubmit" :loading="submitting">
-            {{ isEdit ? $t('common.update') : $t('common.add') }}
+            {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
-          <el-button @click="handleReset">{{ $t('common.reset') }}</el-button>
-          <el-button @click="$router.go(-1)">{{ $t('common.cancel') }}</el-button>
+          <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
+          <el-button @click="$router.go(-1)">{{
+            t("common.cancel")
+          }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -505,13 +576,17 @@ import { useDetaineeStore } from "@/stores/detainee";
 import { useProvinceStore } from "@/stores/province";
 import { useWardStore } from "@/stores/ward";
 import { usePrisonStore } from "@/stores/prison";
-import {useEthnicityStore} from "@/stores/ethnicity"
+import { useEthnicityStore } from "@/stores/ethnicity";
 import { useReligionStore } from "@/stores/religion";
 import { useCountryStore } from "@/stores/country";
 import { storeToRefs } from "pinia";
 import type { Province } from "@/types/province";
 import type { Ward } from "@/types/ward";
-import type { Detainee, CreateDetaineeRequest, UpdateDetaineeRequest } from "@/types/detainee";
+import type {
+  Detainee,
+  CreateDetaineeRequest,
+  UpdateDetaineeRequest,
+} from "@/types/detainee";
 import { useI18n } from "vue-i18n";
 
 const route = useRoute();
@@ -529,7 +604,6 @@ const { prisons } = storeToRefs(prisonStore);
 const { ethnicities } = storeToRefs(ethnicityStore);
 const { religions } = storeToRefs(religionStore);
 const { countries } = storeToRefs(countryStore);
-
 
 // Reactive data
 const formRef = ref<FormInstance>();
@@ -685,7 +759,7 @@ const getAllReligions = async () => {
 
 const getAllCountries = async () => {
   await countryStore.getAll();
-}
+};
 const loadData = async () => {
   if (isEdit.value) {
     const detainee = await detaineeStore.fetchDetail(Number(route.params.id));
@@ -723,78 +797,78 @@ const handleSubmit = async () => {
     submitting.value = true;
 
     if (isEdit.value && form.id) {
-        const payload: UpdateDetaineeRequest = {
-          profileNumber: form.profileNumber,
-          fullName: form.fullName,
-          aliasName: form.aliasName,
-          gender: form.gender,
-          dateOfBirth: form.dateOfBirth,
-          placeOfBirth: form.placeOfBirth,
-          idNumber: form.idNumber,
-          idIssueDate: form.idIssueDate,
-          idIssuePlace: form.idIssuePlace,
-          ethnicityId: form.ethnicityId,
-          religionId: form.religionId,
-          nationalityId: form.nationalityId,
-          permanentWardId: form.permanentWardId,
-          permanentAddress: form.permanentAddress,
-          temporaryWardId: form.temporaryWardId,
-          temporaryAddress: form.temporaryAddress,
-          currentWardId: form.currentWardId,
-          currentAddress: form.currentAddress,
-          occupation: form.occupation,
-          fatherName: form.fatherName,
-          motherName: form.motherName,
-          spouseName: form.spouseName,
-          detentionCenterId: form.detentionCenterId,
-          detentionDate: form.detentionDate,
-          expectedReleaseDate: form.expectedReleaseDate,
-          actualReleaseDate: form.actualReleaseDate,
-          caseNumber: form.caseNumber,
-          charges: form.charges,
-          sentenceDuration: form.sentenceDuration,
-          cellNumber: form.cellNumber,
-          status: form.status,
-          notes: form.notes
-        };
-        await detaineeStore.updateDetainee(form.id as number, payload);
-      } else {
-        const payload: CreateDetaineeRequest = {
-          profileNumber: form.profileNumber,
-          fullName: form.fullName,
-          aliasName: form.aliasName,
-          gender: form.gender,
-          dateOfBirth: form.dateOfBirth,
-          placeOfBirth: form.placeOfBirth,
-          idNumber: form.idNumber,
-          idIssueDate: form.idIssueDate,
-          idIssuePlace: form.idIssuePlace,
-          ethnicityId: form.ethnicityId,
-          religionId: form.religionId,
-          nationalityId: form.nationalityId,
-          permanentWardId: form.permanentWardId,
-          permanentAddress: form.permanentAddress,
-          temporaryWardId: form.temporaryWardId,
-          temporaryAddress: form.temporaryAddress,
-          currentWardId: form.currentWardId,
-          currentAddress: form.currentAddress,
-          occupation: form.occupation,
-          fatherName: form.fatherName,
-          motherName: form.motherName,
-          spouseName: form.spouseName,
-          detentionCenterId: form.detentionCenterId,
-          detentionDate: form.detentionDate,
-          expectedReleaseDate: form.expectedReleaseDate,
-          actualReleaseDate: form.actualReleaseDate,
-          caseNumber: form.caseNumber,
-          charges: form.charges,
-          sentenceDuration: form.sentenceDuration,
-          cellNumber: form.cellNumber,
-          status: form.status,
-          notes: form.notes
-        };
-        await detaineeStore.createDetainee(payload);
-      }
+      const payload: UpdateDetaineeRequest = {
+        profileNumber: form.profileNumber,
+        fullName: form.fullName,
+        aliasName: form.aliasName,
+        gender: form.gender,
+        dateOfBirth: form.dateOfBirth,
+        placeOfBirth: form.placeOfBirth,
+        idNumber: form.idNumber,
+        idIssueDate: form.idIssueDate,
+        idIssuePlace: form.idIssuePlace,
+        ethnicityId: form.ethnicityId,
+        religionId: form.religionId,
+        nationalityId: form.nationalityId,
+        permanentWardId: form.permanentWardId,
+        permanentAddress: form.permanentAddress,
+        temporaryWardId: form.temporaryWardId,
+        temporaryAddress: form.temporaryAddress,
+        currentWardId: form.currentWardId,
+        currentAddress: form.currentAddress,
+        occupation: form.occupation,
+        fatherName: form.fatherName,
+        motherName: form.motherName,
+        spouseName: form.spouseName,
+        detentionCenterId: form.detentionCenterId,
+        detentionDate: form.detentionDate,
+        expectedReleaseDate: form.expectedReleaseDate,
+        actualReleaseDate: form.actualReleaseDate,
+        caseNumber: form.caseNumber,
+        charges: form.charges,
+        sentenceDuration: form.sentenceDuration,
+        cellNumber: form.cellNumber,
+        status: form.status,
+        notes: form.notes,
+      };
+      await detaineeStore.updateDetainee(form.id as number, payload);
+    } else {
+      const payload: CreateDetaineeRequest = {
+        profileNumber: form.profileNumber,
+        fullName: form.fullName,
+        aliasName: form.aliasName,
+        gender: form.gender,
+        dateOfBirth: form.dateOfBirth,
+        placeOfBirth: form.placeOfBirth,
+        idNumber: form.idNumber,
+        idIssueDate: form.idIssueDate,
+        idIssuePlace: form.idIssuePlace,
+        ethnicityId: form.ethnicityId,
+        religionId: form.religionId,
+        nationalityId: form.nationalityId,
+        permanentWardId: form.permanentWardId,
+        permanentAddress: form.permanentAddress,
+        temporaryWardId: form.temporaryWardId,
+        temporaryAddress: form.temporaryAddress,
+        currentWardId: form.currentWardId,
+        currentAddress: form.currentAddress,
+        occupation: form.occupation,
+        fatherName: form.fatherName,
+        motherName: form.motherName,
+        spouseName: form.spouseName,
+        detentionCenterId: form.detentionCenterId,
+        detentionDate: form.detentionDate,
+        expectedReleaseDate: form.expectedReleaseDate,
+        actualReleaseDate: form.actualReleaseDate,
+        caseNumber: form.caseNumber,
+        charges: form.charges,
+        sentenceDuration: form.sentenceDuration,
+        cellNumber: form.cellNumber,
+        status: form.status,
+        notes: form.notes,
+      };
+      await detaineeStore.createDetainee(payload);
+    }
 
     router.push("/detainees");
   } catch (error) {
@@ -846,10 +920,12 @@ const handleReset = () => {
   }
 };
 
-onMounted(async() => {
-   await nextTick();
+onMounted(async () => {
+  await nextTick();
   await getAllProvinces();
-  getAllPrisons();
+  await getAllPrisons();
+  // form.detentionCenterId = JSON.parse(sessionStorage.getItem("user") as string)
+  //   .detentionCenterId as number;
   getAllEthnicities();
   getAllReligions();
   getAllCountries();

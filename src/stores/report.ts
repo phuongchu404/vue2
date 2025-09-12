@@ -500,7 +500,7 @@ export const useReportStore = defineStore("report", {
       URL.revokeObjectURL(link.href);
     },
 
-    async exportToPDF(reportData) {
+    async exportToPDF(reportData: any) {
       // Simulate PDF export
       console.log("Exporting to PDF:", reportData);
 
@@ -508,15 +508,17 @@ export const useReportStore = defineStore("report", {
       const printContent = this.generatePrintHTML(reportData);
 
       const printWindow = window.open("", "_blank");
-      printWindow.document.write(printContent);
-      printWindow.document.close();
-      printWindow.focus();
+      if (printWindow) {
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
 
-      // Auto print and close after delay
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 500);
+        // Auto print and close after delay
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
+      }
     },
 
     convertToCSV(data) {
@@ -613,68 +615,5 @@ export const useReportStore = defineStore("report", {
           return value;
       }
     },
-  },
-});
-
-// stores/detainee.js (Referenced in fingerprint store)
-import { defineStore } from "pinia";
-
-export const useDetaineeStore = defineStore("detainee", {
-  state: () => ({
-    detainees: [],
-    loading: false,
-    error: null,
-  }),
-
-  actions: {
-    async findByCode(code) {
-      // Simulate API call or search in local data
-      const detainee = this.detainees.find((d) => d.detainee_code === code);
-
-      if (detainee) {
-        return detainee;
-      }
-
-      // Return sample data for development
-      const sampleDetainees = {
-        PN001: { fullName: "Nguyễn Văn A", detainee_code: "PN001" },
-        PN002: { fullName: "Trần Thị B", detainee_code: "PN002" },
-        PN003: { fullName: "Lê Văn C", detainee_code: "PN003" },
-      };
-
-      return sampleDetainees[code] || null;
-    },
-  },
-});
-
-// stores/staff.js (Referenced in report store)
-import { defineStore } from "pinia";
-
-export const useStaffStore = defineStore("staff", {
-  state: () => ({
-    staff: [],
-    loading: false,
-    error: null,
-  }),
-
-  getters: {
-    totalStaff: (state) => state.staff.length,
-    activeStaff: (state) =>
-      state.staff.filter((s) => s.status === "ACTIVE").length,
-  },
-});
-
-// stores/identity.js (Referenced in report store)
-import { defineStore } from "pinia";
-
-export const useIdentityStore = defineStore("identity", {
-  state: () => ({
-    records: [],
-    loading: false,
-    error: null,
-  }),
-
-  getters: {
-    totalRecords: (state) => state.records.length,
   },
 });
