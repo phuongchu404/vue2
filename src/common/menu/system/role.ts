@@ -59,6 +59,14 @@ export const role: MenuItem = {
       pattern: "/api/admin/roleperms/{roleId}",
       method: "GET",
     },
+    {
+      tag: "system:role:sync-permission",
+      type: "button",
+      isWhiteList: false,
+      name: t("role.syncPermission"),
+      pattern: "/api/admin/permissions",
+      method: "POST",
+    },
   ],
 };
 // export default {

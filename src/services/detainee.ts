@@ -4,6 +4,7 @@ import {
   Detainee,
   CreateDetaineeRequest,
   UpdateDetaineeRequest,
+  ExportExcelQuery,
   PageQuery,
 } from "@/types/detainee";
 
@@ -55,6 +56,20 @@ export const DetaineeService = {
 
   async getAll() {
     const res = Utils.doGet(`/api/admin/detainee/all`);
+    return res;
+  },
+
+  async exportExcel(params?: ExportExcelQuery) {
+    Utils.doDownload("GET", `/api/admin/detainee/export`, params);
+  },
+
+  async getTop3Recent() {
+    const res = Utils.doGet(`/api/admin/detainee/get-top-3-newest`);
+    return res;
+  },
+
+  async count() {
+    const res = Utils.doGet(`/api/admin/detainee/count`);
     return res;
   },
 };

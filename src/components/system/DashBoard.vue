@@ -1,13 +1,5 @@
 <template>
   <div class="dashboard">
-<!--    <el-page-header @back="$router.go(-1)">-->
-<!--      <template #content>-->
-<!--        <span class="text-large font-600 mr-3"-->
-<!--          >Trang chủ - Tổng quan hệ thống</span-->
-<!--        >-->
-<!--      </template>-->
-<!--    </el-page-header>-->
-
     <!-- Statistics Cards -->
     <el-row :gutter="20" class="stats-row">
       <el-col :xs="24" :sm="12" :md="6">
@@ -17,7 +9,7 @@
               <el-icon size="32"><OfficeBuilding /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-number">{{ prisonStore.prisons.length }}</div>
+              <div class="stats-number">{{ prisonStore.getTotal }}</div>
               <div class="stats-label">Trại giam</div>
             </div>
           </div>
@@ -32,7 +24,7 @@
             </div>
             <div class="stats-info">
               <div class="stats-number">
-                {{ detaineeStore.detainees.length }}
+                {{ detaineeStore.getTotal }}
               </div>
               <div class="stats-label">Phạm nhân</div>
             </div>
@@ -47,7 +39,7 @@
               <el-icon size="32"><Avatar /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-number">{{ staffStore.staff.length }}</div>
+              <div class="stats-number">{{ staffStore.getTotal }}</div>
               <div class="stats-label">Cán bộ</div>
             </div>
           </div>
@@ -62,7 +54,7 @@
             </div>
             <div class="stats-info">
               <div class="stats-number">
-                {{ identityStore.identityRecords.length }}
+                {{ identityStore.getTotal }}
               </div>
               <div class="stats-label">Danh bản</div>
             </div>
@@ -90,31 +82,42 @@
             <el-table-column prop="warden" label="Giám thị" />
             <el-table-column label="Sức chứa">
               <template #default="scope">
-                {{ scope.row.current_inmates }}/{{ scope.row.capacity }}
+                {{ scope.row.currentPopulation }}/{{ scope.row.capacity }}
               </template>
             </el-table-column>
-            <el-table-column label="Tỷ lệ lấp đầy">
+            <el-table-column :label="t('prison.occupancyRate')" width="150">
               <template #default="scope">
                 <el-progress
                   :percentage="
-                    Math.round(
-                      (scope.row.current_inmates / scope.row.capacity) * 100
+                    Number(
+                      (
+                        (scope.row.currentPopulation / scope.row.capacity) *
+                        100
+                      ).toFixed(2)
                     )
                   "
                   :color="
                     getProgressColor(
-                      scope.row.current_inmates / scope.row.capacity
+                      scope.row.currentPopulation / scope.row.capacity
                     )
                   "
                 />
               </template>
             </el-table-column>
-            <el-table-column label="Trạng thái">
+            <el-table-column
+              :label="t('prison.status')"
+              width="110"
+              align="center"
+            >
               <template #default="scope">
                 <el-tag
-                  :type="scope.row.status === 'ACTIVE' ? 'success' : 'danger'"
+                  :type="scope.row.isActive === true ? 'success' : 'danger'"
                 >
-                  {{ scope.row.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng" }}
+                  {{
+                    scope.row.isActive === true
+                      ? t("prison.active")
+                      : t("prison.inactive")
+                  }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -132,14 +135,14 @@
           </template>
           <el-timeline>
             <el-timeline-item
-              v-for="detainee in recentDetainees"
+              v-for="detainee in detaineeStore.getDetainees"
               :key="detainee.id"
-              :timestamp="formatDate(detainee.detention_date)"
+              :timestamp="formatDate(detainee.detentionDate)"
               placement="top"
             >
               <el-card>
-                <h4>{{ detainee.full_name }}</h4>
-                <p>Mã: {{ detainee.detainee_code }}</p>
+                <h4>{{ detainee.fullName }}</h4>
+                <p>Mã: {{ detainee.detaineeCode }}</p>
                 <p>Tội danh: {{ detainee.charges }}</p>
               </el-card>
             </el-timeline-item>
@@ -154,14 +157,14 @@
           </template>
           <el-timeline>
             <el-timeline-item
-              v-for="member in recentStaff"
+              v-for="member in staffStore.getStaffs"
               :key="member.id"
-              :timestamp="formatDate(member.created_at)"
+              :timestamp="formatDate(member.createdAt)"
               placement="top"
             >
               <el-card>
-                <h4>{{ member.full_name }}</h4>
-                <p>Mã: {{ member.staff_code }}</p>
+                <h4>{{ member.fullName }}</h4>
+                <p>Mã: {{ member.staffCode }}</p>
                 <p>Cấp bậc: {{ member.rank }}</p>
               </el-card>
             </el-timeline-item>
@@ -172,53 +175,76 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from "vue";
+<script setup lang="ts">
+import { onMounted } from "vue";
 import {
   OfficeBuilding,
   User,
   Avatar,
   Document,
 } from "@element-plus/icons-vue";
-import {
-  usePrisonStore,
-  useDetaineeStore,
-  useStaffStore,
-  useIdentityStore,
-} from "@/stores";
+// import {
+//   usePrisonStore,
+//   useDetaineeStore,
+//   useStaffStore,
+//   useIdentityStore,
+// } from "@/stores";
+import { nextTick } from "vue";
+import { usePrisonStore } from "@/stores/prison";
+import { useDetaineeStore } from "@/stores/detainee";
+import { useStaffStore } from "@/stores/staff";
+import { useIdentityStore } from "@/stores/identity";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const prisonStore = usePrisonStore();
 const detaineeStore = useDetaineeStore();
 const staffStore = useStaffStore();
 const identityStore = useIdentityStore();
 
-const recentDetainees = computed(() => {
-  return detaineeStore.detainees
-    .slice()
-    .sort((a, b) => new Date(b.detention_date) - new Date(a.detention_date))
-    .slice(0, 3);
+onMounted(async () => {
+  await nextTick();
+  await prisonStore.getTop3Recent();
+  await prisonStore.count();
+  await detaineeStore.getTop3Recent();
+  await detaineeStore.count();
+  await staffStore.getTop3Recent();
+  await staffStore.count();
+  await identityStore.count();
 });
 
-const recentStaff = computed(() => {
-  return staffStore.staff
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.created_at || "2024-01-01") -
-        new Date(a.created_at || "2024-01-01")
-    )
-    .slice(0, 3);
-});
+// const recentDetainees = computed(() => {
+//   return detaineeStore.detainees
+//     .slice()
+//     .sort((a, b) => new Date(b.detention_date) - new Date(a.detention_date))
+//     .slice(0, 3);
+// });
 
-const getProgressColor = (ratio) => {
+// const recentStaff = computed(() => {
+//   return staffStore.staff
+//     .slice()
+//     .sort(
+//       (a, b) =>
+//         new Date(b.created_at || "2024-01-01") -
+//         new Date(a.created_at || "2024-01-01")
+//     )
+//     .slice(0, 3);
+// });
+
+const getProgressColor = (ratio: any) => {
   if (ratio < 0.7) return "#67C23A";
   if (ratio < 0.9) return "#E6A23C";
   return "#F56C6C";
 };
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+const formatDate = (dateStr: any) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 };
 </script>
 

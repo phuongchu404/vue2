@@ -159,39 +159,52 @@ export async function doPut(url: string, data?: any): Promise<any> {
 }
 
 export async function doDownload(
-  method: string,
+  method: "GET" | "POST",
   url: string,
   data?: any
-): Promise<any> {
-  return new Promise((resolve, reject) => {
-    axios({
-      method: method,
-      url: url,
-      data: data,
-      responseType: "blob",
-    })
-      .then(function (res) {
-        console.log("excel download data");
-        const blob = new Blob([res.data], {
-          type: res.headers["content-type"],
-        });
-        const filename =
-          res.headers["content-disposition"]?.match(/filename=(.*)/)?.[1];
-        const downloadElement = document.createElement("a");
-        const href = window.URL.createObjectURL(blob);
-        downloadElement.href = href;
-        downloadElement.download = filename || "download";
-        document.body.appendChild(downloadElement);
-        downloadElement.click();
-        document.body.removeChild(downloadElement);
-        window.URL.revokeObjectURL(href);
-        resolve({ success: true });
-      })
-      .catch(function (error) {
-        console.log(error);
-        reject({ success: false });
-      });
+) {
+  const cfg: any = {
+    method,
+    url,
+    responseType: "blob",
+  };
+  if (method.toUpperCase() === "GET") cfg.params = data;
+  else cfg.data = data;
+
+  const res = await axios(cfg);
+
+  const blob = new Blob([res.data], {
+    type:
+      res.headers["content-type"] ||
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
+
+  // Axios headers đều là lowercase
+  const cd = res.headers["content-disposition"];
+  let filename = "download.xlsx";
+
+  if (cd) {
+    // Bắt cả 3 dạng: filename*=UTF-8''..., filename="...", filename=...
+    const m =
+      /filename\*\s*=\s*UTF-8''([^;]+)|filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(
+        cd
+      );
+    if (m) {
+      filename = decodeURIComponent((m[1] || m[2] || m[3]).trim());
+    }
+  }
+
+  // Tạo link tải
+  const a = document.createElement("a");
+  const href = URL.createObjectURL(blob);
+  a.href = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(href);
+
+  return { success: true };
 }
 
 export function showWarning(message: string, title?: string) {

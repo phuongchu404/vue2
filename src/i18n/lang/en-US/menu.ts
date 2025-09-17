@@ -11,6 +11,7 @@ const menu: Menu = {
   identity: "Identity Record Management",
   fingerprint: "Fingerprint Record Management",
   report: "Reports & Statistics",
+  department: "Department Management",
 };
 
 export default menu;

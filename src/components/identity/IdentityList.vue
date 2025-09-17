@@ -68,7 +68,11 @@
           >
             {{ t("common.add") }}
           </el-button>
-          <el-button type="success" @click="handleExport" :icon="Download">
+          <el-button
+            type="success"
+            @click="exportSelectedToExcel"
+            :icon="Download"
+          >
             {{ t("common.export") }}
           </el-button>
         </div>
@@ -294,8 +298,12 @@ import { useIdentityStore } from "@/stores/identity";
 import type { Identity, PageQuery } from "@/types/identity";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useBaseMixin } from "@/components/BaseMixin";
+import * as XLSX from "xlsx";
+import { headerMap, columnWidths } from "@/excel/identity";
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 
 const router = useRouter();
 const identityStore = useIdentityStore();
@@ -316,6 +324,7 @@ const page = ref(1);
 const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedRecord = ref<Identity | null>(null);
+const exporting = ref(false);
 
 const photoTypes = {
   front: "Mặt trước",
@@ -376,6 +385,83 @@ const search = async (extra?: Partial<PageQuery>) => {
     loading.value = false;
   }
 };
+function toExportRow(item: any) {
+  const ant = item.anthropometry || {};
+  return {
+    detaineeCode: item.detaineeCode ?? "",
+    detaineeName: item.detaineeName ?? "",
+    createdPlace: item.createdPlace ?? "",
+    reasonNote: item.reasonNote ?? "",
+    arrestDate: item.arrestDate
+      ? new Date(item.arrestDate).toLocaleDateString()
+      : "",
+    arrestUnit: item.arrestUnit ?? "",
+    fpClassification: item.fpClassification ?? "",
+    dp: item.dp ?? "",
+    tw: item.tw ?? "",
+    akFileNo: item.akFileNo ?? "",
+    notes: item.notes ?? "",
+
+    // anthropometry flatten
+    "anthropometry.faceShape": ant.faceShape ?? "",
+    "anthropometry.heightCm": ant.heightCm ?? "",
+    "anthropometry.noseBridge": ant.noseBridge ?? "",
+    "anthropometry.distinctiveMarks": ant.distinctiveMarks ?? "",
+    "anthropometry.earLowerFold": ant.earLowerFold ?? "",
+    "anthropometry.earLobe": ant.earLobe ?? "",
+  };
+}
+
+const exportSelectedToExcel = async () => {
+  // if (selectedRows.value.length === 0) {
+  //   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
+  //   return;
+  // }
+
+  exporting.value = true;
+  try {
+    const keys = Object.keys(headerMap);
+    const rows = identities.value.map((it: any) => toExportRow(it));
+
+    const chunkSize = 50_000;
+    const wb = XLSX.utils.book_new();
+
+    for (
+      let start = 0, part = 1;
+      start < rows.length;
+      start += chunkSize, part++
+    ) {
+      const chunk = rows.slice(start, start + chunkSize);
+
+      // matrix dữ liệu theo thứ tự keys
+      const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
+
+      // tạo sheet: thêm header tiếng Việt ở dòng đầu
+      const ws = XLSX.utils.aoa_to_sheet([
+        keys.map((k) => headerMap[k]),
+        ...dataMatrix,
+      ]);
+
+      (ws as any)["!cols"] = columnWidths;
+
+      XLSX.utils.book_append_sheet(wb, ws, `Danh bản (${part})`);
+    }
+
+    // tên file
+    const today = new Date();
+    const filename = `danh-ban-${today.getFullYear()}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+
+    await XLSX.writeFile(wb, filename);
+    ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
+  } catch (error) {
+    console.error("Export error:", error);
+    ElMessage.error("Lỗi khi xuất Excel!");
+  } finally {
+    exporting.value = false;
+  }
+};
 const onSearch = () => {
   page.value = 1;
   search({ pageNo: 1 });
@@ -417,10 +503,6 @@ const handleDelete = async (record: any) => {
   } catch {
     ElMessage.info("Đã hủy thao tác xóa");
   }
-};
-
-const handleExport = () => {
-  ElMessage.info("Chức năng xuất Excel đang được phát triển!");
 };
 
 const handleDetailClose = () => {

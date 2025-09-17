@@ -176,6 +176,28 @@ export const useIdentityStore = defineStore("identity", {
       }
     },
 
+    async count() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<number> = await IdentityService.count();
+        if (!res.success) {
+          throw new Error(res.message || "Count identity records failed");
+        }
+        this.total = res.data || 0;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Count identity records failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     resetAndBackToList() {
       this.identities = undefined;
       this.total = 0;

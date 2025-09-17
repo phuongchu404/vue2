@@ -11,6 +11,7 @@ const menu: Menu = {
   identity: "Quản lý danh bản",
   fingerprint: "Quản lý chỉ bản",
   report: "Báo cáo và thống kê",
+  department: "Quản lý phòng ban",
 };
 
 export default menu;

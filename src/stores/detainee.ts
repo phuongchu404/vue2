@@ -7,6 +7,7 @@ import type {
   Detainee,
   PageQuery,
   CreateDetaineeRequest,
+  ExportExcelQuery,
   UpdateDetaineeRequest,
 } from "@/types/detainee";
 import type { ServiceResult, PagingResult } from "@/types/common";
@@ -190,6 +191,67 @@ export const useDetaineeStore = defineStore("detainee", {
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Fetch prison failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async exportExcel(query: ExportExcelQuery) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const params: ExportExcelQuery = {
+          ...query,
+        };
+
+        // Call API
+        await DetaineeService.exportExcel(params);
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Export Excel failed";
+        this.error = msg;
+        ElMessage.error(msg);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getTop3Recent() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<Detainee[]> =
+          await DetaineeService.getTop3Recent();
+        if (!res.success) {
+          throw new Error(res.message || "Fetch detainees failed");
+        }
+        this.detainees = res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Fetch detainees failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async count() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<number> = await DetaineeService.count();
+        if (!res.success) {
+          throw new Error(res.message || "Count detainees failed");
+        }
+        this.total = res.data || 0;
+        return res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Count detainees failed";
         this.error = msg;
         ElMessage.error(msg);
         throw e;

@@ -295,9 +295,13 @@ import {
 } from "@element-plus/icons-vue";
 import { usePrisonStore } from "@/stores/prison";
 import { useRouter } from "vue-router";
-import type { PageQuery, Prison } from "@/types/prison";
-
+import type { PageQuery, Prison, ExportExcelQuery } from "@/types/prison";
+import * as XLSX from "xlsx";
+import { headerMap, columnWidths } from "@/excel/prison";
+import { useBaseMixin } from "@/components/BaseMixin";
 import { useI18n } from "vue-i18n";
+
+const { isButtonEnabled } = useBaseMixin();
 
 const { t } = useI18n();
 
@@ -305,7 +309,6 @@ const prisonStore = usePrisonStore();
 const router = useRouter();
 
 // Reactive data
-const loading = ref(false);
 const prisons = ref<Prison[]>([]);
 const searchForm = reactive<{
   code?: string;
@@ -320,6 +323,7 @@ const page = ref(1);
 const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedPrison = ref<Prison | null>(null);
+const exporting = ref(false);
 const getProgressColor = (ratio: any) => {
   if (ratio < 0.7) return "#67C23A";
   if (ratio < 0.9) return "#E6A23C";
@@ -339,8 +343,18 @@ const handleDetailClose = () => {
   selectedPrison.value = null;
 };
 
-const handleExport = () => {
-  ElMessage.info(t("common.exportUpdating"));
+const handleExport = async () => {
+  try {
+    await prisonStore.exportExcel({
+      code: searchForm.code?.trim() ?? null,
+      name: searchForm.name?.trim() ?? null,
+      isActive: searchForm.isActive ?? undefined,
+    } as ExportExcelQuery);
+  } catch (error) {
+    console.error("Export error:", error);
+    ElMessage.error("Lỗi khi xuất Excel!");
+  } finally {
+  }
 };
 const handleView = (prison: any) => {
   selectedPrison.value = prison;
@@ -349,8 +363,6 @@ const handleView = (prison: any) => {
 
 const search = async (extra?: Partial<PageQuery>) => {
   try {
-    loading.value = true;
-
     const request = {
       pageNo: page.value,
       pageSize: size.value,
@@ -366,9 +378,96 @@ const search = async (extra?: Partial<PageQuery>) => {
     // console.error("Error fetching prison list:", error);
     ElMessage.error(t("common.dataFail"));
   } finally {
-    loading.value = false;
   }
 };
+function toExportRow(p: any) {
+  const fmtDateTime = (v: any) => (v ? String(v) : ""); // BE trả chuỗi sẵn, giữ nguyên
+  const statusText = p.isActive ? "Đang hoạt động" : "Ngừng hoạt động";
+
+  return {
+    code: p.code ?? "",
+    name: p.name ?? "",
+    address: p.address ?? "",
+    wardFullName: p.wardFullName ?? "",
+    provinceFullName: p.provinceFullName ?? "",
+    phone: p.phone ?? "",
+    email: p.email ?? "",
+    director: p.director ?? "",
+    deputyDirector: p.deputyDirector ?? "",
+    establishedDate: p.establishedDate ? String(p.establishedDate) : "",
+    capacity: p.capacity ?? "",
+    currentPopulation: p.currentPopulation ?? "",
+    isActive: statusText,
+    createdAt: fmtDateTime(p.createdAt),
+    updatedAt: fmtDateTime(p.updatedAt),
+  };
+}
+// const exportSelectedToExcel = async () => {
+//   exporting.value = true;
+//   try {
+//     if (!prisons.value?.length) return;
+
+//     const keys = Object.keys(headerMap);
+//     const headerVN = keys.map((k) => headerMap[k]);
+
+//     const chunkSize = 50_000;
+//     const wb = new ExcelJS.Workbook();
+
+//     for (
+//       let start = 0, part = 1;
+//       start < prisons.value.length;
+//       start += chunkSize, part++
+//     ) {
+//       const chunk = prisons.value
+//         .slice(start, start + chunkSize)
+//         .map(toExportRow);
+
+//       const ws = wb.addWorksheet(`Trại giam (${part})`);
+
+//       // ==== Title ở dòng 1 ====
+//       ws.mergeCells("A1:H1"); // merge từ A1 đến H1
+//       const titleCell = ws.getCell("A1");
+//       titleCell.value = "Danh sách trại giam";
+//       titleCell.font = { bold: true, size: 16 };
+//       titleCell.alignment = { vertical: "middle", horizontal: "center" };
+//       ws.getRow(1).height = 24;
+
+//       // ==== Header ở dòng 2 ====
+//       const headerRow = ws.addRow(headerVN);
+//       headerRow.font = { bold: true };
+//       headerRow.alignment = { vertical: "middle", horizontal: "center" };
+//       ws.getRow(2).height = 20;
+
+//       // ==== Data từ dòng 3 trở đi ====
+//       chunk.forEach((rowObj: any) => {
+//         ws.addRow(keys.map((k) => rowObj[k]));
+//       });
+
+//       // ==== Auto width ====
+//       ws.columns.forEach((col: any, idx: any) => {
+//         let max = headerVN[idx].length;
+//         col.eachCell({ includeEmpty: true }, (cell: any) => {
+//           const len = String(cell.value ?? "").length;
+//           if (len > max) max = len;
+//         });
+//         col.width = max + 2;
+//       });
+//     }
+
+//     const buf = await wb.xlsx.writeBuffer();
+//     const today = new Date();
+//     const filename = `trai-giam-${today.getFullYear()}-${String(
+//       today.getMonth() + 1
+//     ).padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+
+//     saveAs(new Blob([buf]), filename);
+//   } catch (error) {
+//     console.error("Export error:", error);
+//     ElMessage.error("Lỗi khi xuất Excel!");
+//   } finally {
+//     exporting.value = false;
+//   }
+// };
 
 onMounted(async () => {
   await nextTick();

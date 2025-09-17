@@ -19,7 +19,7 @@ import IdentityForm from "@/components/identity/IdentityForm.vue";
 import Fingerprint from "@/components/fingerprint/Fingerprint.vue";
 //  import FingerprintForm from '@/components/fingerprint/FingerprintForm.vue'
 import Reports from "@/components/report/ReportsStatistics.vue";
-import Finger from "@/components/other/finger.vue";
+import DepartmentList from "@/components/department/DepartmentList.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -147,6 +147,12 @@ export const routes: Array<RouteRecordRaw> = [
         name: "Reports",
         component: Reports,
         meta: { title: "reports" },
+      },
+      {
+        path: "/department",
+        name: "DepartmentList",
+        component: DepartmentList,
+        meta: { title: "departmentList" },
       },
     ],
   },

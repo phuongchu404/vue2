@@ -26,4 +26,8 @@ export const IdentityService = {
     const res = Utils.doGet(`/api/admin/identity-record/${id}`);
     return res;
   },
+  async count() {
+    const res = Utils.doGet(`/api/admin/identity-record/count`);
+    return res;
+  },
 };

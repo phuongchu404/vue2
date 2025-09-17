@@ -1,3 +1,4 @@
+import channel from "../icon/channel.png";
 export default {
-    channel: require('../icon/channel.png'),
+  channel,
 };

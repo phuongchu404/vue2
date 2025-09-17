@@ -7,21 +7,21 @@
         class="demo-form-inline"
         label-width="170px"
       >
-        <el-form-item :label="$t('user.userName')">
+        <el-form-item :label="t('user.userName')">
           <el-input
             v-model="queryForm.userName"
-            :placeholder="$t('user.userName')"
+            :placeholder="t('user.userName')"
           ></el-input>
         </el-form-item>
         <el-form-item>
           <el-button
             type="primary"
             @click="onSearch"
-            :disabled="isButtonEnabled('system:user:select')"
+            :disabled="isButtonEnabled('system:user:search')"
             size="mini"
             :icon="Search"
           >
-            {{ $t("option.query") }}
+            {{ t("option.query") }}
           </el-button>
         </el-form-item>
         <el-form-item>
@@ -30,7 +30,7 @@
             @click="handleAdd"
             :disabled="isButtonEnabled('system:user:insert')"
           >
-            <el-icon><Plus /></el-icon><span>{{ $t("option.add") }}</span>
+            <el-icon><Plus /></el-icon><span>{{ t("option.add") }}</span>
           </el-button>
         </el-form-item>
       </el-form>
@@ -40,47 +40,47 @@
       <el-table-column
         type="index"
         prop="id"
-        :label="$t('common.index')"
+        :label="t('common.index')"
         width="85"
       ></el-table-column>
       <el-table-column
         prop="userName"
-        :label="$t('user.userName')"
+        :label="t('user.userName')"
         min-width="80"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="roles"
-        :label="$t('user.roles')"
+        :label="t('user.roles')"
         :formatter="rolesFormatter"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="realName"
-        :label="$t('user.realName')"
+        :label="t('user.realName')"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="createTime"
-        :label="$t('common.createTime')"
+        :label="t('common.createTime')"
         width="180"
         :formatter="defaultTimeFormatter"
         show-overflow-tooltip
       ></el-table-column>
       <el-table-column
         prop="updateTime"
-        :label="$t('common.updateTime')"
+        :label="t('common.updateTime')"
         width="180"
         :formatter="defaultTimeFormatter"
         show-overflow-tooltip
       ></el-table-column>
-      <el-table-column fixed="right" :label="$t('common.option')" width="500">
+      <el-table-column fixed="right" :label="t('common.option')" width="500">
         <template #default="scope">
           <el-button
             type="primary"
             :disabled="isButtonEnabled('system:user:update')"
             @click="handleEdit(scope.row)"
-            >{{ $t("option.update") }}
+            >{{ t("option.update") }}
           </el-button>
           <el-button
             type="success"
@@ -90,7 +90,7 @@
               scope.row.removable != '1'
             "
             @click="handleSelectRoles(scope.row)"
-            >{{ $t("user.allocateRole") }}
+            >{{ t("user.allocateRole") }}
           </el-button>
           <el-button
             type="warning"
@@ -99,7 +99,7 @@
               scope.row.userName === userNameLogin
             "
             @click="resetPassword(scope.row)"
-            >{{ $t("user.resetPassword") }}
+            >{{ t("user.resetPassword") }}
           </el-button>
           <el-button
             type="danger"
@@ -109,7 +109,7 @@
               scope.row.removable != '1'
             "
             @click="handleDelete(scope.row.id)"
-            >{{ $t("option.delete") }}
+            >{{ t("option.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -126,20 +126,20 @@
     />
 
     <el-dialog
-      :title="ui.addRecord ? $t('user.add') : $t('user.update')"
+      :title="ui.addRecord ? t('user.add') : t('user.update')"
       v-model="ui.dialogVisible"
       width="40%"
       class="dialog"
     >
       <el-form :model="form" :rules="rules" label-width="130px" ref="formRef">
-        <el-form-item :label="$t('user.userName')" prop="userName">
+        <el-form-item :label="t('user.userName')" prop="userName">
           <el-input
             v-model="form.userName"
             autofocus
             :readonly="!ui.addRecord"
           ></el-input>
         </el-form-item>
-        <el-form-item :label="$t('user.realName')" prop="realName">
+        <el-form-item :label="t('user.realName')" prop="realName">
           <el-input v-model="form.realName"></el-input>
         </el-form-item>
         <el-form-item
@@ -158,30 +158,30 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('user.email')" prop="mail">
+        <el-form-item :label="t('user.email')" prop="mail">
           <el-input v-model="form.mail"></el-input>
         </el-form-item>
-        <el-form-item :label="$t('user.phoneNumber')" prop="phoneNumber">
+        <el-form-item :label="t('user.phoneNumber')" prop="phoneNumber">
           <el-input v-model="form.phoneNumber"></el-input>
         </el-form-item>
-        <el-form-item :label="$t('user.description')">
+        <el-form-item :label="t('user.description')">
           <el-input type="textarea" v-model="form.description"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="ui.dialogVisible = false">{{
-            $t("common.cancel")
+            t("common.cancel")
           }}</el-button>
           <el-button type="primary" @click="handleSaveOrUpdate()">{{
-            $t("common.ok")
+            t("common.ok")
           }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <el-dialog
-      :title="$t('ResetPassword')"
+      :title="t('ResetPassword')"
       v-model="ui.resetPassword"
       width="40%"
       class="dialog"
@@ -192,7 +192,7 @@
         label-width="130px"
         ref="passwordFormRef"
       >
-        <el-form-item :label="$t('user.password')" prop="password">
+        <el-form-item :label="t('user.password')" prop="password">
           <el-input
             v-model="password.password"
             type="password"
@@ -203,17 +203,17 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="ui.resetPassword = false">{{
-            $t("common.cancel")
+            t("common.cancel")
           }}</el-button>
           <el-button type="primary" @click="handleResetPassword()">{{
-            $t("common.ok")
+            t("common.ok")
           }}</el-button>
         </div>
       </template>
     </el-dialog>
 
     <el-dialog
-      :title="$t('user.selectRole')"
+      :title="t('user.selectRole')"
       width="35%"
       v-model="ui.rolesDialogVisible"
       @open="loadRolesDialogData"
@@ -232,10 +232,10 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="ui.rolesDialogVisible = false">{{
-            $t("common.cancel")
+            t("common.cancel")
           }}</el-button>
           <el-button type="primary" @click="handleRolesUpdate()">{{
-            $t("common.ok")
+            t("common.ok")
           }}</el-button>
         </div>
       </template>
@@ -254,6 +254,7 @@ import {
   type FormRules,
 } from "element-plus";
 import * as Utils from "../../utils";
+import { useBaseMixin } from "@/components/BaseMixin";
 import {
   Search,
   Refresh,
@@ -281,6 +282,7 @@ import { usePrisonStore } from "@/stores/prison";
 const { messageInfoPassword } = useMessage();
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const roleStore = useRoleStore();
@@ -338,13 +340,13 @@ const rules: FormRules = {
   realName: [
     { required: true, message: t("user.inputRealName"), trigger: "blur" },
   ],
-  detentionCenterId: [
-    {
-      required: true,
-      message: t("user.inputDetentionCenter"),
-      trigger: "blur",
-    },
-  ],
+  // detentionCenterId: [
+  //   {
+  //     required: true,
+  //     message: t("user.inputDetentionCenter"),
+  //     trigger: "blur",
+  //   },
+  // ],
 };
 
 const passwordRules: FormRules = {
@@ -369,11 +371,6 @@ const resetPassword = async (rowData: any) => {
   ui.resetPassword = true;
   password.password = "";
   password.id = rowData.id;
-};
-
-const isButtonEnabled = (buttonName: string) => {
-  const state = appStore.buttons.has(buttonName);
-  return !state;
 };
 
 const handleAdd = async () => {

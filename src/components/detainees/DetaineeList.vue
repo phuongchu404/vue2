@@ -1,11 +1,5 @@
 <template>
   <div class="detainee-list">
-    <!-- <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3">Quản lý phạm nhân</span>
-      </template>
-    </el-page-header> -->
-
     <!-- Search Section -->
     <div class="search-section">
       <el-form :model="searchForm" label-width="130px" label-position="left">
@@ -56,9 +50,13 @@
         </el-row>
 
         <el-form-item>
-          <el-button type="primary" @click="onSearch" :icon="Search">{{
-            $t("common.Search")
-          }}</el-button>
+          <el-button
+            :disabled="isButtonEnabled('detainee:search')"
+            type="primary"
+            @click="onSearch"
+            :icon="Search"
+            >{{ $t("common.Search") }}</el-button
+          >
           <el-button @click="onReset" :icon="Refresh">{{
             $t("common.reset")
           }}</el-button>
@@ -74,10 +72,17 @@
             type="primary"
             @click="$router.push('/detainees/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('detainee:insert')"
           >
             {{ $t("common.add") }}
           </el-button>
-          <el-button type="success" @click="handleExport" :icon="Download">
+          <el-button
+            type="success"
+            @click="handleExport"
+            :icon="Download"
+            v-loading.fullscreen.lock="detaineeStore.getLoading"
+            :disabled="isButtonEnabled('detainee:search')"
+          >
             {{ $t("common.export") }}
           </el-button>
         </div>
@@ -95,7 +100,14 @@
       v-loading="loading"
       stripe
       border
+      :header-cell-style="{
+        background: '#f5f7fa',
+        color: '#606266',
+        fontWeight: 'bold',
+      }"
+      @selection-change="handleSelectionChange"
     >
+      <!-- <el-table-column type="selection" width="55" /> -->
       <el-table-column
         align="center"
         prop="detaineeCode"
@@ -170,17 +182,24 @@
       </el-table-column>
       <el-table-column :label="$t('common.actions')" width="200" fixed="right">
         <template #default="scope">
-          <el-button @click="handleView(scope.row)" :icon="View"> </el-button>
+          <el-button
+            :disabled="isButtonEnabled('detainee:update')"
+            @click="handleView(scope.row)"
+            :icon="View"
+          >
+          </el-button>
           <el-button
             type="primary"
             @click="handleEdit(scope.row.id)"
             :icon="Edit"
+            :disabled="isButtonEnabled('detainee:update')"
           >
           </el-button>
           <el-button
             type="danger"
             @click="onDelete(scope.row.id)"
             :icon="Delete"
+            :disabled="isButtonEnabled('detainee:delete')"
           >
           </el-button>
         </template>
@@ -358,12 +377,16 @@ import {
   Delete,
 } from "@element-plus/icons-vue";
 import { useDetaineeStore } from "@/stores/detainee";
-import type { Detainee, PageQuery } from "@/types/detainee";
+import type { Detainee, PageQuery, ExportExcelQuery } from "@/types/detainee";
 import { DetaineeStatus, Gender, Status, genderOptions } from "@/constants";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useBaseMixin } from "@/components/BaseMixin";
+import * as XLSX from "xlsx";
+import { headerMap, columnWidths } from "@/excel/detainee";
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 const router = useRouter();
 const detaineeStore = useDetaineeStore();
 
@@ -385,6 +408,8 @@ const page = ref(1);
 const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedDetainee = ref<Detainee | null>(null);
+const selectedRows = ref<Detainee[]>([]);
+const exporting = ref(false);
 
 // Computed
 
@@ -396,6 +421,9 @@ const formatDate = (dateStr: any) => {
     month: "2-digit",
     year: "numeric",
   });
+};
+const handleSelectionChange = (selection: any) => {
+  selectedRows.value = selection;
 };
 
 const getGenderLabel = (value: any) => {
@@ -438,8 +466,19 @@ const handleDetailClose = () => {
   selectedDetainee.value = null;
 };
 
-const handleExport = () => {
-  ElMessage.info(t("common.exportUpdating"));
+const handleExport = async () => {
+  try {
+    await detaineeStore.exportExcel({
+      detaineeCode: searchForm.detaineeCode ?? null,
+      fullName: searchForm.fullName ?? null,
+      idNumber: searchForm.idNumber ?? null,
+      status: searchForm.status ?? null,
+    } as ExportExcelQuery);
+  } catch (error) {
+    console.error("Export error:", error);
+    ElMessage.error("Lỗi khi xuất Excel!");
+  } finally {
+  }
 };
 const handleView = (staff: any) => {
   selectedDetainee.value = staff;
@@ -468,6 +507,76 @@ const search = async (extra?: Partial<PageQuery>) => {
     loading.value = false;
   }
 };
+function toExportRow(item: any) {
+  const genderText =
+    item.gender === "MALE"
+      ? "Nam"
+      : item.gender === "FEMALE"
+      ? "Nữ"
+      : "Không xác định";
+
+  return {
+    detaineeCode: item.detaineeCode,
+    fullName: item.fullName,
+    gender: genderText,
+    dateOfBirth: formatDate(item.dateOfBirth),
+    idNumber: item.idNumber,
+    detentionDate: formatDate(item.detentionDate),
+    cellNumber: item.cellNumber,
+    charges: item.charges,
+    status: getStatusText(item.status),
+  };
+}
+const exportSelectedToExcel = async () => {
+  // if (selectedRows.value.length === 0) {
+  //   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
+  //   return;
+  // }
+
+  exporting.value = true;
+  try {
+    const keys = Object.keys(headerMap);
+    const rows = detainees.value.map((it: any) => toExportRow(it));
+
+    const chunkSize = 50_000;
+    const wb = XLSX.utils.book_new();
+
+    for (
+      let start = 0, part = 1;
+      start < rows.length;
+      start += chunkSize, part++
+    ) {
+      const chunk = rows.slice(start, start + chunkSize);
+
+      // matrix dữ liệu theo thứ tự keys
+      const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
+
+      // tạo sheet: thêm header tiếng Việt ở dòng đầu
+      const ws = XLSX.utils.aoa_to_sheet([
+        keys.map((k) => headerMap[k]),
+        ...dataMatrix,
+      ]);
+
+      (ws as any)["!cols"] = columnWidths;
+
+      XLSX.utils.book_append_sheet(wb, ws, `Phạm nhân (${part})`);
+    }
+
+    // tên file
+    const today = new Date();
+    const filename = `pham-nhan-${today.getFullYear()}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+
+    await XLSX.writeFile(wb, filename);
+    ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
+  } catch (error) {
+    console.error("Export error:", error);
+    ElMessage.error("Lỗi khi xuất Excel!");
+  } finally {
+    exporting.value = false;
+  }
+};
 
 const getStatusType = (status: any) => {
   const typeMap = {
@@ -485,10 +594,12 @@ const getStatusText = (status?: string) => {
 
 watch(page, (p) => {
   detaineeStore.pageNo = p;
+  console.log("page", p);
   search();
 });
 watch(size, (s) => {
   detaineeStore.pageSize = s;
+  console.log("size", s);
   search();
 });
 
@@ -507,10 +618,12 @@ const onReset = () => {
 
 const onPageChange = (p: number) => {
   page.value = p;
+  console.log("pagechange", p);
   search();
 };
 const onSizeChange = (s: number) => {
   size.value = s;
+  console.log("sizechange", s);
   search();
 };
 

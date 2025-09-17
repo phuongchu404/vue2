@@ -4,15 +4,59 @@
     <div class="statistics-overview">
       <h3>📈 Thống Kê Tổng Quan</h3>
       <div class="stats-grid">
-        <div class="stat-card" v-for="stat in statisticsCards" :key="stat.key">
-          <div class="stat-icon">
-            <el-icon :size="40"><component :is="stat.icon" /></el-icon>
-          </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
           <div class="stat-content">
-            <h4>{{ stat.title }}</h4>
-            <div class="stat-number">{{ stat.value }}</div>
-            <div class="stat-change" :class="getChangeClass(stat.change)">
-              {{ formatChange(stat.change) }} so với tháng trước
+            <h4>Tổng Số Phạm Nhân</h4>
+            <div class="stat-number">{{ statistics.totalDetainees }}</div>
+            <div
+              class="stat-change"
+              :class="getChangeClass(statistics.detaineeChange)"
+            >
+              {{ formatChange(statistics.detaineeChange) }} so với tháng trước
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👮</div>
+          <div class="stat-content">
+            <h4>Tổng Số Cán Bộ</h4>
+            <div class="stat-number">{{ statistics.totalStaff }}</div>
+            <div
+              class="stat-change"
+              :class="getChangeClass(statistics.staffChange)"
+            >
+              {{ formatChange(statistics.staffChange) }} so với tháng trước
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <h4>Danh Bản Đã Lập</h4>
+            <div class="stat-number">{{ statistics.totalIdentity }}</div>
+            <div
+              class="stat-change"
+              :class="getChangeClass(statistics.identityChange)"
+            >
+              {{ formatChange(statistics.identityChange) }} so với tháng trước
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👆</div>
+          <div class="stat-content">
+            <h4>Chỉ Bản Đã Lập</h4>
+            <div class="stat-number">{{ statistics.totalFingerprint }}</div>
+            <div
+              class="stat-change"
+              :class="getChangeClass(statistics.fingerprintChange)"
+            >
+              {{ formatChange(statistics.fingerprintChange) }} so với tháng
+              trước
             </div>
           </div>
         </div>
@@ -25,93 +69,83 @@
       <div class="filter-grid">
         <div class="form-group">
           <label>Loại báo cáo</label>
-          <el-select
-            v-model="reportForm.type"
-            placeholder="Chọn loại báo cáo"
-            @change="handleReportTypeChange"
-            clearable
-          >
-            <el-option
-              v-for="option in reportTypeOptions"
-              :key="option.value"
-              :label="option.label"
-              :value="option.value"
-            />
-          </el-select>
+          <select v-model="reportForm.type" @change="handleReportTypeChange">
+            <option value="">Chọn loại báo cáo</option>
+            <option value="detainees-by-status">
+              Phạm nhân theo trạng thái
+            </option>
+            <option value="detainees-by-month">Phạm nhân theo tháng</option>
+            <option value="detainees-by-crime">Phạm nhân theo tội danh</option>
+            <option value="staff-by-department">Cán bộ theo phòng ban</option>
+            <option value="staff-by-rank">Cán bộ theo cấp bậc</option>
+            <option value="identity-records">Danh bản đã lập</option>
+            <option value="fingerprint-cards">Chỉ bản đã lập</option>
+            <option value="monthly-summary">Tổng hợp theo tháng</option>
+          </select>
         </div>
 
         <div class="form-group">
           <label>Từ ngày</label>
-          <el-date-picker
-            v-model="reportForm.fromDate"
+          <input
             type="date"
-            placeholder="Chọn ngày bắt đầu"
+            v-model="reportForm.fromDate"
             :disabled="!reportForm.type"
-            format="DD/MM/YYYY"
-            value-format="YYYY-MM-DD"
           />
         </div>
 
         <div class="form-group">
           <label>Đến ngày</label>
-          <el-date-picker
-            v-model="reportForm.toDate"
+          <input
             type="date"
-            placeholder="Chọn ngày kết thúc"
+            v-model="reportForm.toDate"
             :disabled="!reportForm.type"
-            format="DD/MM/YYYY"
-            value-format="YYYY-MM-DD"
           />
         </div>
 
         <div class="form-group">
           <label>Định dạng xuất</label>
-          <el-select v-model="reportForm.format" placeholder="Chọn định dạng">
-            <el-option label="Bảng" value="table" />
-            <el-option label="Biểu đồ" value="chart" />
-            <el-option label="Cả hai" value="both" />
-          </el-select>
+          <select v-model="reportForm.format">
+            <option value="table">Bảng</option>
+            <option value="chart">Biểu đồ</option>
+            <option value="both">Cả hai</option>
+          </select>
         </div>
       </div>
 
       <div class="filter-actions">
-        <el-button
+        <button
           class="btn btn-primary"
-          type="primary"
           @click="generateReport"
-          :disabled="!reportForm.type"
-          :loading="loading"
+          :disabled="!reportForm.type || loading"
         >
           <span v-if="loading">⏳</span>
           <span v-else>📊</span>
           {{ loading ? "Đang tạo..." : "Tạo Báo Cáo" }}
-        </el-button>
+        </button>
 
-        <el-button
+        <button
           class="btn btn-success"
-          type="success"
           @click="exportReport"
           :disabled="!currentReport || loading"
         >
           📤 Xuất Excel
-        </el-button>
+        </button>
 
-        <el-button
+        <button
           class="btn btn-secondary"
           @click="exportToPDF"
           :disabled="!currentReport || loading"
         >
           📄 Xuất PDF
-        </el-button>
+        </button>
 
-        <el-button
+        <button
           class="btn btn-info"
-          type="info"
           @click="printReport"
           :disabled="!currentReport"
         >
           🖨️ In Báo Cáo
-        </el-button>
+        </button>
       </div>
     </div>
 
@@ -135,37 +169,29 @@
 
       <!-- Bảng dữ liệu -->
       <div v-if="showTable" class="table-container">
-        <el-table
-          :data="currentReport.data"
-          stripe
-          border
-          class="data-table"
-          :header-cell-style="{ background: '#667eea', color: 'white' }"
-        >
-          <el-table-column
-            v-for="column in currentReport.columns"
-            :key="column.key"
-            :prop="column.key"
-            :label="column.title"
-            :min-width="120"
-          >
-            <template #default="{ row }">
-              {{ formatCellValue(row[column.key], column.type) }}
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <!-- Tổng kết -->
-        <div v-if="currentReport.summary" class="table-summary">
-          <div class="summary-row">
-            <strong>Tổng kết:</strong>
-            <span v-for="column in currentReport.columns" :key="column.key">
-              <span v-if="currentReport.summary[column.key]">
-                {{ column.title }}: {{ currentReport.summary[column.key] }}
-              </span>
-            </span>
-          </div>
-        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th v-for="column in currentReport.columns" :key="column.key">
+                {{ column.title }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, index) in currentReport.data" :key="index">
+              <td v-for="column in currentReport.columns" :key="column.key">
+                {{ formatCellValue(row[column.key], column.type) }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot v-if="currentReport.summary">
+            <tr class="summary-row">
+              <td v-for="column in currentReport.columns" :key="column.key">
+                {{ currentReport.summary[column.key] || "" }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
 
       <!-- Tóm tắt báo cáo -->
@@ -203,21 +229,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Thông báo -->
+    <div
+      v-if="notification.show"
+      :class="['alert', `alert-${notification.type}`]"
+    >
+      {{ notification.message }}
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from "vue";
-import { ElMessage } from "element-plus";
-import {
-  TrendCharts,
-  User,
-  Avatar,
-  Document,
-  Pointer,
-} from "@element-plus/icons-vue";
-
-// Stores (assuming these are already set up)
 import { useReportStore } from "@/stores/report";
 import { useDetaineeStore } from "@/stores";
 import { useStaffStore } from "@/stores";
@@ -255,49 +279,11 @@ const statistics = reactive({
   fingerprintChange: 0,
 });
 
-// Report type options
-const reportTypeOptions = [
-  { value: "detainees-by-status", label: "Phạm nhân theo trạng thái" },
-  { value: "detainees-by-month", label: "Phạm nhân theo tháng" },
-  { value: "detainees-by-crime", label: "Phạm nhân theo tội danh" },
-  { value: "staff-by-department", label: "Cán bộ theo phòng ban" },
-  { value: "staff-by-rank", label: "Cán bộ theo cấp bậc" },
-  { value: "identity-records", label: "Danh bản đã lập" },
-  { value: "fingerprint-cards", label: "Chỉ bản đã lập" },
-  { value: "monthly-summary", label: "Tổng hợp theo tháng" },
-];
-
-// Statistics cards computed
-const statisticsCards = computed(() => [
-  {
-    key: "detainees",
-    title: "Tổng Số Phạm Nhân",
-    value: statistics.totalDetainees,
-    change: statistics.detaineeChange,
-    icon: User,
-  },
-  {
-    key: "staff",
-    title: "Tổng Số Cán Bộ",
-    value: statistics.totalStaff,
-    change: statistics.staffChange,
-    icon: Avatar,
-  },
-  {
-    key: "identity",
-    title: "Danh Bản Đã Lập",
-    value: statistics.totalIdentity,
-    change: statistics.identityChange,
-    icon: Document,
-  },
-  {
-    key: "fingerprint",
-    title: "Chỉ Bản Đã Lập",
-    value: statistics.totalFingerprint,
-    change: statistics.fingerprintChange,
-    icon: Pointer,
-  },
-]);
+const notification = reactive({
+  show: false,
+  message: "",
+  type: "success",
+});
 
 // Quick reports configuration
 const quickReports = [
@@ -342,7 +328,7 @@ const loadStatistics = async () => {
     const stats = await reportStore.getOverviewStatistics();
     Object.assign(statistics, stats);
   } catch (error) {
-    ElMessage.error("Lỗi khi tải thống kê!");
+    showNotification("Lỗi khi tải thống kê!", "error");
   }
 };
 
@@ -359,7 +345,7 @@ const generateReport = async () => {
     loading.value = true;
 
     if (!reportForm.type) {
-      ElMessage.error("Vui lòng chọn loại báo cáo!");
+      showNotification("Vui lòng chọn loại báo cáo!", "error");
       return;
     }
 
@@ -380,9 +366,9 @@ const generateReport = async () => {
       renderChart(reportData);
     }
 
-    ElMessage.success("Tạo báo cáo thành công!");
+    showNotification("Tạo báo cáo thành công!", "success");
   } catch (error) {
-    ElMessage.error(error.message || "Lỗi khi tạo báo cáo!");
+    showNotification(error.message || "Lỗi khi tạo báo cáo!", "error");
   } finally {
     loading.value = false;
   }
@@ -396,8 +382,19 @@ const renderChart = async (reportData) => {
     chartInstance.value.destroy();
   }
 
+  // Import Chart.js dynamically (since it's not available in this environment)
+  // In real implementation, you would use Chart.js library
   try {
     const ctx = chartCanvas.value.getContext("2d");
+
+    // This is a placeholder for Chart.js implementation
+    // chartInstance.value = new Chart(ctx, {
+    //   type: reportData.chartData.type,
+    //   data: reportData.chartData.data,
+    //   options: reportData.chartData.options
+    // })
+
+    // For demonstration, draw a simple chart
     drawSimpleChart(ctx, reportData.chartData);
   } catch (error) {
     console.error("Error rendering chart:", error);
@@ -407,8 +404,8 @@ const renderChart = async (reportData) => {
 const drawSimpleChart = (ctx, chartData) => {
   // Simple bar chart implementation
   const canvas = ctx.canvas;
-  const width = (canvas.width = 800);
-  const height = (canvas.height = 400);
+  const width = canvas.width;
+  const height = canvas.height;
 
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "#667eea";
@@ -476,7 +473,7 @@ const runQuickReport = async (quickReport) => {
 
     await generateReport();
   } catch (error) {
-    ElMessage.error("Lỗi khi tạo báo cáo nhanh!");
+    showNotification("Lỗi khi tạo báo cáo nhanh!", "error");
   } finally {
     loading.value = false;
   }
@@ -486,32 +483,37 @@ const exportReport = async () => {
   try {
     if (!currentReport.value) return;
 
+    // In real implementation, this would generate and download Excel file
     const data = {
       title: currentReport.value.title,
       data: currentReport.value.data,
       columns: currentReport.value.columns,
     };
 
+    // Simulate export
     await reportStore.exportToExcel(data);
-    ElMessage.success("Xuất Excel thành công!");
+    showNotification("Xuất Excel thành công!", "success");
   } catch (error) {
-    ElMessage.error("Lỗi khi xuất Excel!");
+    showNotification("Lỗi khi xuất Excel!", "error");
   }
 };
 
 const exportToPDF = async () => {
   try {
     if (!currentReport.value) return;
+
+    // In real implementation, this would generate and download PDF file
     await reportStore.exportToPDF(currentReport.value);
-    ElMessage.success("Xuất PDF thành công!");
+    showNotification("Xuất PDF thành công!", "success");
   } catch (error) {
-    ElMessage.error("Lỗi khi xuất PDF!");
+    showNotification("Lỗi khi xuất PDF!", "error");
   }
 };
 
 const printReport = () => {
   if (!currentReport.value) return;
 
+  // Create print window
   const printWindow = window.open("", "_blank");
   const printContent = generatePrintContent(currentReport.value);
 
@@ -621,6 +623,16 @@ const getChangeClass = (change) => {
   return "stat-neutral";
 };
 
+const showNotification = (message, type = "success") => {
+  notification.message = message;
+  notification.type = type;
+  notification.show = true;
+
+  setTimeout(() => {
+    notification.show = false;
+  }, 3000);
+};
+
 // Lifecycle
 onMounted(() => {
   loadStatistics();
@@ -642,6 +654,28 @@ onMounted(() => {
   padding: 20px;
 }
 
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.header h2 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
 .statistics-overview {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -649,13 +683,6 @@ onMounted(() => {
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.statistics-overview h3 {
-  color: #2c3e50;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  font-weight: 700;
 }
 
 .stats-grid {
@@ -684,7 +711,6 @@ onMounted(() => {
   font-size: 3rem;
   margin-right: 20px;
   opacity: 0.8;
-  color: rgba(255, 255, 255, 0.9);
 }
 
 .stat-content h4 {
@@ -723,13 +749,6 @@ onMounted(() => {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.report-filters h3 {
-  color: #2c3e50;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -748,15 +767,27 @@ onMounted(() => {
   color: #2c3e50;
 }
 
-.form-group :deep(.el-select),
-.form-group :deep(.el-date-editor) {
-  width: 100%;
+.form-group input,
+.form-group select {
+  padding: 12px 15px;
+  border: 2px solid #ecf0f1;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: #fff;
 }
 
-.form-group :deep(.el-input__wrapper) {
-  padding: 12px 15px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+  background: #f8f9fa;
+  color: #6c757d;
 }
 
 .filter-actions {
@@ -767,16 +798,26 @@ onMounted(() => {
 }
 
 .btn {
-  padding: 12px 25px !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  transition: all 0.3s ease !important;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  border: none !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -785,19 +826,18 @@ onMounted(() => {
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%) !important;
-  border: none !important;
+  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+  color: white;
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #95e1d3 0%, #fce38a 100%) !important;
-  color: #2c3e50 !important;
-  border: none !important;
+  background: linear-gradient(135deg, #95e1d3 0%, #fce38a 100%);
+  color: #2c3e50;
 }
 
 .btn-info {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
-  border: none !important;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
 }
 
 .report-results {
@@ -847,33 +887,40 @@ onMounted(() => {
 }
 
 .data-table {
+  width: 100%;
+  border-collapse: collapse;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
-.table-summary {
-  margin-top: 20px;
+.data-table th,
+.data-table td {
   padding: 15px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.data-table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.data-table tr:hover {
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .summary-row {
+  background: rgba(102, 126, 234, 0.1) !important;
   font-weight: bold;
-  color: #2c3e50;
 }
 
 .report-insights {
   margin-top: 40px;
   padding-top: 30px;
   border-top: 2px solid #ecf0f1;
-}
-
-.report-insights h4 {
-  color: #2c3e50;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
 }
 
 .insights-grid {
@@ -913,13 +960,6 @@ onMounted(() => {
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.quick-reports h3 {
-  color: #2c3e50;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  font-weight: 700;
 }
 
 .quick-report-grid {
@@ -962,14 +1002,49 @@ onMounted(() => {
 .quick-report-card p {
   color: #7f8c8d;
   font-size: 0.9rem;
-  margin: 0;
+}
+
+.alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  z-index: 1001;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-success {
+  background: rgba(81, 207, 102, 0.9);
+  color: white;
+  border: 1px solid rgba(81, 207, 102, 0.2);
+}
+
+.alert-error {
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.alert-info {
+  background: rgba(52, 152, 219, 0.9);
+  color: white;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @media (max-width: 768px) {
-  .reports-statistics {
-    padding: 10px;
-  }
-
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -990,6 +1065,10 @@ onMounted(() => {
 
   .filter-actions {
     flex-direction: column;
+  }
+
+  .header h2 {
+    font-size: 2rem;
   }
 
   .quick-report-grid {

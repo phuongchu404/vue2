@@ -12,6 +12,7 @@ import prison from "./en-US/prison";
 import route from "./en-US/route";
 import identity from "./en-US/identity";
 import detainee from "./en-US/detainee";
+import department from "./en-US/department.ts";
 
 export default {
   route,
@@ -28,4 +29,5 @@ export default {
   prison,
   identity,
   detainee,
+  department
 };

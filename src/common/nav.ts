@@ -39,6 +39,7 @@ export const getNavData = (): MenuItem[] => [
   fingerprint,
   prison,
   report,
+  department,
 ];
 
 // export const getPermissionTree = () => {

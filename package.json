@@ -17,6 +17,8 @@
     "bootstrap": "^5.3.0",
     "echarts": "^5.4.0",
     "element-plus": "^2.4.4",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "js-base64": "^3.7.8",
     "lodash": "^4.17.21",
     "moment": "^2.29.0",
@@ -24,9 +26,11 @@
     "vue": "^3.5.18",
     "vue-i18n": "^9.9.0",
     "vue-router": "^4.2.0",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/lodash": "^4.14.202",
     "@types/moment": "^2.13.0",
     "@types/node": "^20.19.11",

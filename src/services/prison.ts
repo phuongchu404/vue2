@@ -3,6 +3,7 @@ import type {
   CreatePrisonRequest,
   UpdatePrisonRequest,
   PageQuery,
+  ExportExcelQuery,
 } from "../types/prison";
 export const PrisonService = {
   async list(params?: PageQuery) {
@@ -38,14 +39,16 @@ export const PrisonService = {
     const res = await Utils.doDelete(`/api/admin/detention-center/${id}`);
     return res;
   },
+  async exportExcel(params?: ExportExcelQuery) {
+    Utils.doDownload("GET", `/api/admin/detention-center/export`, params);
+  },
 
-  // async list(params?: PagingQuery): Promise<PagingResult<Prison>> {
-  //   const { data } = await http.get('/admin/prisons', { params });
-  //   return data; // kỳ vọng backend trả { items, total, page, size }
-  // },
-
-  // async getById(id: number): Promise<Prison> {
-  //   const { data } = await http.get(`/admin/prisons/${id}`);
-  //   return data;
-  // },
+  async getTop3Recent() {
+    const res = Utils.doGet(`/api/admin/detention-center/get-top-3-newest`);
+    return res;
+  },
+  async count() {
+    const res = Utils.doGet(`/api/admin/detention-center/count`);
+    return res;
+  },
 };

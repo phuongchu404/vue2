@@ -20,6 +20,8 @@ const route: Route = {
   identityList: "Manage Identity Records",
   identityAdd: "Add Identity Record",
   identityEdit: "Edit Identity Record",
+  departmentList: "Department Management",
+
 };
 
 export default route;

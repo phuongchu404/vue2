@@ -30,14 +30,28 @@ export interface Prison {
 }
 
 export interface CreatePrisonRequest
-  extends Omit<Prison, "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName"> {}
+  extends Omit<
+    Prison,
+    "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName"
+  > {}
 
 export interface UpdatePrisonRequest
-  extends Partial<Omit<Prison, "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName">> {}
+  extends Partial<
+    Omit<
+      Prison,
+      "id" | "createdAt" | "updatedAt" | "provinceFullName" | "wardFullName"
+    >
+  > {}
 
 export interface PageQuery {
   pageNo: number;
   pageSize: number;
+  code?: string;
+  name?: string;
+  isActive?: string;
+}
+
+export interface ExportExcelQuery {
   code?: string;
   name?: string;
   isActive?: string;

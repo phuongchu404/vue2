@@ -100,15 +100,14 @@ export interface PageQuery {
   pageNo: number;
   pageSize: number;
   staffCode?: string;
-  profileNumber?: string;
   fullName?: string;
-  idNumber?: string;
-  phone?: string;
-  email?: string;
-  detentionCenterId?: number;
-  departmentId?: number;
-  positionId?: number;
   rank?: string;
   status?: string;
-  isActive?: boolean;
+}
+
+export interface ExportStaffQuery {
+  staffCode?: string;
+  fullName?: string;
+  rank?: string;
+  status?: string;
 }

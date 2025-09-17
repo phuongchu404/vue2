@@ -8,8 +8,10 @@ import type {
   PageQuery,
   CreatePrisonRequest,
   UpdatePrisonRequest,
+  ExportExcelQuery,
 } from "@/types/prison";
 import type { ServiceResult, PagingResult } from "@/types/common";
+import { get } from "lodash";
 
 export const usePrisonStore = defineStore("prison", {
   state: (): PrisonState => ({
@@ -193,6 +195,68 @@ export const usePrisonStore = defineStore("prison", {
       } catch (e: any) {
         const msg =
           e?.response?.data?.message || e?.message || "Delete prison failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async exportExcel(query: ExportExcelQuery) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const params: ExportExcelQuery = {
+          ...query,
+        };
+
+        // Call API
+        await PrisonService.exportExcel(params);
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Export Excel failed";
+        this.error = msg;
+        ElMessage.error(msg);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getTop3Recent() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<Prison[]> =
+          await PrisonService.getTop3Recent();
+        if (!res.success) {
+          throw new Error(res.message || "Fetch recent prisons failed");
+        }
+        this.prisons = res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Fetch recent prisons failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async count() {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<number> = await PrisonService.count();
+        if (!res.success) {
+          throw new Error(res.message || "Count prisons failed");
+        }
+        this.total = res.data || 0;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Count prisons failed";
         this.error = msg;
         ElMessage.error(msg);
         throw e;

@@ -51,7 +51,12 @@
           </el-col>
         </el-row>
         <el-form-item>
-          <el-button type="primary" @click="onSearch" :icon="Search">
+          <el-button
+            :disabled="isButtonEnabled('staff:search')"
+            type="primary"
+            @click="onSearch"
+            :icon="Search"
+          >
             {{ t("common.Search") }}
           </el-button>
           <el-button @click="onReset" :icon="Refresh">
@@ -68,10 +73,16 @@
             type="primary"
             @click="$router.push('/staff/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('staff:insert')"
           >
             {{ t("common.add") }}
           </el-button>
-          <el-button type="success" @click="handleExport" :icon="Download">
+          <el-button
+            type="success"
+            @click="handleExport"
+            :icon="Download"
+            :disabled="isButtonEnabled('staff:search')"
+          >
             {{ t("common.export") }}
           </el-button>
         </div>
@@ -133,18 +144,25 @@
         fixed="right"
       >
         <template #default="scope">
-          <el-button size="small" @click="handleView(scope.row)" :icon="View" />
+          <el-button
+            :disabled="isButtonEnabled('staff:select:id')"
+            size="small"
+            @click="handleView(scope.row)"
+            :icon="View"
+          />
           <el-button
             size="small"
             type="primary"
             @click="handleEdit(scope.row)"
             :icon="Edit"
+            :disabled="isButtonEnabled('staff:update')"
           />
           <el-button
             size="small"
             type="danger"
             @click="onDelete(scope.row.id)"
             :icon="Delete"
+            :disabled="isButtonEnabled('staff:delete')"
           />
         </template>
       </el-table-column>
@@ -301,12 +319,14 @@ import {
 } from "@element-plus/icons-vue";
 import { useStaffStore } from "@/stores/staff";
 import { useRouter } from "vue-router";
-import type { Staff, PageQuery } from "@/types/staff";
+import type { Staff, PageQuery, ExportStaffQuery } from "@/types/staff";
 import { statusOptions, Gender, Status, genderOptions } from "@/constants";
 import { useI18n } from "vue-i18n";
+import { useBaseMixin } from "@/components/BaseMixin";
+// import { headerMap, columnWidths } from "@/excel/staff";
 
 const { t } = useI18n();
-
+const { isButtonEnabled } = useBaseMixin();
 const router = useRouter();
 const staffStore = useStaffStore();
 const staffs = ref<Staff[]>([]);
@@ -328,6 +348,7 @@ const page = ref(1);
 const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedStaff = ref<Staff | null>(null);
+const exporting = ref(false);
 
 // Methods
 const formatDate = (dateStr: any) => {
@@ -370,12 +391,24 @@ const handleDetailClose = () => {
   selectedStaff.value = null;
 };
 
-const handleExport = () => {
-  ElMessage.info(t("common.exportUpdating"));
-};
 const handleView = (staff: any) => {
   selectedStaff.value = staff;
   detailDialogVisible.value = true;
+};
+
+const handleExport = async () => {
+  try {
+    await staffStore.exportExcel({
+      staffCode: searchForm.staffCode?.trim() ?? null,
+      fullName: searchForm.fullName?.trim() ?? null,
+      rank: searchForm.rank?.trim() ?? null,
+      status: searchForm.status?.trim() ?? null,
+    } as ExportStaffQuery);
+  } catch (error) {
+    console.error("Export error:", error);
+    ElMessage.error("Lỗi khi xuất Excel!");
+  } finally {
+  }
 };
 
 const search = async (extra?: Partial<PageQuery>) => {
@@ -399,7 +432,75 @@ const search = async (extra?: Partial<PageQuery>) => {
     loading.value = false;
   }
 };
+function toExportRow(item: any) {
+  const genderText =
+    item.gender === "MALE"
+      ? "Nam"
+      : item.gender === "FEMALE"
+      ? "Nữ"
+      : "Không xác định";
 
+  return {
+    staffCode: item.staffCode,
+    fullName: item.fullName,
+    idNumber: item.idNumber,
+    gender: genderText,
+    rank: item.rank,
+    phone: item.phone,
+    email: item.email,
+    status: getStatusText(item.status),
+  };
+}
+// const exportSelectedToExcel = async () => {
+//   // if (selectedRows.value.length === 0) {
+//   //   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
+//   //   return;
+//   // }
+
+//   exporting.value = true;
+//   try {
+//     const keys = Object.keys(headerMap);
+//     const rows = staffs.value.map((it: any) => toExportRow(it));
+
+//     const chunkSize = 50_000;
+//     const wb = XLSX.utils.book_new();
+
+//     for (
+//       let start = 0, part = 1;
+//       start < rows.length;
+//       start += chunkSize, part++
+//     ) {
+//       const chunk = rows.slice(start, start + chunkSize);
+
+//       // matrix dữ liệu theo thứ tự keys
+//       const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
+
+//       // tạo sheet: thêm header tiếng Việt ở dòng đầu
+//       const ws = XLSX.utils.aoa_to_sheet([
+//         keys.map((k) => headerMap[k]),
+//         ...dataMatrix,
+//       ]);
+
+//       (ws as any)["!cols"] = columnWidths;
+
+//       XLSX.utils.book_append_sheet(wb, ws, `Cán bộ (${part})`);
+//     }
+
+//     // tên file
+//     const today = new Date();
+//     const filename = `can-bo-${today.getFullYear()}-${(today.getMonth() + 1)
+//       .toString()
+//       .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+
+//     await XLSX.writeFile(wb, filename);
+//     ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
+//   } catch (error) {
+//     console.error("Export error:", error);
+//     ElMessage.error("Lỗi khi xuất Excel!");
+//   } finally {
+//     exporting.value = false;
+//   }
+// };
 onMounted(async () => {
   await nextTick();
   if (staffStore.pageNo) page.value = staffStore.pageNo;
@@ -421,14 +522,14 @@ const getStatusText = (status?: string) => {
   return hit?.label ?? status ?? "—";
 };
 
-watch(page, (p) => {
-  staffStore.pageNo = p;
-  search();
-});
-watch(size, (s) => {
-  staffStore.pageSize = s;
-  search();
-});
+// watch(page, (p) => {
+//   staffStore.pageNo = p;
+//   search();
+// });
+// watch(size, (s) => {
+//   staffStore.pageSize = s;
+//   search();
+// });
 
 const onSearch = () => {
   page.value = 1;

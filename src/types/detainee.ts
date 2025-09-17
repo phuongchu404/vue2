@@ -125,3 +125,10 @@ export interface PageQuery {
   idNumber?: string;
   status?: string;
 }
+
+export interface ExportExcelQuery {
+  detaineeCode?: string;
+  fullName?: string;
+  idNumber?: string;
+  status?: string;
+}

@@ -19,7 +19,7 @@
           <el-button
             type="primary"
             @click="onSearch"
-            :disabled="isButtonEnabled('system:user:select')"
+            :disabled="isButtonEnabled('system:role:search')"
             :icon="Search"
           >
             {{ t("option.query") }}
@@ -37,7 +37,7 @@
           <el-button
             type="success"
             @click="handleSynchronizePermission()"
-            :disabled="isButtonEnabled('system:role:insert')"
+            :disabled="isButtonEnabled('system:role:sync-permission')"
             :icon="Refresh"
           >
             <span>{{ t("option.syn") }}</span>
@@ -231,8 +231,10 @@ import type {
 import { useRoleStore } from "@/stores/role";
 import { useRolePermissionStore } from "@/stores/rolePermission";
 import { usePermissionStore } from "@/stores/permission";
+import { useBaseMixin } from "@/components/BaseMixin";
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 const appStore = useAppStore();
 const roleStore = useRoleStore();
 const rolePermissionStore = useRolePermissionStore();
@@ -301,11 +303,6 @@ const isButtonEnabledByUser = (rowData: any, buttonName: string) => {
   if (!rowData.removable && buttonName === "system:role:assign-permission")
     return true;
   if (!rowData.removable && buttonName === "system:role:update") return true;
-  const disabled = appStore.buttons.has(buttonName);
-  return !disabled;
-};
-
-const isButtonEnabled = (buttonName: string) => {
   const disabled = appStore.buttons.has(buttonName);
   return !disabled;
 };

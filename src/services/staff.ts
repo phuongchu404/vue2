@@ -3,6 +3,7 @@ import type {
   CreateStaffRequest,
   UpdateStaffRequest,
   PageQuery,
+  ExportStaffQuery,
 } from "../types/staff";
 export const StaffService = {
   async list(params?: PageQuery) {
@@ -28,6 +29,19 @@ export const StaffService = {
 
   async delete(id: number) {
     const res = await Utils.doDelete(`/api/admin/staff/${id}`);
+    return res;
+  },
+
+  async exportExcel(params?: ExportStaffQuery) {
+    Utils.doDownload("GET", `/api/admin/staff/export`, params);
+  },
+
+  async getTop3Recent() {
+    const res = Utils.doGet(`/api/admin/staff/get-top-3-newest`);
+    return res;
+  },
+  async count() {
+    const res = Utils.doGet(`/api/admin/staff/count`);
     return res;
   },
 };
