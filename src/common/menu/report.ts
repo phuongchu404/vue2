@@ -9,7 +9,24 @@ export const report: MenuItem = {
   name: t("menu.report"),
   icon: "el-icon-s-custom",
   children: [],
-  permissions: [],
+  permissions: [
+    {
+      tag: "report:view",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.view"),
+      pattern: "/api/admin/reports",
+      method: "GET",
+    },
+    {
+      tag: "report:generate",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.generate"),
+      pattern: "/api/admin/report/generate",
+      method: "POST",
+    },
+  ],
 };
 // export default {
 //   tag: "report",

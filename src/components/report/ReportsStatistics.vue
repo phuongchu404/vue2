@@ -188,7 +188,7 @@
     </div>
 
     <!-- Báo cáo nhanh -->
-    <div class="quick-reports">
+    <!-- <div class="quick-reports">
       <h3>⚡ Báo Cáo Nhanh</h3>
       <div class="quick-report-grid">
         <div
@@ -202,7 +202,7 @@
           <p>{{ quickReport.description }}</p>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -637,7 +637,6 @@ onMounted(() => {
 
 <style scoped>
 .reports-statistics {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }

@@ -1,224 +1,5 @@
-// stores/fingerprint.js
 import { defineStore } from "pinia";
-
-export const useFingerprintStore = defineStore("report", {
-  state: () => ({
-    cards: [],
-    filteredCards: [],
-    loading: false,
-    error: null,
-  }),
-
-  getters: {
-    totalCards: (state) => state.cards.length,
-
-    cardsByPersonId: (state) => (personId) => {
-      return state.cards.filter((card) => card.personId === personId);
-    },
-
-    completedCards: (state) => {
-      return state.cards.filter((card) => {
-        const fingerprintCount = card.fingerprints
-          ? Object.keys(card.fingerprints).length
-          : 0;
-        return fingerprintCount === 10;
-      });
-    },
-  },
-
-  actions: {
-    async fetchCards() {
-      this.loading = true;
-      try {
-        // Simulate API call
-        const response = await fetch("/api/fingerprint-cards");
-        if (!response.ok) throw new Error("Failed to fetch fingerprint cards");
-
-        const data = await response.json();
-        this.cards = data;
-        this.filteredCards = data;
-        this.error = null;
-      } catch (error) {
-        this.error = error.message;
-        // Use sample data for development
-        this.loadSampleData();
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async searchCards(searchForm) {
-      this.loading = true;
-      try {
-        const filtered = this.cards.filter((card) => {
-          const matchCode =
-            !searchForm.detaineeCode ||
-            card.personId
-              .toLowerCase()
-              .includes(searchForm.detaineeCode.toLowerCase());
-          const matchName =
-            !searchForm.detaineeName ||
-            (card.detaineeName &&
-              card.detaineeName
-                .toLowerCase()
-                .includes(searchForm.detaineeName.toLowerCase()));
-
-          return matchCode && matchName;
-        });
-
-        this.filteredCards = filtered;
-      } catch (error) {
-        this.error = error.message;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async createCard(cardData) {
-      this.loading = true;
-      try {
-        // Simulate API call
-        const response = await fetch("/api/fingerprint-cards", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(cardData),
-        });
-
-        if (!response.ok) throw new Error("Failed to create fingerprint card");
-
-        const newCard = await response.json();
-
-        // Add to local state
-        newCard.id = this.cards.length + 1;
-        newCard.createdAt = new Date().toISOString();
-        this.cards.unshift(newCard);
-        this.filteredCards = [...this.cards];
-
-        return newCard;
-      } catch (error) {
-        // Simulate success for development
-        const newCard = {
-          id: this.cards.length + 1,
-          ...cardData,
-          createdAt: new Date().toISOString(),
-        };
-
-        this.cards.unshift(newCard);
-        this.filteredCards = [...this.cards];
-
-        return newCard;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async updateCard(id, updates) {
-      this.loading = true;
-      try {
-        const response = await fetch(`/api/fingerprint-cards/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updates),
-        });
-
-        if (!response.ok) throw new Error("Failed to update fingerprint card");
-
-        const updatedCard = await response.json();
-
-        const index = this.cards.findIndex((card) => card.id === id);
-        if (index !== -1) {
-          this.cards[index] = updatedCard;
-          this.filteredCards = [...this.cards];
-        }
-
-        return updatedCard;
-      } catch (error) {
-        this.error = error.message;
-        throw error;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async deleteCard(id) {
-      this.loading = true;
-      try {
-        const response = await fetch(`/api/fingerprint-cards/${id}`, {
-          method: "DELETE",
-        });
-
-        if (!response.ok) throw new Error("Failed to delete fingerprint card");
-
-        this.cards = this.cards.filter((card) => card.id !== id);
-        this.filteredCards = this.filteredCards.filter(
-          (card) => card.id !== id
-        );
-      } catch (error) {
-        // Simulate success for development
-        this.cards = this.cards.filter((card) => card.id !== id);
-        this.filteredCards = this.filteredCards.filter(
-          (card) => card.id !== id
-        );
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    loadSampleData() {
-      this.cards = [
-        {
-          id: 1,
-          personId: "PN001",
-          detaineeName: "Nguyễn Văn A",
-          createdDate: "2024-01-15",
-          createdPlace: "Trại giam T16",
-          fpFormula: "AL-32-W-OOO",
-          dp: "15",
-          tw: "8",
-          reasonNote: "Lập chỉ bản phục vụ điều tra",
-          fingerprints: {
-            RIGHT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-          },
-          createdAt: "2024-01-15T10:30:00Z",
-        },
-        {
-          id: 2,
-          personId: "PN002",
-          detaineeName: "Trần Thị B",
-          createdDate: "2024-02-20",
-          createdPlace: "Trại giam T16",
-          fpFormula: "WL-28-A-IOI",
-          dp: "12",
-          tw: "6",
-          reasonNote: "Lập chỉ bản theo quy định",
-          fingerprints: {
-            RIGHT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_RING: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_LITTLE: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_RING: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_LITTLE: { preview: "/placeholder-fingerprint.jpg" },
-          },
-          createdAt: "2024-02-20T14:15:00Z",
-        },
-      ];
-      this.filteredCards = [...this.cards];
-    },
-  },
-});
-
-// stores/report.js
-import { defineStore } from "pinia";
+import * as Utils from "../utils";
 
 export const useReportStore = defineStore("report", {
   state: () => ({
@@ -228,8 +9,8 @@ export const useReportStore = defineStore("report", {
   }),
 
   getters: {
-    reportsByType: (state) => (type) => {
-      return state.reports.filter((report) => report.type === type);
+    reportsByType: (state) => (type: any) => {
+      return state.reports.filter((report: any) => report.type === type);
     },
   },
 
@@ -237,24 +18,24 @@ export const useReportStore = defineStore("report", {
     async getOverviewStatistics() {
       try {
         // Simulate API call
-        const response = await fetch("/api/statistics/overview");
+        const response = await Utils.doGet("/api/admin/reports/overview");
 
-        if (response.ok) {
-          return await response.json();
+        if (response.success) {
+          return await response.data;
         }
 
         // Return sample data for development
-        return {
-          totalDetainees: 127,
-          totalStaff: 48,
-          totalIdentity: 98,
-          totalFingerprint: 85,
-          detaineeChange: 5,
-          staffChange: -2,
-          identityChange: 12,
-          fingerprintChange: 8,
-        };
-      } catch (error) {
+        // return {
+        //   totalDetainees: 127,
+        //   totalStaff: 48,
+        //   totalIdentity: 98,
+        //   totalFingerprint: 85,
+        //   detaineeChange: 5,
+        //   staffChange: -2,
+        //   identityChange: 12,
+        //   fingerprintChange: 8,
+        // };
+      } catch (error: any) {
         this.error = error.message;
         return {
           totalDetainees: 0,
@@ -273,21 +54,21 @@ export const useReportStore = defineStore("report", {
       this.loading = true;
       try {
         // Simulate API call
-        const response = await fetch("/api/reports/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ type, fromDate, toDate }),
-        });
+        // const response = await fetch("/api/reports/generate", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({ type, fromDate, toDate }),
+        // });
 
-        if (response.ok) {
-          return await response.json();
-        }
+        // if (response.ok) {
+        //   return await response.json();
+        // }
 
         // Generate sample report data
         return this.generateSampleReport(type, fromDate, toDate);
-      } catch (error) {
+      } catch (error: any) {
         this.error = error.message;
         return this.generateSampleReport(type, fromDate, toDate);
       } finally {
@@ -516,7 +297,7 @@ export const useReportStore = defineStore("report", {
         // Auto print and close after delay
         setTimeout(() => {
           printWindow.print();
-          printWindow.close();
+          // printWindow.close();
         }, 500);
       }
     },
