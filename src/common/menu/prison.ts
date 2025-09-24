@@ -7,7 +7,7 @@ export const prison: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.prison"),
-  icon: "el-icon-fa-users",
+  icon: "OfficeBuilding",
   children: [],
   permissions: [
     {

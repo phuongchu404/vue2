@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import * as Utils from "../utils";
+import { ReportService } from "@/services/report";
 
 export const useReportStore = defineStore("report", {
   state: () => ({
@@ -18,23 +18,8 @@ export const useReportStore = defineStore("report", {
     async getOverviewStatistics() {
       try {
         // Simulate API call
-        const response = await Utils.doGet("/api/admin/reports/overview");
-
-        if (response.success) {
-          return await response.data;
-        }
-
-        // Return sample data for development
-        // return {
-        //   totalDetainees: 127,
-        //   totalStaff: 48,
-        //   totalIdentity: 98,
-        //   totalFingerprint: 85,
-        //   detaineeChange: 5,
-        //   staffChange: -2,
-        //   identityChange: 12,
-        //   fingerprintChange: 8,
-        // };
+        const response = await ReportService.overview();
+        return await response;
       } catch (error: any) {
         this.error = error.message;
         return {
@@ -53,21 +38,37 @@ export const useReportStore = defineStore("report", {
     async generateReport({ type, fromDate, toDate }) {
       this.loading = true;
       try {
-        // Simulate API call
-        // const response = await fetch("/api/reports/generate", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ type, fromDate, toDate }),
-        // });
-
-        // if (response.ok) {
-        //   return await response.json();
-        // }
-
-        // Generate sample report data
-        return this.generateSampleReport(type, fromDate, toDate);
+        switch (type) {
+          case "detainees-by-status":
+            const response = await ReportService.detaineeByStatus({
+              fromDate,
+              toDate,
+            });
+            return await response;
+          case "detainees-by-month":
+            const response2 = await ReportService.detaineeByMonth({
+              fromDate,
+              toDate,
+            });
+            return await response2;
+          case "staff-by-department":
+            const response3 = await ReportService.staffByDepartment();
+            return await response3;
+          case "identity-records":
+            const response4 = await ReportService.identityRecords({
+              fromDate,
+              toDate,
+            });
+            return await response4;
+          case "fingerprint-cards":
+            const response5 = await ReportService.fingerprintCards({
+              fromDate,
+              toDate,
+            });
+            return await response5;
+          default:
+            break;
+        }
       } catch (error: any) {
         this.error = error.message;
         return this.generateSampleReport(type, fromDate, toDate);
@@ -76,7 +77,7 @@ export const useReportStore = defineStore("report", {
       }
     },
 
-    generateSampleReport(type, fromDate, toDate) {
+    generateSampleReport(type: any, fromDate: any, toDate: any) {
       const reports = {
         "detainees-by-status": {
           title: "Báo Cáo Phạm Nhân Theo Trạng Thái",
@@ -265,7 +266,7 @@ export const useReportStore = defineStore("report", {
       );
     },
 
-    async exportToExcel(data) {
+    async exportToExcel(data: any) {
       // Simulate Excel export
       console.log("Exporting to Excel:", data);
 
@@ -302,16 +303,18 @@ export const useReportStore = defineStore("report", {
       }
     },
 
-    convertToCSV(data) {
-      const headers = data.columns.map((col) => col.title).join(",");
+    convertToCSV(data: any) {
+      const headers = data.columns.map((col: any) => col.title).join(",");
       const rows = data.data
-        .map((row) => data.columns.map((col) => row[col.key] || "").join(","))
+        .map((row: any) =>
+          data.columns.map((col: any) => row[col.key] || "").join(",")
+        )
         .join("\n");
 
       return `${headers}\n${rows}`;
     },
 
-    generatePrintHTML(reportData) {
+    generatePrintHTML(reportData: any) {
       return `
         <!DOCTYPE html>
         <html>
@@ -339,17 +342,17 @@ export const useReportStore = defineStore("report", {
             <thead>
               <tr>
                 ${reportData.columns
-                  .map((col) => `<th>${col.title}</th>`)
+                  .map((col: any) => `<th>${col.title}</th>`)
                   .join("")}
               </tr>
             </thead>
             <tbody>
               ${reportData.data
                 .map(
-                  (row) =>
+                  (row: any) =>
                     `<tr>${reportData.columns
                       .map(
-                        (col) =>
+                        (col: any) =>
                           `<td>${this.formatValue(row[col.key], col.type)}</td>`
                       )
                       .join("")}</tr>`
@@ -364,7 +367,7 @@ export const useReportStore = defineStore("report", {
               <h3>Tóm tắt & Phân tích</h3>
               ${reportData.insights
                 .map(
-                  (insight) => `
+                  (insight: any) => `
                 <div class="insight">
                   <h4>${insight.title}</h4>
                   <p>${insight.description}</p>
@@ -382,7 +385,7 @@ export const useReportStore = defineStore("report", {
       `;
     },
 
-    formatValue(value, type) {
+    formatValue(value: any, type: any) {
       if (value === null || value === undefined) return "-";
 
       switch (type) {

@@ -9,7 +9,7 @@ export const system: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.system"),
-  icon: "el-icon-fa-cogs",
+  icon: "Setting",
   children: [user, role],
   permissions: [],
 };

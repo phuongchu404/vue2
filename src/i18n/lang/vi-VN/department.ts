@@ -1,5 +1,27 @@
 export default {
-    department: {
-        keyword: "Từ khóa",
-    }
+    section: {
+        basicInfo: "Thông tin phòng ban",
+    },
+    code: "Mã phòng ban",
+    name: "Tên phòng ban",
+    detentionCenter: "Trại tạm giam",
+    detentionCenterId: "Mã trại giam",
+    status: "Trạng thái",
+    notes: "Ghi chú",
+    description: "Mô tả",
+
+    placeholder: {
+        code: "Nhập mã phòng ban",
+        name: "Nhập tên phòng ban",
+        detentionCenter: "Chọn trại tạm giam",
+        status: "Chọn trạng thái",
+        notes: "Nhập ghi chú",
+    },
+
+    message: {
+        createSuccess: "Tạo phòng ban thành công",
+        updateSuccess: "Cập nhật phòng ban thành công",
+        deleteSuccess: "Xóa phòng ban thành công",
+        notFound: "Không tìm thấy phòng ban",
+    },
 }

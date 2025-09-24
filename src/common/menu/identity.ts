@@ -7,7 +7,7 @@ export const identity: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.identity"),
-  icon: "el-icon-fa-users",
+  icon: "Camera",
   children: [],
   permissions: [
     {

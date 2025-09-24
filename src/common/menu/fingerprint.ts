@@ -17,7 +17,7 @@ export const fingerprint: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.fingerprint"),
-  icon: "el-icon-fa-users",
+  icon: "Pointer",
   children: [],
   permissions: [],
 };

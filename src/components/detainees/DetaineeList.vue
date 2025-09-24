@@ -32,8 +32,8 @@
                 clearable
               /> </el-form-item
           ></el-col>
-          <el-col :span="8"
-            ><el-form-item :label="$t('detainee.status')">
+          <el-col :span="8">
+            <el-form-item :label="$t('detainee.status')">
               <el-select
                 v-model="searchForm.status"
                 :placeholder="$t('detainee.placeholder.status')"
@@ -45,8 +45,9 @@
                   :label="option.label"
                   :value="option.value"
                 />
-              </el-select> </el-form-item
-          ></el-col>
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
 
         <el-form-item>
@@ -59,7 +60,8 @@
           >
           <el-button @click="onReset" :icon="Refresh">{{
             $t("common.reset")
-          }}</el-button>
+          }}
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -143,7 +145,7 @@
         align="center"
         prop="idNumber"
         :label="$t('detainee.idNumber')"
-        width="150"
+        width="170"
         show-overflow-tooltip
       />
       <el-table-column
@@ -382,8 +384,8 @@ import { DetaineeStatus, Gender, Status, genderOptions } from "@/constants";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useBaseMixin } from "@/components/BaseMixin";
-import * as XLSX from "xlsx";
-import { headerMap, columnWidths } from "@/excel/detainee";
+// import * as XLSX from "xlsx";
+// import { headerMap, columnWidths } from "@/excel/detainee";
 
 const { t } = useI18n();
 const { isButtonEnabled } = useBaseMixin();
@@ -409,7 +411,7 @@ const size = ref(10);
 const detailDialogVisible = ref(false);
 const selectedDetainee = ref<Detainee | null>(null);
 const selectedRows = ref<Detainee[]>([]);
-const exporting = ref(false);
+// const exporting = ref(false);
 
 // Computed
 
@@ -507,76 +509,76 @@ const search = async (extra?: Partial<PageQuery>) => {
     loading.value = false;
   }
 };
-function toExportRow(item: any) {
-  const genderText =
-    item.gender === "MALE"
-      ? "Nam"
-      : item.gender === "FEMALE"
-      ? "Nữ"
-      : "Không xác định";
-
-  return {
-    detaineeCode: item.detaineeCode,
-    fullName: item.fullName,
-    gender: genderText,
-    dateOfBirth: formatDate(item.dateOfBirth),
-    idNumber: item.idNumber,
-    detentionDate: formatDate(item.detentionDate),
-    cellNumber: item.cellNumber,
-    charges: item.charges,
-    status: getStatusText(item.status),
-  };
-}
-const exportSelectedToExcel = async () => {
+// function toExportRow(item: any) {
+//   const genderText =
+//     item.gender === "MALE"
+//       ? "Nam"
+//       : item.gender === "FEMALE"
+//       ? "Nữ"
+//       : "Không xác định";
+//
+//   return {
+//     detaineeCode: item.detaineeCode,
+//     fullName: item.fullName,
+//     gender: genderText,
+//     dateOfBirth: formatDate(item.dateOfBirth),
+//     idNumber: item.idNumber,
+//     detentionDate: formatDate(item.detentionDate),
+//     cellNumber: item.cellNumber,
+//     charges: item.charges,
+//     status: getStatusText(item.status),
+//   };
+// }
+// const exportSelectedToExcel = async () => {
   // if (selectedRows.value.length === 0) {
   //   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
   //   return;
   // }
 
-  exporting.value = true;
-  try {
-    const keys = Object.keys(headerMap);
-    const rows = detainees.value.map((it: any) => toExportRow(it));
-
-    const chunkSize = 50_000;
-    const wb = XLSX.utils.book_new();
-
-    for (
-      let start = 0, part = 1;
-      start < rows.length;
-      start += chunkSize, part++
-    ) {
-      const chunk = rows.slice(start, start + chunkSize);
-
-      // matrix dữ liệu theo thứ tự keys
-      const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
-
-      // tạo sheet: thêm header tiếng Việt ở dòng đầu
-      const ws = XLSX.utils.aoa_to_sheet([
-        keys.map((k) => headerMap[k]),
-        ...dataMatrix,
-      ]);
-
-      (ws as any)["!cols"] = columnWidths;
-
-      XLSX.utils.book_append_sheet(wb, ws, `Phạm nhân (${part})`);
-    }
-
-    // tên file
-    const today = new Date();
-    const filename = `pham-nhan-${today.getFullYear()}-${(today.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
-
-    await XLSX.writeFile(wb, filename);
-    ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
-  } catch (error) {
-    console.error("Export error:", error);
-    ElMessage.error("Lỗi khi xuất Excel!");
-  } finally {
-    exporting.value = false;
-  }
-};
+  // exporting.value = true;
+  // try {
+  //   const keys = Object.keys(headerMap);
+  //   const rows = detainees.value.map((it: any) => toExportRow(it));
+  //
+  //   const chunkSize = 50_000;
+  //   const wb = XLSX.utils.book_new();
+  //
+  //   for (
+  //     let start = 0, part = 1;
+  //     start < rows.length;
+  //     start += chunkSize, part++
+  //   ) {
+  //     const chunk = rows.slice(start, start + chunkSize);
+  //
+  //     // matrix dữ liệu theo thứ tự keys
+  //     const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
+  //
+  //     // tạo sheet: thêm header tiếng Việt ở dòng đầu
+  //     const ws = XLSX.utils.aoa_to_sheet([
+  //       keys.map((k) => headerMap[k]),
+  //       ...dataMatrix,
+  //     ]);
+  //
+  //     (ws as any)["!cols"] = columnWidths;
+  //
+  //     XLSX.utils.book_append_sheet(wb, ws, `Phạm nhân (${part})`);
+  //   }
+  //
+  //   // tên file
+  //   const today = new Date();
+  //   const filename = `pham-nhan-${today.getFullYear()}-${(today.getMonth() + 1)
+  //     .toString()
+  //     .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+  //
+  //   await XLSX.writeFile(wb, filename);
+  //   ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
+  // } catch (error) {
+  //   console.error("Export error:", error);
+  //   ElMessage.error("Lỗi khi xuất Excel!");
+  // } finally {
+  //   exporting.value = false;
+  // }
+// };
 
 const getStatusType = (status: any) => {
   const typeMap = {

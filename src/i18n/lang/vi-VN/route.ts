@@ -20,7 +20,9 @@ const route: Route = {
   identityList: "Quản lý Danh bản",
   identityAdd: "Thêm Danh bản",
   identityEdit: "Chỉnh sửa Danh bản",
-  departmentList: "Quản lý Phòng Ban",
+  departmentList: "Quản lý Phòng ban",
+  departmentEdit: "Chỉnh sửa Phòng ban",
+  departmentAdd: "Thêm Phòng ban",
 };
 
 export default route;

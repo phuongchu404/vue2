@@ -1,265 +1,158 @@
-// stores/fingerprint.store.ts
 import { defineStore } from "pinia";
-// import { store } from './index';
-
-// 10 ngón tay chuẩn
-export type FingerName =
-  | "RIGHT_THUMB"
-  | "RIGHT_INDEX"
-  | "RIGHT_MIDDLE"
-  | "RIGHT_RING"
-  | "RIGHT_LITTLE"
-  | "LEFT_THUMB"
-  | "LEFT_INDEX"
-  | "LEFT_MIDDLE"
-  | "LEFT_RING"
-  | "LEFT_LITTLE";
-
-export interface Fingerprint {
-  preview: string;
-}
-
-export type FingerprintMap = Partial<Record<FingerName, Fingerprint>>;
-
-export interface Card {
-  id: number;
-  personId: string;
-  detaineeName?: string;
-  createdDate?: string;
-  createdPlace?: string;
-  fpFormula?: string;
-  dp?: string;
-  tw?: string;
-  reasonNote?: string;
-  fingerprints?: FingerprintMap;
-  createdAt: string; // ISO string
-}
-
-export interface SearchForm {
-  detaineeCode?: string;
-  detaineeName?: string;
-}
-
-interface FingerprintState {
-  cards: Card[];
-  filteredCards: Card[];
-  loading: boolean;
-  error: string | null;
-}
+import { ElMessage } from "element-plus";
+import { FingerprintService } from "@/services/fingerprint";
+import type {
+  FingerprintState,
+  FingerprintCardResponse,
+  PageQuery,
+} from "@/types/fingerprint";
+import type { ServiceResult, PagingResult } from "@/types/common";
 
 export const useFingerprintStore = defineStore("fingerprint", {
   state: (): FingerprintState => ({
-    cards: [],
-    filteredCards: [],
+    fingerprints: [],
+    total: 0,
+    pageNo: 1,
+    pageSize: 10,
     loading: false,
-    error: null,
+    error: undefined,
+    lastQuery: undefined,
   }),
 
   getters: {
-    totalCards: (state): number => state.cards.length,
-
-    cardsByPersonId:
-      (state) =>
-      (personId: string): Card[] => {
-        return state.cards.filter((card) => card.personId === personId);
-      },
-
-    completedCards: (state): Card[] => {
-      return state.cards.filter((card) => {
-        const fingerprintCount = card.fingerprints
-          ? Object.keys(card.fingerprints).length
-          : 0;
-        return fingerprintCount === 10;
-      });
-    },
+    getFingerprints: (state): FingerprintCardResponse[] | undefined =>
+      state.fingerprints,
+    getTotal: (state): number => state.total,
+    getPage: (state): number => state.pageNo,
+    getSize: (state): number => state.pageSize,
+    getLoading: (state): boolean => state.loading,
+    getError: (state): string | undefined => state.error,
   },
 
   actions: {
-    async fetchCards(): Promise<void> {
+    async listPage(query: PageQuery) {
       this.loading = true;
+      this.error = undefined;
       try {
-        const response = await fetch("/api/fingerprint-cards");
-        if (!response.ok) throw new Error("Failed to fetch fingerprint cards");
-
-        const data = (await response.json()) as Card[];
-        this.cards = data;
-        this.filteredCards = data;
-        this.error = null;
-      } catch (e: unknown) {
-        const message =
-          e instanceof Error ? e.message : "Failed to fetch fingerprint cards";
-        this.error = message;
-        // Dùng dữ liệu mẫu khi dev
-        this.loadSampleData();
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async searchCards(searchForm: SearchForm): Promise<void> {
-      this.loading = true;
-      try {
-        const filtered = this.cards.filter((card) => {
-          const matchCode =
-            !searchForm.detaineeCode ||
-            card.personId
-              .toLowerCase()
-              .includes(searchForm.detaineeCode.toLowerCase());
-
-          const matchName =
-            !searchForm.detaineeName ||
-            (!!card.detaineeName &&
-              card.detaineeName
-                .toLowerCase()
-                .includes(searchForm.detaineeName.toLowerCase()));
-
-          return matchCode && matchName;
-        });
-
-        this.filteredCards = filtered;
-      } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : "Search cards failed";
-        this.error = message;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async createCard(cardData: Omit<Card, "id" | "createdAt">): Promise<Card> {
-      this.loading = true;
-      try {
-        const response = await fetch("/api/fingerprint-cards", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(cardData),
-        });
-
-        if (!response.ok) throw new Error("Failed to create fingerprint card");
-
-        const newCard = (await response.json()) as Card;
-
-        // Bảo đảm có id/createdAt phía client (nếu BE chưa trả)
-        newCard.id = newCard.id ?? this.cards.length + 1;
-        newCard.createdAt = newCard.createdAt ?? new Date().toISOString();
-
-        this.cards.unshift(newCard);
-        this.filteredCards = [...this.cards];
-
-        return newCard;
-      } catch (e: unknown) {
-        // Giả lập thành công khi dev
-        const fallback: Card = {
-          id: this.cards.length + 1,
-          ...cardData,
-          createdAt: new Date().toISOString(),
+        const params: PageQuery = {
+          ...query,
+          pageNo: query.pageNo ?? this.pageNo,
+          pageSize: query.pageSize ?? this.pageSize,
         };
-        this.cards.unshift(fallback);
-        this.filteredCards = [...this.cards];
-        return fallback;
-      } finally {
-        this.loading = false;
-      }
-    },
 
-    async updateCard(id: number, updates: Partial<Card>): Promise<Card> {
-      this.loading = true;
-      try {
-        const response = await fetch(`/api/fingerprint-cards/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updates),
-        });
+        // Call API
+        const res: ServiceResult<PagingResult<FingerprintCardResponse>> =
+          await FingerprintService.list(params);
 
-        if (!response.ok) throw new Error("Failed to update fingerprint card");
-
-        const updatedCard = (await response.json()) as Card;
-
-        const index = this.cards.findIndex((card) => card.id === id);
-        if (index !== -1) {
-          this.cards[index] = updatedCard;
-          this.filteredCards = [...this.cards];
+        // Kiểm tra success
+        if (!res.success) {
+          throw new Error(res.message || "Get fingerprints failed");
         }
 
-        return updatedCard;
-      } catch (e: unknown) {
-        const message =
-          e instanceof Error ? e.message : "Failed to update fingerprint card";
-        this.error = message;
+        if (!res.data) {
+          throw new Error("No data returned from get fingerprints");
+        }
+
+        const {
+          content,
+          totalElements,
+          number: pageNo,
+          size: pageSize,
+        } = res.data;
+
+        this.fingerprints = content;
+        this.total = totalElements;
+        this.pageNo = pageNo;
+        this.pageSize = pageSize;
+        this.lastQuery = { ...params };
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Get fingerprints failed";
+        this.error = msg;
+        ElMessage.error(msg);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createFingerprint(payload: FormData) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<FingerprintCardResponse> =
+          await FingerprintService.create(payload);
+
+        if (!res.success) {
+          throw new Error(res.message || "Create fingerprint failed");
+        }
+
+        const created = res.data;
+        ElMessage.success("Created successfully");
+        return created;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Create fingerprint failed";
+        this.error = msg;
+        ElMessage.error(msg);
         throw e;
       } finally {
         this.loading = false;
       }
     },
 
-    async deleteCard(id: number): Promise<void> {
+    async updateFingerprint(id: number, payload: FormData) {
       this.loading = true;
+      this.error = undefined;
       try {
-        const response = await fetch(`/api/fingerprint-cards/${id}`, {
-          method: "DELETE",
-        });
+        const res: ServiceResult<FingerprintCardResponse> =
+          await FingerprintService.update(id, payload);
 
-        if (!response.ok) throw new Error("Failed to delete fingerprint card");
+        if (!res.success) {
+          throw new Error(res.message || "Update Fingerprint failed");
+        }
 
-        this.cards = this.cards.filter((card) => card.id !== id);
-        this.filteredCards = this.filteredCards.filter(
-          (card) => card.id !== id
-        );
-      } catch {
-        // Giả lập xoá thành công khi dev
-        this.cards = this.cards.filter((card) => card.id !== id);
-        this.filteredCards = this.filteredCards.filter(
-          (card) => card.id !== id
-        );
+        const updated = res.data;
+        ElMessage.success("Updated successfully");
+        return updated;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Update Fingerprint failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
       } finally {
         this.loading = false;
       }
     },
 
-    loadSampleData(): void {
-      this.cards = [
-        {
-          id: 1,
-          personId: "PN001",
-          detaineeName: "Nguyễn Văn A",
-          createdDate: "2024-01-15",
-          createdPlace: "Trại giam T16",
-          fpFormula: "AL-32-W-OOO",
-          dp: "15",
-          tw: "8",
-          reasonNote: "Lập chỉ bản phục vụ điều tra",
-          fingerprints: {
-            RIGHT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-          },
-          createdAt: "2024-01-15T10:30:00Z",
-        },
-        {
-          id: 2,
-          personId: "PN002",
-          detaineeName: "Trần Thị B",
-          createdDate: "2024-02-20",
-          createdPlace: "Trại giam T16",
-          fpFormula: "WL-28-A-IOI",
-          dp: "12",
-          tw: "6",
-          reasonNote: "Lập chỉ bản theo quy định",
-          fingerprints: {
-            RIGHT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_RING: { preview: "/placeholder-fingerprint.jpg" },
-            RIGHT_LITTLE: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_THUMB: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_INDEX: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_MIDDLE: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_RING: { preview: "/placeholder-fingerprint.jpg" },
-            LEFT_LITTLE: { preview: "/placeholder-fingerprint.jpg" },
-          },
-          createdAt: "2024-02-20T14:15:00Z",
-        },
-      ];
-      this.filteredCards = [...this.cards];
+    async deleteFingerprint(id: number) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<boolean> = await FingerprintService.delete(id);
+
+        if (!res.success) {
+          throw new Error(res.message || "Delete Fingerprint failed");
+        }
+        ElMessage.success("Deleted successfully");
+        if (this.lastQuery) {
+          await this.listPage(this.lastQuery);
+        }
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message ||
+          e?.message ||
+          "Delete Fingerprint failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });

@@ -7,7 +7,7 @@ export const report: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.report"),
-  icon: "el-icon-s-custom",
+  icon: "List",
   children: [],
   permissions: [
     {

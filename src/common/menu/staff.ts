@@ -7,7 +7,7 @@ export const staff: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.staff"),
-  icon: "el-icon-s-custom",
+  icon: "Avatar",
   children: [],
   permissions: [
     {

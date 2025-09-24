@@ -8,10 +8,9 @@ import vi from "./lang/vi-VN";
 const locales: { [key: string]: any } = {};
 
 function addLang(key: string, a: object, b: object) {
-  _.assignIn(locales, {
-    [key]: _.assignIn({}, a, b),
-  });
+  _.set(locales, key, _.merge({}, a, b));
 }
+
 
 addLang("en-US", en, enLocale);
 addLang("vi-VN", vi, viLocale);

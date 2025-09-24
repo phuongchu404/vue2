@@ -62,7 +62,7 @@
               >
                 <template #title>
                   <el-icon v-if="item.icon">
-                    <component :is="getIconComponent(item.icon)" />
+                    <component :is="item.icon" />
                   </el-icon>
                   <span>{{ item.name }}</span>
                 </template>
@@ -72,7 +72,7 @@
                   :key="child.tag"
                 >
                   <el-icon v-if="child.icon">
-                    <component :is="getIconComponent(child.icon)" />
+                    <component :is="child.icon" />
                   </el-icon>
                   <template #title>{{ child.name }}</template>
                 </el-menu-item>
@@ -84,7 +84,7 @@
                 :key="item.tag"
               >
                 <el-icon v-if="item.icon">
-                  <component :is="getIconComponent(item.icon)" />
+                  <component :is="item.icon" />
                 </el-icon>
                 <template #title>{{ item.name }}</template>
               </el-menu-item>
@@ -195,6 +195,8 @@ import {
   User,
   Setting,
   Document,
+  Avatar,
+  List,
 } from "@element-plus/icons-vue";
 import * as utils from "../../utils";
 import * as nav from "../../common/nav";

@@ -186,27 +186,10 @@
         </div>
       </div>
     </div>
-
-    <!-- Báo cáo nhanh -->
-    <!-- <div class="quick-reports">
-      <h3>⚡ Báo Cáo Nhanh</h3>
-      <div class="quick-report-grid">
-        <div
-          v-for="quickReport in quickReports"
-          :key="quickReport.id"
-          class="quick-report-card"
-          @click="runQuickReport(quickReport)"
-        >
-          <div class="quick-report-icon">{{ quickReport.icon }}</div>
-          <h4>{{ quickReport.title }}</h4>
-          <p>{{ quickReport.description }}</p>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick } from "vue";
 import { ElMessage } from "element-plus";
 import {
@@ -216,26 +199,17 @@ import {
   Document,
   Pointer,
 } from "@element-plus/icons-vue";
-
-// Stores (assuming these are already set up)
+import Chart from "chart.js/auto";
 import { useReportStore } from "@/stores/report";
-import { useDetaineeStore } from "@/stores";
-import { useStaffStore } from "@/stores";
-import { useIdentityStore } from "@/stores";
-import { useFingerprintStore } from "@/stores/fingerprint";
 
 // Stores
 const reportStore = useReportStore();
-const detaineeStore = useDetaineeStore();
-const staffStore = useStaffStore();
-const identityStore = useIdentityStore();
-const fingerprintStore = useFingerprintStore();
 
 // Reactive data
 const loading = ref(false);
 const currentReport = ref(null);
 const chartCanvas = ref(null);
-const chartInstance = ref(null);
+const chartInstance = ref<Chart | null>(null);
 
 const reportForm = reactive({
   type: "",
@@ -259,12 +233,12 @@ const statistics = reactive({
 const reportTypeOptions = [
   { value: "detainees-by-status", label: "Phạm nhân theo trạng thái" },
   { value: "detainees-by-month", label: "Phạm nhân theo tháng" },
-  { value: "detainees-by-crime", label: "Phạm nhân theo tội danh" },
+  // { value: "detainees-by-crime", label: "Phạm nhân theo tội danh" },
   { value: "staff-by-department", label: "Cán bộ theo phòng ban" },
-  { value: "staff-by-rank", label: "Cán bộ theo cấp bậc" },
+  // { value: "staff-by-rank", label: "Cán bộ theo cấp bậc" },
   { value: "identity-records", label: "Danh bản đã lập" },
   { value: "fingerprint-cards", label: "Chỉ bản đã lập" },
-  { value: "monthly-summary", label: "Tổng hợp theo tháng" },
+  // { value: "monthly-summary", label: "Tổng hợp theo tháng" },
 ];
 
 // Statistics cards computed
@@ -298,34 +272,6 @@ const statisticsCards = computed(() => [
     icon: Pointer,
   },
 ]);
-
-// Quick reports configuration
-const quickReports = [
-  {
-    id: "daily-summary",
-    title: "Tổng Hợp Ngày",
-    description: "Báo cáo tổng hợp hoạt động trong ngày",
-    icon: "📅",
-  },
-  {
-    id: "weekly-summary",
-    title: "Tổng Hợp Tuần",
-    description: "Báo cáo tổng hợp hoạt động trong tuần",
-    icon: "📊",
-  },
-  {
-    id: "new-detainees",
-    title: "Phạm Nhân Mới",
-    description: "Danh sách phạm nhân mới trong tháng",
-    icon: "👥",
-  },
-  {
-    id: "capacity-report",
-    title: "Báo Cáo Công Suất",
-    description: "Tình hình sử dụng buồng giam",
-    icon: "🏢",
-  },
-];
 
 // Computed properties
 const showChart = computed(() => {
@@ -381,30 +327,56 @@ const generateReport = async () => {
     }
 
     ElMessage.success("Tạo báo cáo thành công!");
-  } catch (error) {
+  } catch (error: Error | any) {
     ElMessage.error(error.message || "Lỗi khi tạo báo cáo!");
   } finally {
     loading.value = false;
   }
 };
 
-const renderChart = async (reportData) => {
-  if (!chartCanvas.value || !reportData.chartData) return;
+// const renderChart = async (reportData) => {
+//   if (!chartCanvas.value || !reportData.chartData) return;
 
-  // Destroy existing chart
-  if (chartInstance.value) {
+//   // Destroy existing chart
+//   if (chartInstance.value) {
+//     chartInstance.value.destroy();
+//   }
+
+//   try {
+//     const ctx = chartCanvas.value.getContext("2d");
+//     drawSimpleChart(ctx, reportData.chartData);
+//   } catch (error) {
+//     console.error("Error rendering chart:", error);
+//   }
+// };
+
+const renderChart = async (reportData: any) => {
+  if (!chartCanvas.value || !reportData?.chartData) return;
+
+  // Hủy chart cũ
+  if (chartInstance.value?.destroy) {
     chartInstance.value.destroy();
+    chartInstance.value = null;
   }
 
   try {
     const ctx = chartCanvas.value.getContext("2d");
-    drawSimpleChart(ctx, reportData.chartData);
-  } catch (error) {
-    console.error("Error rendering chart:", error);
+
+    // Import động Chart.js (v4)
+    // const { default: Chart } = await import("chart.js/auto");
+
+    // Tạo chart mới từ cấu hình vào reportData.chartData
+    chartInstance.value = new Chart(ctx, {
+      type: reportData.chartData.type, // ví dụ: 'doughnut'
+      data: reportData.chartData.data, // { labels, datasets }
+      options: reportData.chartData.options, // { plugins, responsive, ... }
+    });
+  } catch (err) {
+    console.error("Error rendering chart:", err);
   }
 };
 
-const drawSimpleChart = (ctx, chartData) => {
+const drawSimpleChart = (ctx: any, chartData: any) => {
   // Simple bar chart implementation
   const canvas = ctx.canvas;
   const width = (canvas.width = 800);
@@ -421,7 +393,7 @@ const drawSimpleChart = (ctx, chartData) => {
     const barWidth = (width / data.length) * 0.8;
     const barSpacing = (width / data.length) * 0.2;
 
-    data.forEach((value, index) => {
+    data.forEach((value: any, index: any) => {
       const barHeight = (value / maxValue) * (height - 50);
       const x = index * (barWidth + barSpacing) + barSpacing / 2;
       const y = height - barHeight - 30;
@@ -440,7 +412,7 @@ const drawSimpleChart = (ctx, chartData) => {
   }
 };
 
-const runQuickReport = async (quickReport) => {
+const runQuickReport = async (quickReport: any) => {
   try {
     loading.value = true;
 
@@ -513,6 +485,10 @@ const printReport = () => {
   if (!currentReport.value) return;
 
   const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    ElMessage.error("Không thể mở cửa sổ in!");
+    return;
+  }
   const printContent = generatePrintContent(currentReport.value);
 
   printWindow.document.write(printContent);
@@ -522,7 +498,7 @@ const printReport = () => {
   printWindow.close();
 };
 
-const generatePrintContent = (report) => {
+const generatePrintContent = (report: any) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -553,16 +529,18 @@ const generatePrintContent = (report) => {
       <table>
         <thead>
           <tr>
-            ${report.columns.map((col) => `<th>${col.title}</th>`).join("")}
+            ${report.columns
+              .map((col: any) => `<th>${col.title}</th>`)
+              .join("")}
           </tr>
         </thead>
         <tbody>
           ${report.data
             .map(
-              (row) =>
+              (row: any) =>
                 `<tr>${report.columns
                   .map(
-                    (col) =>
+                    (col: any) =>
                       `<td>${formatCellValue(row[col.key], col.type)}</td>`
                   )
                   .join("")}</tr>`
@@ -575,7 +553,7 @@ const generatePrintContent = (report) => {
   `;
 };
 
-const formatCellValue = (value, type) => {
+const formatCellValue = (value: any, type: any) => {
   if (value === null || value === undefined) return "-";
 
   switch (type) {
@@ -597,25 +575,25 @@ const formatCellValue = (value, type) => {
   }
 };
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr: any) => {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
   return date.toLocaleDateString("vi-VN");
 };
 
-const formatDateTime = (dateStr) => {
+const formatDateTime = (dateStr: any) => {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
   return date.toLocaleString("vi-VN");
 };
 
-const formatChange = (change) => {
+const formatChange = (change: any) => {
   if (change === 0) return "Không thay đổi";
   const prefix = change > 0 ? "+" : "";
   return `${prefix}${change}`;
 };
 
-const getChangeClass = (change) => {
+const getChangeClass = (change: any) => {
   if (change > 0) return "stat-increase";
   if (change < 0) return "stat-decrease";
   return "stat-neutral";

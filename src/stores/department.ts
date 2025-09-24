@@ -24,7 +24,6 @@ export const useDepartmentStore = defineStore("department", {
 
   getters: {
     getDepartments: (state): Department[] | undefined => state.departments,
-
     getTotal: (state): number => state.total,
     getPage: (state): number => state.pageNo,
     getSize: (state): number => state.pageSize,
@@ -72,6 +71,31 @@ export const useDepartmentStore = defineStore("department", {
           "Fetch departments failed";
         this.error = msg;
         ElMessage.error(msg);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchDetail(id: number) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<Department> = await DepartmentService.getById(
+          id
+        );
+
+        if (!res.success) {
+          throw new Error(res.message || "Fetch prison failed");
+        }
+
+        const detail = res.data;
+        return detail;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Fetch prison failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
       } finally {
         this.loading = false;
       }
@@ -178,33 +202,6 @@ export const useDepartmentStore = defineStore("department", {
       } finally {
         this.loading = false;
       }
-    },
-    async getByDetentionCenterId(id: number) {
-      this.loading = true;
-      this.error = undefined;
-      try {
-        const res: ServiceResult<Department[]> =
-          await DepartmentService.getByDetentionCenterId(id);
-
-        if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
-        }
-
-        this.departments = res.data;
-      } catch (e: any) {
-        const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
-        this.error = msg;
-        ElMessage.error(msg);
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
-    clear() {
-      this.departments = undefined;
-      this.error = undefined;
-      this.loading = false;
     },
   },
 });

@@ -20,6 +20,9 @@ import Fingerprint from "@/components/fingerprint/Fingerprint.vue";
 //  import FingerprintForm from '@/components/fingerprint/FingerprintForm.vue'
 import Reports from "@/components/report/ReportsStatistics.vue";
 import DepartmentList from "@/components/department/DepartmentList.vue";
+import DepartmentForm from "@/components/department/DepartmentForm.vue";
+import finger from "@/components/fingerprint/FingerprintList.vue";
+import FingerprintForm from "@/components/fingerprint/FingerprintForm.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -129,19 +132,19 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: "/fingerprint",
         name: "Fingerprint",
-        component: Fingerprint,
+        component: finger,
         meta: { title: "fingerprint" },
       },
-      // {
-      //   path: "/fingerprint/add",
-      //   name: "FingerprintAdd",
-      //   component: FingerprintForm,
-      // },
-      // {
-      //   path: "/fingerprint/edit/:id",
-      //   name: "FingerprintEdit",
-      //   component: FingerprintForm,
-      // },
+      {
+        path: "/fingerprint/add",
+        name: "FingerprintAdd",
+        component: FingerprintForm,
+      },
+      {
+        path: "/fingerprint/edit/:id",
+        name: "FingerprintEdit",
+        component: FingerprintForm,
+      },
       {
         path: "/report",
         name: "Reports",
@@ -153,6 +156,18 @@ export const routes: Array<RouteRecordRaw> = [
         name: "DepartmentList",
         component: DepartmentList,
         meta: { title: "departmentList" },
+      },
+      {
+        path: "/department/add",
+        name: "DepartmentAdd",
+        component: DepartmentForm,
+        meta: { title: "departmentAdd" },
+      },
+      {
+        path: "/department/edit/:id",
+        name: "DepartmentEdit",
+        component: DepartmentForm,
+        meta: { title: "departmentEdit" },
       },
     ],
   },

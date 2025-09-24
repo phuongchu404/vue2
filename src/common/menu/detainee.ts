@@ -7,7 +7,7 @@ export const detainee: MenuItem = {
   type: "menu",
   isWhiteList: false,
   name: t("menu.detainee"),
-  icon: "el-icon-fa-users",
+  icon: "User",
   children: [],
   permissions: [
     {
