@@ -28,6 +28,7 @@
                 :placeholder="t('identity.placeholder.detaineeId')"
                 filterable
                 @change="onDetaineeChange"
+                :disabled="isEdit"
               >
                 <el-option
                   v-for="detainee in detaineeStore.getDetainees"

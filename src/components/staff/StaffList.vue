@@ -117,21 +117,22 @@
         prop="idNumber"
         :label="t('staff.idNumber')"
         min-width="170"
+        align="center"
       />
-      <el-table-column :label="t('staff.gender')" width="120">
+      <el-table-column :label="t('staff.gender')" width="120" align="center ">
         <template #default="{ row }">
           {{ getGenderLabel(row.gender) }}
         </template>
       </el-table-column>
-      <el-table-column prop="rank" :label="t('staff.rank')" width="120" />
-      <el-table-column prop="phone" :label="t('staff.phone')" width="130" />
+      <el-table-column prop="rank" :label="t('staff.rank')" width="120" align="center"/>
+      <el-table-column prop="phone" :label="t('staff.phone')" width="150" align="center" />
       <el-table-column
         prop="email"
         :label="t('staff.email')"
         min-width="120"
         show-overflow-tooltip
       />
-      <el-table-column :label="t('staff.status')" width="130" align="center">
+      <el-table-column :label="t('staff.status')" width="170" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)">
             {{ getStatusText(scope.row.status) }}

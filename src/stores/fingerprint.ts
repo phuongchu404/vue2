@@ -154,5 +154,25 @@ export const useFingerprintStore = defineStore("fingerprint", {
         this.loading = false;
       }
     },
+    async getById(id: number) {
+      this.loading = true;
+      this.error = undefined;
+      try {
+        const res: ServiceResult<FingerprintCardResponse> =
+          await FingerprintService.getById(id);
+        if (!res.success) {
+          throw new Error(res.message || "Get Fingerprint failed");
+        }
+        return res.data;
+      } catch (e: any) {
+        const msg =
+          e?.response?.data?.message || e?.message || "Get Fingerprint failed";
+        this.error = msg;
+        ElMessage.error(msg);
+        throw e;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });

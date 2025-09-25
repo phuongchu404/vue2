@@ -2,51 +2,45 @@
   <div class="fingerprint-list">
     <!-- Search Section -->
     <div class="search-section">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="Mã phạm nhân">
+      <el-form :model="searchForm" inline label-width="130">
+        <el-form-item :label="$t('fingerprint.search.detaineeCode')">
           <el-input
             v-model="searchForm.detaineeCode"
-            placeholder="Nhập mã phạm nhân..."
+            :placeholder="$t('fingerprint.search.detaineeCode')"
+            style="width: 200px"
             clearable
           />
         </el-form-item>
-        <el-form-item label="Tên phạm nhân">
+        <el-form-item :label="$t('fingerprint.search.detaineeName')">
           <el-input
             v-model="searchForm.detaineeName"
-            placeholder="Nhập tên phạm nhân..."
+            :placeholder="$t('fingerprint.search.detaineeName')"
+            style="width: 200px"
             clearable
           />
         </el-form-item>
-        <el-form-item label="Công thức VT">
-          <el-input
-            v-model="searchForm.fpFormula"
-            placeholder="Nhập công thức vân tay..."
+        <el-form-item :label="$t('department.detentionCenter')">
+          <el-select
+            v-model="searchForm.detentionCenterId"
+            :placeholder="$t('department.placeholder.detentionCenter')"
+            style="width: 200px"
             clearable
-          />
-        </el-form-item>
-        <el-form-item label="Từ ngày">
-          <el-date-picker
-            v-model="searchForm.fromDate"
-            type="date"
-            placeholder="Chọn từ ngày"
-            format="DD/MM/YYYY"
-            value-format="YYYY-MM-DD"
-          />
-        </el-form-item>
-        <el-form-item label="Đến ngày">
-          <el-date-picker
-            v-model="searchForm.toDate"
-            type="date"
-            placeholder="Chọn đến ngày"
-            format="DD/MM/YYYY"
-            value-format="YYYY-MM-DD"
-          />
+          >
+            <el-option
+              v-for="prison in prisons"
+              :key="prison.id"
+              :label="prison.name"
+              :value="prison.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch" :icon="Search"
-            >Tìm kiếm</el-button
-          >
-          <el-button @click="handleReset" :icon="Refresh">Làm mới</el-button>
+          <el-button type="primary" @click="handleSearch" :icon="Search">
+            {{ $t("common.Search") }}
+          </el-button>
+          <el-button @click="handleReset" :icon="Refresh">
+            {{ $t("common.reset") }}
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -60,7 +54,7 @@
             @click="$router.push('/fingerprint/add')"
             :icon="Plus"
           >
-            Tạo chỉ bản mới
+            {{ $t("common.add") }}
           </el-button>
           <!-- <el-button type="success" @click="handleExport" :icon="Download">
             Xuất Excel
@@ -70,7 +64,7 @@
           </el-button> -->
         </div>
         <div class="result-info">
-          Tổng số: {{ fingerprintStore.getTotal }} chỉ bản
+          {{ $t("common.total") }}: {{ fingerprintStore.getTotal }}
         </div>
       </div>
     </div>
@@ -83,28 +77,59 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="80" sortable />
-      <el-table-column prop="detaineeCode" label="Mã phạm nhân" width="120" />
+      <!-- <el-table-column prop="id" :label="$t('fingerprint.table.id')" width="80" sortable align="center"/> -->
+      <el-table-column
+        prop="detaineeCode"
+        :label="$t('fingerprint.search.detaineeCode')"
+        min-width="150"
+        align="center"
+      />
       <el-table-column
         prop="detaineeName"
-        label="Tên phạm nhân"
-        min-width="150"
+        :label="$t('fingerprint.search.detaineeName')"
+        min-width="200"
+        align="center"
       />
-      <el-table-column prop="createdAt" label="Ngày tạo" width="120">
+      <el-table-column
+        prop="createdDate"
+        :label="$t('fingerprint.table.createdDate')"
+        width="140"
+        align="center"
+      >
         <template #default="scope">
           {{ formatDate(scope.row.createdAt) }}
         </template>
       </el-table-column>
       <el-table-column
         prop="createdPlace"
-        label="Tạo tại"
+        :label="$t('fingerprint.table.createdPlace')"
         min-width="150"
+        align="center"
         show-overflow-tooltip
       />
-      <el-table-column prop="fpFormula" label="Công thức VT" width="120" />
-      <el-table-column prop="dp" label="DP" width="80" />
-      <el-table-column prop="tw" label="TW" width="80" />
-      <el-table-column label="Vân tay" width="120" align="center">
+      <el-table-column
+        prop="fpFormula"
+        :label="$t('fingerprint.table.fpFormula')"
+        width="170"
+        align="center"
+      />
+      <el-table-column
+        prop="dp"
+        :label="$t('fingerprint.table.dp')"
+        width="80"
+        align="center"
+      />
+      <el-table-column
+        prop="tw"
+        :label="$t('fingerprint.table.tw')"
+        width="80"
+        align="center"
+      />
+      <el-table-column
+        :label="$t('fingerprint.table.fingerprint')"
+        min-width="120"
+        align="center"
+      >
         <template #default="scope">
           <div class="fingerprint-summary">
             <el-tag
@@ -122,7 +147,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="Tổng số ảnh" width="100" align="center">
+      <el-table-column
+        :label="$t('fingerprint.table.totalImages')"
+        width="150"
+        align="center"
+      >
         <template #default="scope">
           <el-tag :type="getTotalFingerprintTagType(scope.row)" size="small">
             {{ getTotalFingerprintCount(scope.row) }}/14
@@ -141,7 +170,7 @@
             />
           </template>
         </el-table-column> -->
-      <el-table-column label="Thao tác" width="250" fixed="right">
+      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View">
           </el-button>
@@ -186,7 +215,7 @@
     <!-- Detail Dialog -->
     <el-dialog
       v-model="detailDialogVisible"
-      title="Chi tiết chỉ bản"
+      :title="$t('fingerprint.detail.title')"
       width="90%"
       :before-close="handleDetailClose"
       class="dialog"
@@ -195,41 +224,51 @@
         <el-row :gutter="20">
           <el-col :span="10">
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="Mã phạm nhân">{{
-                selectedCard.detaineeCode
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Tên phạm nhân">{{
-                selectedCard.detaineeName
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Ngày tạo">{{
-                formatDate(selectedCard.createdAt)
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Tạo tại">{{
-                selectedCard.createdPlace || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Công thức VT">{{
-                selectedCard.fpFormula || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="DP">{{
-                selectedCard.dp || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="TW">{{
-                selectedCard.tw || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Lý do lập">{{
-                selectedCard.reasonNote || "-"
-              }}</el-descriptions-item>
+              <el-descriptions-item
+                :label="$t('fingerprint.detail.detaineeCode')"
+              >
+                {{ selectedCard.detaineeCode }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="$t('fingerprint.detail.detaineeName')"
+              >
+                {{ selectedCard.detaineeName }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="$t('fingerprint.detail.createdDate')"
+              >
+                {{ formatDate(selectedCard.createdAt) }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="$t('fingerprint.detail.createdPlace')"
+              >
+                {{ selectedCard.createdPlace || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('fingerprint.detail.fpFormula')">
+                {{ selectedCard.fpFormula || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="DP">
+                {{ selectedCard.dp || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item label="TW">
+                {{ selectedCard.tw || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="$t('fingerprint.detail.reasonNote')"
+              >
+                {{ selectedCard.reasonNote || "-" }}
+              </el-descriptions-item>
             </el-descriptions>
           </el-col>
 
           <el-col :span="14">
             <div class="fingerprint-section">
-              <h4>Vân tay thu thập được</h4>
+              <h4>{{ $t("fingerprint.detail.section.collected") }}</h4>
 
               <!-- Individual Fingerprints -->
               <div class="fingerprint-subsection">
                 <h5>
-                  Vân tay từng ngón ({{
+                  {{ $t("fingerprint.detail.section.individual") }} ({{
                     getIndividualFingerprintCount(selectedCard)
                   }}/10)
                 </h5>
@@ -255,7 +294,9 @@
                       />
                       <div v-else class="no-fingerprint">
                         <el-icon><Pointer /></el-icon>
-                        <span>Chưa có</span>
+                        <span>{{
+                          $t("fingerprint.detail.noFingerprint")
+                        }}</span>
                       </div>
                     </div>
 
@@ -263,7 +304,7 @@
                       class="finger-quality"
                       v-if="getFingerprintObjByFinger(selectedCard, finger.key)"
                     >
-                      <el-tag
+                      <!-- <el-tag
                         size="small"
                         :type="
                           getQualityTagType(
@@ -281,7 +322,7 @@
                             getFingerprintObjByFinger(selectedCard, finger.key)
                           ) ?? "N/A"
                         }}
-                      </el-tag>
+                      </el-tag> -->
                     </div>
                   </div>
                 </div>
@@ -290,11 +331,15 @@
               <!-- Four Finger Slaps -->
               <div class="fingerprint-subsection">
                 <h5>
-                  Ảnh 4 ngón chụm ({{ getFourFingerSlapCount(selectedCard) }}/2)
+                  {{ $t("fingerprint.detail.section.fourFingers") }} ({{
+                    getFourFingerSlapCount(selectedCard)
+                  }}/2)
                 </h5>
                 <div class="slap-grid">
                   <div class="slap-item">
-                    <div class="slap-label">4 ngón chụm tay phải</div>
+                    <div class="slap-label">
+                      {{ $t("fingerprint.detail.rightFour") }}
+                    </div>
                     <div class="slap-container">
                       <img
                         v-if="
@@ -308,17 +353,19 @@
                             )
                           )
                         "
-                        alt="4 ngón chụm tay phải"
+                        :alt="$t('fingerprint.detail.rightFour')"
                         @error="handleFingerprintImageError"
                       />
                       <div v-else class="no-slap">
                         <el-icon><Pointer /></el-icon>
-                        <span>Chưa có</span>
+                        <span>{{ $t("fingerprint.detail.noData") }}</span>
                       </div>
                     </div>
                   </div>
                   <div class="slap-item">
-                    <div class="slap-label">4 ngón chụm tay trái</div>
+                    <div class="slap-label">
+                      {{ $t("fingerprint.detail.leftFour") }}
+                    </div>
                     <div class="slap-container">
                       <img
                         v-if="
@@ -329,12 +376,12 @@
                             getFingerprintObjByFinger(selectedCard, 'LEFT_FOUR')
                           )
                         "
-                        alt="4 ngón chụm tay trái"
+                        :alt="$t('fingerprint.detail.leftFour')"
                         @error="handleFingerprintImageError"
                       />
                       <div v-else class="no-slap">
                         <el-icon><Pointer /></el-icon>
-                        <span>Chưa có</span>
+                        <span>{{ $t("fingerprint.detail.noData") }}</span>
                       </div>
                     </div>
                   </div>
@@ -344,11 +391,15 @@
               <!-- Full Hand Prints -->
               <div class="fingerprint-subsection">
                 <h5>
-                  Ảnh toàn bộ bàn tay ({{ getFullHandCount(selectedCard) }}/2)
+                  {{ $t("fingerprint.detail.section.fullHands") }} ({{
+                    getFullHandCount(selectedCard)
+                  }}/2)
                 </h5>
                 <div class="hand-grid">
                   <div class="hand-item">
-                    <div class="hand-label">Bàn tay phải</div>
+                    <div class="hand-label">
+                      {{ $t("fingerprint.detail.rightHand") }}
+                    </div>
                     <div class="hand-container">
                       <img
                         v-if="
@@ -362,7 +413,7 @@
                             )
                           )
                         "
-                        alt="Bàn tay phải"
+                        :alt="$t('fingerprint.detail.rightHand')"
                         @error="handleFingerprintImageError"
                       />
                       <div v-else class="no-hand">
@@ -372,7 +423,9 @@
                     </div>
                   </div>
                   <div class="hand-item">
-                    <div class="hand-label">Bàn tay trái</div>
+                    <div class="hand-label">
+                      {{ $t("fingerprint.detail.leftHand") }}
+                    </div>
                     <div class="hand-container">
                       <img
                         v-if="
@@ -383,12 +436,12 @@
                             getFingerprintObjByFinger(selectedCard, 'LEFT_FULL')
                           )
                         "
-                        alt="Bàn tay trái"
+                        :alt="$t('fingerprint.detail.leftHand')"
                         @error="handleFingerprintImageError"
                       />
                       <div v-else class="no-hand">
                         <el-icon><Pointer /></el-icon>
-                        <span>Chưa có</span>
+                        <span>{{ $t("fingerprint.detail.noData") }}</span>
                       </div>
                     </div>
                   </div>
@@ -411,7 +464,7 @@
     </el-dialog>
 
     <!-- Compare Dialog -->
-    <el-dialog
+    <!-- <el-dialog
       v-model="compareDialogVisible"
       title="So sánh vân tay"
       width="60%"
@@ -494,7 +547,7 @@
           Bắt đầu so sánh
         </el-button>
       </template>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -522,9 +575,12 @@ import {
   fourFingers,
   thumbFingers,
 } from "@/constants/fingerprint";
+import type { FingerprintCard } from "@/types/fingerprint";
+import { usePrisonStore } from "@/stores/prison";
+import { storeToRefs } from "pinia";
 
-import type { FingerprintCardResponse } from "@/types/fingerprint";
-
+const prisonStore = usePrisonStore();
+const { prisons } = storeToRefs(prisonStore);
 const { t } = useI18n();
 const { isButtonEnabled } = useBaseMixin();
 
@@ -547,7 +603,7 @@ const page = ref(1);
 const size = ref(10);
 const detailDialogVisible = ref(false);
 const compareDialogVisible = ref(false);
-const selectedCard = ref<FingerprintCardResponse | null>(null);
+const selectedCard = ref<FingerprintCard | null>(null);
 
 const compareForm = ref({
   threshold: 80,
@@ -557,16 +613,16 @@ const compareResults = ref([]);
 
 // Finger positions mapping
 const fingerPositions = [
-  { key: "RIGHT_THUMB", label: "Cái phải" },
-  { key: "RIGHT_INDEX", label: "Trỏ phải" },
-  { key: "RIGHT_MIDDLE", label: "Giữa phải" },
-  { key: "RIGHT_RING", label: "Áp út phải" },
-  { key: "RIGHT_LITTLE", label: "Út phải" },
-  { key: "LEFT_THUMB", label: "Cái trái" },
-  { key: "LEFT_INDEX", label: "Trỏ trái" },
-  { key: "LEFT_MIDDLE", label: "Giữa trái" },
-  { key: "LEFT_RING", label: "Áp út trái" },
-  { key: "LEFT_LITTLE", label: "Út trái" },
+  { key: "RIGHT_THUMB", label: t("fingerprint.fingers.thumbright") },
+  { key: "RIGHT_INDEX", label: t("fingerprint.fingers.indexright") },
+  { key: "RIGHT_MIDDLE", label: t("fingerprint.fingers.middleright") },
+  { key: "RIGHT_RING", label: t("fingerprint.fingers.ringright") },
+  { key: "RIGHT_LITTLE", label: t("fingerprint.fingers.littleright") },
+  { key: "LEFT_THUMB", label: t("fingerprint.fingers.thumbleft") },
+  { key: "LEFT_INDEX", label: t("fingerprint.fingers.indexleft") },
+  { key: "LEFT_MIDDLE", label: t("fingerprint.fingers.middleleft") },
+  { key: "LEFT_RING", label: t("fingerprint.fingers.ringleft") },
+  { key: "LEFT_LITTLE", label: t("fingerprint.fingers.littleleft") },
 ];
 
 // Computed
@@ -682,13 +738,7 @@ const getFingerprintObjByFinger = (card: any, fingerKey: string) =>
   card?.fingerPrintImages?.find((img: any) => img?.finger === fingerKey);
 
 // Lấy URL ảnh (ưu tiên linkUrl đã ký)
-const getFingerprintImage = (obj?: any) => obj?.linkUrl || obj?.objectUrl || "";
-
-// const paginatedCards = computed(() => {
-//   const start = (currentPage.value - 1) * pageSize.value;
-//   const end = start + pageSize.value;
-//   return filteredCards.value.slice(start, end);
-// });
+const getFingerprintImage = (obj?: any) => obj?.linkUrl || "";
 
 // Methods
 const handleSearch = () => {
@@ -882,11 +932,16 @@ const handleFingerprintImageError = (event: any) => {
 
 const formatDate = (dateStr: any) => {
   if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 };
 
 onMounted(async () => {
   await nextTick();
+  await prisonStore.getAll();
   if (fingerprintStore.pageNo) page.value = fingerprintStore.pageNo;
   if (fingerprintStore.pageSize) size.value = fingerprintStore.pageSize;
   await search();

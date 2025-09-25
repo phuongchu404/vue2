@@ -136,7 +136,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('prison.occupancyRate')" width="150">
+      <el-table-column :label="t('prison.occupancyRate')" width="150" >
         <template #default="scope">
           <el-progress
             :percentage="
@@ -153,8 +153,8 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="phone" :label="t('prison.phone')" width="130" />
-      <el-table-column :label="t('prison.status')" width="110" align="center">
+      <el-table-column prop="phone" :label="t('prison.phone')" width="150" align="center"/>
+      <el-table-column :label="t('prison.status')" width="130" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
             {{
@@ -165,7 +165,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="160" fixed="right">
+      <el-table-column :label="t('common.actions')" width="200" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View">
           </el-button>

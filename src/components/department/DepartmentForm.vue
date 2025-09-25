@@ -116,7 +116,7 @@ const form = reactive<Partial<Department>>({
 
 // Validation
 const rules: FormRules = {
-  code: [{ required: true, message: "Vui lòng nhập mã phòng ban", trigger: "blur" }],
+  // code: [{ required: true, message: "Vui lòng nhập mã phòng ban", trigger: "blur" }],
   name: [{ required: true, message: "Vui lòng nhập tên phòng ban", trigger: "blur" }],
   detentionCenterId: [{ required: true, message: "Vui lòng chọn trại giam", trigger: "change" }],
 };

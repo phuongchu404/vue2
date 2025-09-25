@@ -90,11 +90,13 @@
         prop="id"
         :label="$t('common.index')"
         width="85"
+        align="center"
       ></el-table-column>
       <el-table-column
         prop="detaineeCode"
         :label="t('identity.detaineeId')"
         width="170"
+        align="center"
       />
       <el-table-column
         prop="detaineeName"
@@ -105,6 +107,7 @@
         prop="arrestDate"
         :label="t('identity.arrestDate')"
         width="140"
+        align="center"
       >
         <template #default="scope">
           {{ formatDate(scope.row.arrestDate) }}
@@ -119,6 +122,7 @@
       <el-table-column
         prop="fpClassification"
         :label="t('identity.fpClassification')"
+        align="center"
         width="150"
       />
       <el-table-column
@@ -135,6 +139,7 @@
       </el-table-column>
       <el-table-column
         prop="createdAt"
+        align="center"
         :label="t('common.createTime')"
         width="180"
       >

@@ -13,6 +13,8 @@ import route from "./en-US/route";
 import identity from "./en-US/identity";
 import detainee from "./en-US/detainee";
 import department from "./en-US/department.ts";
+import fingerprint from "./en-US/fingerprint";
+import report from "@/i18n/lang/en-US/report.ts"
 
 export default {
   route,
@@ -29,5 +31,7 @@ export default {
   prison,
   identity,
   detainee,
-  department
+  department,
+  fingerprint,
+  report,
 };

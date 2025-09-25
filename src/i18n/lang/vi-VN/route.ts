@@ -23,6 +23,9 @@ const route: Route = {
   departmentList: "Quản lý Phòng ban",
   departmentEdit: "Chỉnh sửa Phòng ban",
   departmentAdd: "Thêm Phòng ban",
+  fingerprintList: "Quản lý chỉ bản",
+  fingerprintAdd: "Thêm chỉ bản",
+  fingerprintEdit: "Chỉnh sửa chỉ bản",
 };
 
 export default route;

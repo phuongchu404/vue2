@@ -2,7 +2,7 @@
   <div class="reports-statistics">
     <!-- Thống kê tổng quan -->
     <div class="statistics-overview">
-      <h3>📈 Thống Kê Tổng Quan</h3>
+      <h3>📈 {{ t("report.overview") }}</h3>
       <div class="stats-grid">
         <div class="stat-card" v-for="stat in statisticsCards" :key="stat.key">
           <div class="stat-icon">
@@ -12,7 +12,7 @@
             <h4>{{ stat.title }}</h4>
             <div class="stat-number">{{ stat.value }}</div>
             <div class="stat-change" :class="getChangeClass(stat.change)">
-              {{ formatChange(stat.change) }} so với tháng trước
+              {{ formatChange(stat.change) }} {{ t("report.compareWith") }}
             </div>
           </div>
         </div>
@@ -21,13 +21,13 @@
 
     <!-- Bộ lọc báo cáo -->
     <div class="report-filters">
-      <h3>🔍 Tạo Báo Cáo Chi Tiết</h3>
+      <h3>🔍 {{ t("report.createReportDetail") }}</h3>
       <div class="filter-grid">
         <div class="form-group">
-          <label>Loại báo cáo</label>
+          <label>{{ t("report.type") }}</label>
           <el-select
             v-model="reportForm.type"
-            placeholder="Chọn loại báo cáo"
+            :placeholder="t('report.typePlaceHolder')"
             @change="handleReportTypeChange"
             clearable
           >
@@ -41,11 +41,11 @@
         </div>
 
         <div class="form-group">
-          <label>Từ ngày</label>
+          <label>{{ t("report.fromDate") }}</label>
           <el-date-picker
             v-model="reportForm.fromDate"
             type="date"
-            placeholder="Chọn ngày bắt đầu"
+            :placeholder="t('report.fromDatePlace')"
             :disabled="!reportForm.type"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
@@ -53,11 +53,11 @@
         </div>
 
         <div class="form-group">
-          <label>Đến ngày</label>
+          <label>{{ t("report.toDate") }}</label>
           <el-date-picker
             v-model="reportForm.toDate"
             type="date"
-            placeholder="Chọn ngày kết thúc"
+            :placeholder="t('report.toDatePlace')"
             :disabled="!reportForm.type"
             format="DD/MM/YYYY"
             value-format="YYYY-MM-DD"
@@ -65,11 +65,11 @@
         </div>
 
         <div class="form-group">
-          <label>Định dạng xuất</label>
-          <el-select v-model="reportForm.format" placeholder="Chọn định dạng">
-            <el-option label="Bảng" value="table" />
-            <el-option label="Biểu đồ" value="chart" />
-            <el-option label="Cả hai" value="both" />
+          <label>{{ t("report.exportFormat") }}</label>
+          <el-select v-model="reportForm.format" :placeholder="t('report.exportFormatPlace')">
+            <el-option :label="t('report.table')" value="table" />
+            <el-option :label="t('report.chart')" value="chart" />
+            <el-option :label="t('report.both')" value="both" />
           </el-select>
         </div>
       </div>
@@ -84,7 +84,7 @@
         >
           <span v-if="loading">⏳</span>
           <span v-else>📊</span>
-          {{ loading ? "Đang tạo..." : "Tạo Báo Cáo" }}
+          {{ loading ? t("report.creating") : t("report.create") }}
         </el-button>
 
         <el-button
@@ -93,7 +93,7 @@
           @click="exportReport"
           :disabled="!currentReport || loading"
         >
-          📤 Xuất Excel
+          📤 {{ t("report.excel") }}
         </el-button>
 
         <el-button
@@ -101,7 +101,7 @@
           @click="exportToPDF"
           :disabled="!currentReport || loading"
         >
-          📄 Xuất PDF
+          📄 {{ t("report.pdf") }}
         </el-button>
 
         <el-button
@@ -110,7 +110,7 @@
           @click="printReport"
           :disabled="!currentReport"
         >
-          🖨️ In Báo Cáo
+          🖨️ {{ t("report.print") }}
         </el-button>
       </div>
     </div>
@@ -120,9 +120,9 @@
       <div class="report-header">
         <h3>{{ currentReport.title }}</h3>
         <div class="report-meta">
-          <span>Tạo lúc: {{ formatDateTime(currentReport.createdAt) }}</span>
+          <span>{{ t("report.createAt") }} {{ formatDateTime(currentReport.createdAt) }}</span>
           <span v-if="reportForm.fromDate && reportForm.toDate">
-            Từ {{ formatDate(reportForm.fromDate) }} đến
+            {{t("report.from")}} {{ formatDate(reportForm.fromDate) }} {{t("report.to")}}
             {{ formatDate(reportForm.toDate) }}
           </span>
         </div>
@@ -158,7 +158,7 @@
         <!-- Tổng kết -->
         <div v-if="currentReport.summary" class="table-summary">
           <div class="summary-row">
-            <strong>Tổng kết:</strong>
+            <strong>{{ t("report.summary") }}</strong>
             <span v-for="column in currentReport.columns" :key="column.key">
               <span v-if="currentReport.summary[column.key]">
                 {{ column.title }}: {{ currentReport.summary[column.key] }}
@@ -170,7 +170,7 @@
 
       <!-- Tóm tắt báo cáo -->
       <div v-if="currentReport.insights" class="report-insights">
-        <h4>📋 Tóm Tắt & Phân Tích</h4>
+        <h4>📋 {{ t("report.insight") }}</h4>
         <div class="insights-grid">
           <div
             v-for="insight in currentReport.insights"
@@ -201,6 +201,8 @@ import {
 } from "@element-plus/icons-vue";
 import Chart from "chart.js/auto";
 import { useReportStore } from "@/stores/report";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 // Stores
 const reportStore = useReportStore();
@@ -231,13 +233,13 @@ const statistics = reactive({
 
 // Report type options
 const reportTypeOptions = [
-  { value: "detainees-by-status", label: "Phạm nhân theo trạng thái" },
-  { value: "detainees-by-month", label: "Phạm nhân theo tháng" },
+  { value: "detainees-by-status", label: t("report.detaineeByStatus.text") },
+  { value: "detainees-by-month", label: t("report.detaineeByMonth.text") },
   // { value: "detainees-by-crime", label: "Phạm nhân theo tội danh" },
-  { value: "staff-by-department", label: "Cán bộ theo phòng ban" },
+  { value: "staff-by-department", label: t("report.staffByDepartment.text") },
   // { value: "staff-by-rank", label: "Cán bộ theo cấp bậc" },
-  { value: "identity-records", label: "Danh bản đã lập" },
-  { value: "fingerprint-cards", label: "Chỉ bản đã lập" },
+  { value: "identity-records", label: t("report.identityRecord.text") },
+  { value: "fingerprint-cards", label: t("report.fingerprintCard.text") },
   // { value: "monthly-summary", label: "Tổng hợp theo tháng" },
 ];
 
@@ -245,28 +247,28 @@ const reportTypeOptions = [
 const statisticsCards = computed(() => [
   {
     key: "detainees",
-    title: "Tổng Số Phạm Nhân",
+    title: t("report.totalDetainee"),
     value: statistics.totalDetainees,
     change: statistics.detaineeChange,
     icon: User,
   },
   {
     key: "staff",
-    title: "Tổng Số Cán Bộ",
+    title: t("report.totalStaff"),
     value: statistics.totalStaff,
     change: statistics.staffChange,
     icon: Avatar,
   },
   {
     key: "identity",
-    title: "Danh Bản Đã Lập",
+    title: t("report.totalIdentity"),
     value: statistics.totalIdentity,
     change: statistics.identityChange,
     icon: Document,
   },
   {
     key: "fingerprint",
-    title: "Chỉ Bản Đã Lập",
+    title: t("report.totalFingerprint"),
     value: statistics.totalFingerprint,
     change: statistics.fingerprintChange,
     icon: Pointer,
@@ -326,9 +328,9 @@ const generateReport = async () => {
       renderChart(reportData);
     }
 
-    ElMessage.success("Tạo báo cáo thành công!");
+    ElMessage.success(t("report.success.create"));
   } catch (error: Error | any) {
-    ElMessage.error(error.message || "Lỗi khi tạo báo cáo!");
+    ElMessage.error(error.message || t("report.error.create"));
   } finally {
     loading.value = false;
   }
@@ -448,7 +450,7 @@ const runQuickReport = async (quickReport: any) => {
 
     await generateReport();
   } catch (error) {
-    ElMessage.error("Lỗi khi tạo báo cáo nhanh!");
+    ElMessage.error(t("report.error.createQuick"));
   } finally {
     loading.value = false;
   }
@@ -465,9 +467,9 @@ const exportReport = async () => {
     };
 
     await reportStore.exportToExcel(data);
-    ElMessage.success("Xuất Excel thành công!");
+    ElMessage.success(t("report.success.excel"));
   } catch (error) {
-    ElMessage.error("Lỗi khi xuất Excel!");
+    ElMessage.error(t("report.error.excel"));
   }
 };
 
@@ -475,9 +477,9 @@ const exportToPDF = async () => {
   try {
     if (!currentReport.value) return;
     await reportStore.exportToPDF(currentReport.value);
-    ElMessage.success("Xuất PDF thành công!");
+    ElMessage.success(t("report.success.pdf"));
   } catch (error) {
-    ElMessage.error("Lỗi khi xuất PDF!");
+    ElMessage.error(t("report.error.pdf"));
   }
 };
 
@@ -486,7 +488,7 @@ const printReport = () => {
 
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
-    ElMessage.error("Không thể mở cửa sổ in!");
+    ElMessage.error(t("report.error.print"));
     return;
   }
   const printContent = generatePrintContent(currentReport.value);
@@ -588,7 +590,7 @@ const formatDateTime = (dateStr: any) => {
 };
 
 const formatChange = (change: any) => {
-  if (change === 0) return "Không thay đổi";
+  if (change === 0) return t("report.notChange");
   const prefix = change > 0 ? "+" : "";
   return `${prefix}${change}`;
 };

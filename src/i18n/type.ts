@@ -67,6 +67,7 @@ export interface Common {
   edit: string;
   update: string;
   exportUpdating: string;
+  reminder: string;
 }
 
 export interface Home {
@@ -290,6 +291,12 @@ export interface Route {
   identityList: string;
   identityAdd: string;
   identityEdit: string;
+  fingerprintList: string;
+  fingerprintAdd: string;
+  fingerprintEdit: string;
+  departmentList: string;
+  departmentAdd: string;
+  departmentEdit: string;
 }
 
 export interface Staff {

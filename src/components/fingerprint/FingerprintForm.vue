@@ -12,27 +12,35 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Mã phạm nhân" prop="person_id">
+            <el-form-item :label="$t('fingerprint.form.detaineeCode')" prop="person_id">
               <el-select
-                v-model="form.person_id"
-                placeholder="Chọn phạm nhân"
+                v-model="form.detaineeCode"
+                  :placeholder="$t('fingerprint.form.placeholder.detaineeCode')"
                 filterable
                 @change="onDetaineeChange"
                 :disabled="isEdit"
               >
                 <el-option
-                  v-for="detainee in detaineeStore.detainees"
-                  :key="detainee.id"
-                  :label="`${detainee.detainee_code} - ${detainee.full_name}`"
-                  :value="detainee.detainee_code"
+                  v-for="detainee in detaineeStore.getDetainees"
+                  :key="detainee.detaineeCode"
+                  :label="`${detainee.detaineeCode} - ${detainee.fullName}`"
+                  :value="detainee.detaineeCode"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Ngày lập" prop="created_date">
+            <el-form-item label="Tạo tại">
+              <el-input
+                v-model="form.createdPlace"
+                placeholder="Nhập nơi tạo chỉ bản..."
+              />
+            </el-form-item>
+          </el-col>
+          <!-- <el-col :md="12" :span="24">
+            <el-form-item label="Ngày lập" prop="createdDate">
               <el-date-picker
-                v-model="form.created_date"
+                v-model="form.createdDate"
                 type="date"
                 placeholder="Chọn ngày lập"
                 style="width: 100%"
@@ -40,74 +48,66 @@
                 value-format="YYYY-MM-DD"
               />
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
 
         <el-row :gutter="20">
-          <el-col :md="12" :span="24">
-            <el-form-item label="Tạo tại">
-              <el-input
-                v-model="form.created_place"
-                placeholder="Nhập nơi tạo chỉ bản..."
-              />
-            </el-form-item>
-          </el-col>
           <el-col :md="12" :span="24">
             <el-form-item label="Lý do lập">
               <el-input
-                v-model="form.reason_note"
-                placeholder="Nhập lý do lập chỉ bản..."
+                v-model="form.reasonNote"
+                  :placeholder="$t('fingerprint.form.placeholder.reasonNote')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Thông số kỹ thuật</el-divider>
+        <el-divider content-position="left">{{ $t('fingerprint.section.technicalSpecs') }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item label="Công thức vân tay">
+            <el-form-item :label="$t('fingerprint.form.fpFormula')">
               <el-input
                 v-model="form.fp_formula"
-                placeholder="Nhập công thức vân tay..."
+                  :placeholder="$t('fingerprint.form.placeholder.fpFormula')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="DP">
-              <el-input v-model="form.dp" placeholder="Nhập DP..." />
+            <el-form-item :label="$t('fingerprint.form.dp')">
+              <el-input v-model="form.dp" :placeholder="$t('fingerprint.form.placeholder.dp')"/>
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item label="TW">
-              <el-input v-model="form.tw" placeholder="Nhập TW..." />
+            <el-form-item :label="$t('fingerprint.form.tw')">
+              <el-input v-model="form.tw" :placeholder="$t('fingerprint.form.placeholder.tw')"/>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">Thu thập vân tay</el-divider>
+        <el-divider content-position="left">{{ $t('fingerprint.section.collect') }}</el-divider>
 
         <div class="fingerprint-upload-section">
           <el-alert
-            title="Hướng dẫn thu thập vân tay"
-            type="info"
-            description="Thu thập đầy đủ: 10 vân tay đơn, 4 ngón chụm (2 tay), toàn bộ bàn tay (2 tay). Định dạng: JPG, PNG, WSQ. Tối đa: 5MB."
-            show-icon
-            :closable="false"
-            class="mb-4"
+              :title="$t('fingerprint.collect.guideTitle')"
+              type="info"
+              :description="$t('fingerprint.collect.guideDesc')"
+              show-icon
+              :closable="false"
+              class="mb-4"
           />
 
           <!-- Individual Fingerprints -->
           <div class="section-title">
-            <h4>1. Vân tay từng ngón (10 ngón)</h4>
+            <h4>{{ $t('fingerprint.collect.individual.title') }}</h4>
           </div>
           <div class="fingerprint-grid">
-            <!-- Right Hand -->
+            <!-- Left Hand -->
             <div class="hand-section">
-              <h4>Tay phải</h4>
+              <h4>Tay trái</h4>
               <div class="fingers-row">
                 <div
-                  v-for="finger in rightHandFingers"
+                  v-for="finger in leftHandFingers"
                   :key="finger.key"
                   class="finger-slot"
                   @click="selectFinger(finger.key)"
@@ -143,13 +143,12 @@
                 </div>
               </div>
             </div>
-
-            <!-- Left Hand -->
+            <!-- Right Hand -->
             <div class="hand-section">
-              <h4>Tay trái</h4>
+              <h4>Tay phải</h4>
               <div class="fingers-row">
                 <div
-                  v-for="finger in leftHandFingers"
+                  v-for="finger in rightHandFingers"
                   :key="finger.key"
                   class="finger-slot"
                   @click="selectFinger(finger.key)"
@@ -198,52 +197,12 @@
             <el-row :gutter="20">
               <el-col :span="12">
                 <div class="slap-card">
-                  <h5>4 ngón chụm tay phải</h5>
-                  <div
-                    class="slap-slot"
-                    @click="selectFinger('RIGHT_FOUR_SLAP')"
-                  >
-                    <div class="slap-container">
-                      <img
-                        v-if="fingerprintPreviews['RIGHT_FOUR_SLAP']"
-                        :src="fingerprintPreviews['RIGHT_FOUR_SLAP']"
-                        alt="4 ngón chụm tay phải"
-                        class="slap-preview"
-                      />
-                      <div v-else class="no-slap">
-                        <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh 4 ngón chụm tay phải</span>
-                      </div>
-                    </div>
-                    <div
-                      v-if="fingerprintFiles['RIGHT_FOUR_SLAP']"
-                      class="slap-actions"
-                    >
-                      <el-tag size="small" type="success">
-                        {{ getFileSize(fingerprintFiles["RIGHT_FOUR_SLAP"]) }}
-                      </el-tag>
-                      <el-button
-                        size="small"
-                        type="danger"
-                        @click.stop="removeFinger('RIGHT_FOUR_SLAP')"
-                      >
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </div>
-                  </div>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <div class="slap-card">
                   <h5>4 ngón chụm tay trái</h5>
-                  <div
-                    class="slap-slot"
-                    @click="selectFinger('LEFT_FOUR_SLAP')"
-                  >
+                  <div class="slap-slot" @click="selectFinger('LEFT_FOUR')">
                     <div class="slap-container">
                       <img
-                        v-if="fingerprintPreviews['LEFT_FOUR_SLAP']"
-                        :src="fingerprintPreviews['LEFT_FOUR_SLAP']"
+                        v-if="fingerprintPreviews['LEFT_FOUR']"
+                        :src="fingerprintPreviews['LEFT_FOUR']"
                         alt="4 ngón chụm tay trái"
                         class="slap-preview"
                       />
@@ -253,16 +212,50 @@
                       </div>
                     </div>
                     <div
-                      v-if="fingerprintFiles['LEFT_FOUR_SLAP']"
+                      v-if="fingerprintFiles['LEFT_FOUR']"
                       class="slap-actions"
                     >
                       <el-tag size="small" type="success">
-                        {{ getFileSize(fingerprintFiles["LEFT_FOUR_SLAP"]) }}
+                        {{ getFileSize(fingerprintFiles["LEFT_FOUR"]) }}
                       </el-tag>
                       <el-button
                         size="small"
                         type="danger"
-                        @click.stop="removeFinger('LEFT_FOUR_SLAP')"
+                        @click.stop="removeFinger('LEFT_FOUR')"
+                      >
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="slap-card">
+                  <h5>4 ngón chụm tay phải</h5>
+                  <div class="slap-slot" @click="selectFinger('RIGHT_FOUR')">
+                    <div class="slap-container">
+                      <img
+                        v-if="fingerprintPreviews['RIGHT_FOUR']"
+                        :src="fingerprintPreviews['RIGHT_FOUR']"
+                        alt="4 ngón chụm tay phải"
+                        class="slap-preview"
+                      />
+                      <div v-else class="no-slap">
+                        <el-icon><Plus /></el-icon>
+                        <span>Thêm ảnh 4 ngón chụm tay phải</span>
+                      </div>
+                    </div>
+                    <div
+                      v-if="fingerprintFiles['RIGHT_FOUR']"
+                      class="slap-actions"
+                    >
+                      <el-tag size="small" type="success">
+                        {{ getFileSize(fingerprintFiles["RIGHT_FOUR"]) }}
+                      </el-tag>
+                      <el-button
+                        size="small"
+                        type="danger"
+                        @click.stop="removeFinger('RIGHT_FOUR')"
                       >
                         <el-icon><Delete /></el-icon>
                       </el-button>
@@ -284,52 +277,12 @@
             <el-row :gutter="20">
               <el-col :span="12">
                 <div class="hand-card">
-                  <h5>Bàn tay phải</h5>
-                  <div
-                    class="hand-slot"
-                    @click="selectFinger('RIGHT_FULL_HAND')"
-                  >
-                    <div class="hand-container">
-                      <img
-                        v-if="fingerprintPreviews['RIGHT_FULL_HAND']"
-                        :src="fingerprintPreviews['RIGHT_FULL_HAND']"
-                        alt="Bàn tay phải"
-                        class="hand-preview"
-                      />
-                      <div v-else class="no-hand">
-                        <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh bàn tay phải</span>
-                      </div>
-                    </div>
-                    <div
-                      v-if="fingerprintFiles['RIGHT_FULL_HAND']"
-                      class="hand-actions"
-                    >
-                      <el-tag size="small" type="success">
-                        {{ getFileSize(fingerprintFiles["RIGHT_FULL_HAND"]) }}
-                      </el-tag>
-                      <el-button
-                        size="small"
-                        type="danger"
-                        @click.stop="removeFinger('RIGHT_FULL_HAND')"
-                      >
-                        <el-icon><Delete /></el-icon>
-                      </el-button>
-                    </div>
-                  </div>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <div class="hand-card">
                   <h5>Bàn tay trái</h5>
-                  <div
-                    class="hand-slot"
-                    @click="selectFinger('LEFT_FULL_HAND')"
-                  >
+                  <div class="hand-slot" @click="selectFinger('LEFT_FULL')">
                     <div class="hand-container">
                       <img
-                        v-if="fingerprintPreviews['LEFT_FULL_HAND']"
-                        :src="fingerprintPreviews['LEFT_FULL_HAND']"
+                        v-if="fingerprintPreviews['LEFT_FULL']"
+                        :src="fingerprintPreviews['LEFT_FULL']"
                         alt="Bàn tay trái"
                         class="hand-preview"
                       />
@@ -339,16 +292,50 @@
                       </div>
                     </div>
                     <div
-                      v-if="fingerprintFiles['LEFT_FULL_HAND']"
+                      v-if="fingerprintFiles['LEFT_FULL']"
                       class="hand-actions"
                     >
                       <el-tag size="small" type="success">
-                        {{ getFileSize(fingerprintFiles["LEFT_FULL_HAND"]) }}
+                        {{ getFileSize(fingerprintFiles["LEFT_FULL"]) }}
                       </el-tag>
                       <el-button
                         size="small"
                         type="danger"
-                        @click.stop="removeFinger('LEFT_FULL_HAND')"
+                        @click.stop="removeFinger('LEFT_FULL')"
+                      >
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="hand-card">
+                  <h5>Bàn tay phải</h5>
+                  <div class="hand-slot" @click="selectFinger('RIGHT_FULL')">
+                    <div class="hand-container">
+                      <img
+                        v-if="fingerprintPreviews['RIGHT_FULL']"
+                        :src="fingerprintPreviews['RIGHT_FULL']"
+                        alt="Bàn tay phải"
+                        class="hand-preview"
+                      />
+                      <div v-else class="no-hand">
+                        <el-icon><Plus /></el-icon>
+                        <span>Thêm ảnh bàn tay phải</span>
+                      </div>
+                    </div>
+                    <div
+                      v-if="fingerprintFiles['RIGHT_FULL']"
+                      class="hand-actions"
+                    >
+                      <el-tag size="small" type="success">
+                        {{ getFileSize(fingerprintFiles["RIGHT_FULL"]) }}
+                      </el-tag>
+                      <el-button
+                        size="small"
+                        type="danger"
+                        @click.stop="removeFinger('RIGHT_FULL')"
                       >
                         <el-icon><Delete /></el-icon>
                       </el-button>
@@ -408,7 +395,7 @@
             <el-col :span="12">
               <div class="quality-rating">
                 <h4>Đánh giá tổng thể</h4>
-                <div class="overall-rating">
+                <!-- <div class="overall-rating">
                   <el-rate
                     :model-value="getOverallQuality()"
                     disabled
@@ -416,7 +403,7 @@
                     text-color="#ff9900"
                     score-template="{value} điểm"
                   />
-                </div>
+                </div> -->
                 <el-progress
                   :percentage="getCompletionPercentage()"
                   :color="getProgressColor()"
@@ -465,14 +452,14 @@
           >
             {{ isEdit ? "Cập nhật" : "Tạo mới" }}
           </el-button>
-          <el-button @click="handleReset">Làm mới</el-button>
-          <el-button @click="$router.go(-1)">Hủy</el-button>
+          <el-button @click="handleReset">{{ $t('common.reset')}}</el-button>
+          <el-button @click="$router.go(-1)">{{ $t('common.cancel')}}</el-button>
           <el-button
             type="success"
             @click="handlePreview"
             v-if="getTotalFingerprints() > 0"
           >
-            Xem trước
+            {{ $t('common.preview') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -481,8 +468,9 @@
     <!-- Preview Dialog -->
     <el-dialog
       v-model="previewDialogVisible"
-      title="Xem trước chỉ bản"
+      :title="$t('fingerprint.preview.title')"
       width="80%"
+      class="dialog"
     >
       <div class="preview-content">
         <el-row :gutter="20">
@@ -491,16 +479,16 @@
               <template #header>Thông tin cơ bản</template>
               <el-descriptions :column="1" size="small">
                 <el-descriptions-item label="Mã phạm nhân">{{
-                  form.person_id
+                  form.detaineeCode
                 }}</el-descriptions-item>
-                <el-descriptions-item label="Ngày lập">{{
-                  formatDate(form.created_date)
-                }}</el-descriptions-item>
+                <!-- <el-descriptions-item label="Ngày lập">{{
+                  formatDate(form.createdDate)
+                }}</el-descriptions-item> -->
                 <el-descriptions-item label="Tạo tại">{{
-                  form.created_place || "-"
+                  form.createdPlace || "-"
                 }}</el-descriptions-item>
                 <el-descriptions-item label="Công thức VT">{{
-                  form.fp_formula || "-"
+                  form.fpFormula || "-"
                 }}</el-descriptions-item>
                 <el-descriptions-item label="DP">{{
                   form.dp || "-"
@@ -551,15 +539,15 @@
                   <div
                     class="preview-slap-item"
                     :class="{
-                      'has-image': fingerprintPreviews['RIGHT_FOUR_SLAP'],
+                      'has-image': fingerprintPreviews['LEFT_FOUR'],
                     }"
                   >
-                    <div class="preview-slap-label">4 ngón chụm tay phải</div>
+                    <div class="preview-slap-label">4 ngón chụm tay trái</div>
                     <div class="preview-slap-container">
                       <img
-                        v-if="fingerprintPreviews['RIGHT_FOUR_SLAP']"
-                        :src="fingerprintPreviews['RIGHT_FOUR_SLAP']"
-                        alt="4 ngón chụm tay phải"
+                        v-if="fingerprintPreviews['LEFT_FOUR']"
+                        :src="fingerprintPreviews['LEFT_FOUR']"
+                        alt="4 ngón chụm tay trái"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -569,15 +557,15 @@
                   <div
                     class="preview-slap-item"
                     :class="{
-                      'has-image': fingerprintPreviews['LEFT_FOUR_SLAP'],
+                      'has-image': fingerprintPreviews['RIGHT_FOUR'],
                     }"
                   >
-                    <div class="preview-slap-label">4 ngón chụm tay trái</div>
+                    <div class="preview-slap-label">4 ngón chụm tay phải</div>
                     <div class="preview-slap-container">
                       <img
-                        v-if="fingerprintPreviews['LEFT_FOUR_SLAP']"
-                        :src="fingerprintPreviews['LEFT_FOUR_SLAP']"
-                        alt="4 ngón chụm tay trái"
+                        v-if="fingerprintPreviews['RIGHT_FOUR']"
+                        :src="fingerprintPreviews['RIGHT_FOUR']"
+                        alt="4 ngón chụm tay phải"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -594,15 +582,15 @@
                   <div
                     class="preview-hand-item"
                     :class="{
-                      'has-image': fingerprintPreviews['RIGHT_FULL_HAND'],
+                      'has-image': fingerprintPreviews['LEFT_FULL'],
                     }"
                   >
-                    <div class="preview-hand-label">Bàn tay phải</div>
+                    <div class="preview-hand-label">Bàn tay trái</div>
                     <div class="preview-hand-container">
                       <img
-                        v-if="fingerprintPreviews['RIGHT_FULL_HAND']"
-                        :src="fingerprintPreviews['RIGHT_FULL_HAND']"
-                        alt="Bàn tay phải"
+                        v-if="fingerprintPreviews['LEFT_FULL']"
+                        :src="fingerprintPreviews['LEFT_FULL']"
+                        alt="Bàn tay trái"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -612,15 +600,15 @@
                   <div
                     class="preview-hand-item"
                     :class="{
-                      'has-image': fingerprintPreviews['LEFT_FULL_HAND'],
+                      'has-image': fingerprintPreviews['RIGHT_FULL'],
                     }"
                   >
-                    <div class="preview-hand-label">Bàn tay trái</div>
+                    <div class="preview-hand-label">Bàn tay phải</div>
                     <div class="preview-hand-container">
                       <img
-                        v-if="fingerprintPreviews['LEFT_FULL_HAND']"
-                        :src="fingerprintPreviews['LEFT_FULL_HAND']"
-                        alt="Bàn tay trái"
+                        v-if="fingerprintPreviews['RIGHT_FULL']"
+                        :src="fingerprintPreviews['RIGHT_FULL']"
+                        alt="Bàn tay phải"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -648,13 +636,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { Plus, Delete, Close } from "@element-plus/icons-vue";
 import { useFingerprintStore } from "@/stores/fingerprint";
 import { useDetaineeStore } from "@/stores/detainee";
+import type {
+  FingerprintCard,
+  FingerprintCardCreateRequest,
+  FingerprintCardUpdateRequest,
+} from "@/types/fingerprint";
+import detainee from "@/i18n/lang/en-US/detainee";
 
 const route = useRoute();
 const router = useRouter();
@@ -663,26 +657,27 @@ const detaineeStore = useDetaineeStore();
 
 // Reactive data
 const formRef = ref();
-const fileInput = ref();
 const submitting = ref(false);
 const uploadProgress = ref(0);
 const uploadStatus = ref("");
 const previewDialogVisible = ref(false);
-const currentSelectedFinger = ref(null);
+const fingerprintFiles: Record<string, File> = reactive({});
+const fingerprintPreviews: Record<string, string> = reactive({});
+const currentSelectedFinger = ref<string | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 const isEdit = computed(() => !!route.params.id);
 
-const form = reactive({
-  person_id: "",
-  created_date: "",
-  created_place: "",
-  reason_note: "",
-  fp_formula: "",
+const form = reactive<Partial<FingerprintCard>>({
+  detaineeCode: "",
+  createdDate: "",
+  createdPlace: "",
+  reasonNote: "",
+  fpFormula: "",
   dp: "",
   tw: "",
 });
 
-const fingerprintFiles = reactive({});
-const fingerprintPreviews = reactive({});
+// Script setup
 
 // Finger positions
 const rightHandFingers = [
@@ -705,67 +700,67 @@ const allFingers = [...rightHandFingers, ...leftHandFingers];
 
 // Additional fingerprint types
 const additionalTypes = [
-  { key: "RIGHT_FOUR_SLAP", label: "4 ngón chụm tay phải" },
-  { key: "LEFT_FOUR_SLAP", label: "4 ngón chụm tay trái" },
-  { key: "RIGHT_FULL_HAND", label: "Toàn bộ bàn tay phải" },
-  { key: "LEFT_FULL_HAND", label: "Toàn bộ bàn tay trái" },
+  { key: "RIGHT_FOUR", label: "4 ngón chụm tay phải" },
+  { key: "LEFT_FOUR", label: "4 ngón chụm tay trái" },
+  { key: "RIGHT_FULL", label: "Toàn bộ bàn tay phải" },
+  { key: "LEFT_FULL", label: "Toàn bộ bàn tay trái" },
 ];
 
 const allFingerprintTypes = [...allFingers, ...additionalTypes];
 
 // Validation rules
 const rules = reactive({
-  person_id: [
+  detaineeCode: [
     { required: true, message: "Vui lòng chọn phạm nhân", trigger: "change" },
   ],
-  created_date: [
+  createdDate: [
     { required: true, message: "Vui lòng chọn ngày lập", trigger: "change" },
   ],
 });
 
 // Methods
-const onDetaineeChange = (value) => {
-  const detainee = detaineeStore.detainees.find(
-    (d) => d.detainee_code === value
+const getAllDetainees = () => {
+  detaineeStore.getAll();
+};
+const onDetaineeChange = (value: any) => {
+  const detainee = detaineeStore.getDetainees?.find(
+    (d) => d.detaineeCode === value
   );
   if (detainee) {
     // Auto-fill some information based on detainee
-    ElMessage.success(`Đã chọn phạm nhân: ${detainee.full_name}`);
+    ElMessage.success(`Đã chọn phạm nhân: ${detainee.fullName}`);
   }
 };
 
-const selectFinger = (fingerKey) => {
+const selectFinger = (fingerKey: string) => {
   currentSelectedFinger.value = fingerKey;
-  fileInput.value.click();
+  fileInput.value?.click();
 };
 
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
+const handleFileChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file || !currentSelectedFinger.value) return;
 
-  // Validate file
-  if (!validateFile(file)) return;
-
-  // Store file
+  // Chỉ preview các định dạng ảnh hiển thị được
+  const canPreview = /^image\//.test(file.type); // png, jpg, bmp...
   fingerprintFiles[currentSelectedFinger.value] = file;
 
-  // Create preview
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    fingerprintPreviews[currentSelectedFinger.value] = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  if (canPreview) {
+    // URL preview
+    const url = URL.createObjectURL(file);
+    fingerprintPreviews[currentSelectedFinger.value] = url;
+  } else {
+    // WSQ hoặc định dạng khác: không preview được
+    fingerprintPreviews[currentSelectedFinger.value] = ""; // hoặc đặt icon placeholder
+  }
 
-  ElMessage.success(
-    `Đã thêm vân tay ${getFingerLabel(currentSelectedFinger.value)}`
-  );
-
-  // Reset file input
-  event.target.value = "";
+  // reset input để chọn lại cùng file không bị “không đổi”
+  input.value = "";
   currentSelectedFinger.value = null;
 };
 
-const validateFile = (file) => {
+const validateFile = (file: any) => {
   const validTypes = [
     "image/jpeg",
     "image/png",
@@ -790,23 +785,40 @@ const validateFile = (file) => {
   return true;
 };
 
-const removeFinger = (fingerKey) => {
+const removeFinger = (fingerKey: string) => {
+  const url = fingerprintPreviews[fingerKey];
+  if (url) URL.revokeObjectURL(url);
   delete fingerprintFiles[fingerKey];
   delete fingerprintPreviews[fingerKey];
-  ElMessage.info(`Đã xóa vân tay ${getFingerLabel(fingerKey)}`);
 };
 
-const getFingerLabel = (fingerKey) => {
+const getFingerLabel = (fingerKey: any) => {
   const finger = allFingerprintTypes.find((f) => f.key === fingerKey);
   return finger ? finger.label : fingerKey;
 };
 
-const getFileSize = (file) => {
+const getFileSize = (file: any) => {
+  console.log("file", file);
   if (!file) return "";
-  const size = file.size;
-  if (size < 1024) return `${size}B`;
-  if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
-  return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
+
+  // Nếu là File (tải từ input)
+  if (file instanceof File) {
+    const size = file.size;
+    if (size < 1024) return `${size}B`;
+    if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+    return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
+  }
+
+  // Nếu là object từ backend (không có size)
+  if (file.size) {
+    const size = file.size;
+    if (size < 1024) return `${size}B`;
+    if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+    return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
+  }
+
+  // Trường hợp không có size → hiển thị tên ảnh hoặc chuỗi trống
+  return "";
 };
 
 const getTotalFingerprints = () => {
@@ -819,15 +831,15 @@ const getIndividualFingerprints = () => {
 
 const getFourFingerSlaps = () => {
   let count = 0;
-  if (fingerprintFiles["RIGHT_FOUR_SLAP"]) count++;
-  if (fingerprintFiles["LEFT_FOUR_SLAP"]) count++;
+  if (fingerprintFiles["RIGHT_FOUR"]) count++;
+  if (fingerprintFiles["LEFT_FOUR"]) count++;
   return count;
 };
 
 const getFullHands = () => {
   let count = 0;
-  if (fingerprintFiles["RIGHT_FULL_HAND"]) count++;
-  if (fingerprintFiles["LEFT_FULL_HAND"]) count++;
+  if (fingerprintFiles["RIGHT_FULL"]) count++;
+  if (fingerprintFiles["LEFT_FULL"]) count++;
   return count;
 };
 
@@ -876,20 +888,20 @@ const handleSubmitFromPreview = () => {
   handleSubmit();
 };
 
-const loadData = () => {
+const loadData = async () => {
   if (isEdit.value) {
-    const card = fingerprintStore.getFingerprintCardById(route.params.id);
+    const card = await fingerprintStore.getById(Number(route.params.id));
     if (card) {
       Object.assign(form, card);
 
-      // Load existing fingerprints
-      if (card.fingerprints) {
-        Object.keys(card.fingerprints).forEach((key) => {
-          if (card.fingerprints[key]) {
-            fingerprintFiles[key] = card.fingerprints[key];
-            fingerprintPreviews[key] =
-              card.fingerprints[key].minioUrl ||
-              card.fingerprints[key].imageUrl;
+      if (card.fingerPrintImages && Array.isArray(card.fingerPrintImages)) {
+        card.fingerPrintImages.forEach((img: any) => {
+          if (img && img.finger) {
+            // Lưu file info (ở đây có thể chỉ là object metadata, chưa phải File thực)
+            fingerprintFiles[img.finger] = img;
+
+            // Lưu preview (ưu tiên linkUrl, fallback sang objectUrl)
+            fingerprintPreviews[img.finger] = img.linkUrl || img.objectUrl;
           }
         });
       }
@@ -899,7 +911,7 @@ const loadData = () => {
     }
   } else {
     // Set default values for new fingerprint card
-    form.created_date = new Date().toISOString().split("T")[0];
+    form.createdDate = new Date().toISOString().split("T")[0];
   }
 };
 
@@ -914,37 +926,18 @@ const handleSubmit = async () => {
       return;
     }
 
-    // Check if detainee exists
-    const detainee = detaineeStore.detainees.find(
-      (d) => d.detainee_code === form.person_id
-    );
-    if (!detainee) {
-      ElMessage.error("Không tìm thấy phạm nhân với mã này!");
-      return;
-    }
-
-    // Check if fingerprint card already exists for this detainee (for new records)
-    if (!isEdit.value) {
-      const existingCard = fingerprintStore.fingerprintCards.find(
-        (c) => c.person_id === form.person_id
-      );
-      if (existingCard) {
-        ElMessage.error("Phạm nhân này đã có chỉ bản!");
-        return;
-      }
-    }
-
     submitting.value = true;
 
     // Simulate file upload progress
     uploadProgress.value = 10;
     uploadStatus.value = "active";
 
-    const cardData = {
-      ...form,
-      detainee_name: detainee.full_name,
-      fingerprints: { ...fingerprintFiles },
-    };
+    const fd = new FormData();
+    for (const key in fingerprintFiles) {
+      if (fingerprintFiles[key]) {
+        fd.append(key, fingerprintFiles[key]);
+      }
+    }
 
     // Simulate upload progress
     for (let i = 20; i <= 90; i += 20) {
@@ -953,14 +946,21 @@ const handleSubmit = async () => {
     }
 
     if (isEdit.value) {
-      fingerprintStore.updateFingerprintCard(
-        parseInt(route.params.id),
-        cardData
+      const payload: FingerprintCardUpdateRequest = { ...form };
+      fd.append(
+        "payload",
+        new Blob([JSON.stringify(payload)], { type: "application/json" })
       );
-      ElMessage.success("Cập nhật chỉ bản thành công!");
+
+      await fingerprintStore.updateFingerprint(Number(route.params.id), fd);
     } else {
-      fingerprintStore.addFingerprintCard(cardData);
-      ElMessage.success("Tạo chỉ bản thành công!");
+      const payload: FingerprintCardCreateRequest = { ...form };
+      fd.append(
+        "payload",
+        new Blob([JSON.stringify(payload)], { type: "application/json" })
+      );
+
+      await fingerprintStore.createFingerprint(fd);
     }
 
     uploadProgress.value = 100;
@@ -987,11 +987,11 @@ const handleReset = () => {
   } else {
     formRef.value?.resetFields();
     Object.assign(form, {
-      person_id: "",
-      created_date: new Date().toISOString().split("T")[0],
-      created_place: "",
-      reason_note: "",
-      fp_formula: "",
+      detaineeCode: "",
+      // created_date: new Date().toISOString().split("T")[0],
+      createdPlace: "",
+      reasonNote: "",
+      fpFormula: "",
       dp: "",
       tw: "",
     });
@@ -1004,13 +1004,18 @@ const handleReset = () => {
   }
 };
 
-const formatDate = (dateStr) => {
+const formatDate = (dateStr: any) => {
   if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("vi-VN");
+  return new Date(dateStr).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 };
 
-onMounted(() => {
-  loadData();
+onMounted(async () => {
+  await getAllDetainees();
+  await loadData();
 });
 </script>
 <style scoped>
@@ -1097,9 +1102,16 @@ onMounted(() => {
 }
 
 .fingerprint-preview {
-  width: 100%;
+  /* width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* QUAN TRỌNG: không crop ảnh */
+  object-position: center;
+  image-rendering: crisp-edges; /* giữ nét */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
 }
 
 .no-fingerprint {
@@ -1165,7 +1177,7 @@ onMounted(() => {
 
 .slap-container,
 .hand-container {
-  height: 200px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1176,7 +1188,11 @@ onMounted(() => {
 .hand-preview {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* QUAN TRỌNG: không crop ảnh */
+  object-position: center;
+  image-rendering: crisp-edges; /* giữ nét */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
 }
 
 .no-slap,
@@ -1299,7 +1315,11 @@ onMounted(() => {
 .preview-finger-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* QUAN TRỌNG: không crop ảnh */
+  object-position: center;
+  image-rendering: crisp-edges; /* giữ nét */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
 }
 
 .preview-no-fingerprint,
@@ -1338,7 +1358,7 @@ onMounted(() => {
 
 .preview-slap-container,
 .preview-hand-container {
-  height: 120px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1349,7 +1369,11 @@ onMounted(() => {
 .preview-hand-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* QUAN TRỌNG: không crop ảnh */
+  object-position: center;
+  image-rendering: crisp-edges; /* giữ nét */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
 }
 
 .form-actions {

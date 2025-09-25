@@ -1,34 +1,34 @@
-export type FingerName =
-  | "RIGHT_THUMB"
-  | "RIGHT_INDEX"
-  | "RIGHT_MIDDLE"
-  | "RIGHT_RING"
-  | "RIGHT_LITTLE"
-  | "LEFT_THUMB"
-  | "LEFT_INDEX"
-  | "LEFT_MIDDLE"
-  | "LEFT_RING"
-  | "LEFT_LITTLE";
+// export type FingerName =
+//   | "RIGHT_THUMB"
+//   | "RIGHT_INDEX"
+//   | "RIGHT_MIDDLE"
+//   | "RIGHT_RING"
+//   | "RIGHT_LITTLE"
+//   | "LEFT_THUMB"
+//   | "LEFT_INDEX"
+//   | "LEFT_MIDDLE"
+//   | "LEFT_RING"
+//   | "LEFT_LITTLE";
 
-export interface Fingerprint {
-  preview: string;
-}
+// export interface Fingerprint {
+//   preview: string;
+// }
 
-export type FingerprintMap = Partial<Record<FingerName, Fingerprint>>;
+// export type FingerprintMap = Partial<Record<FingerName, Fingerprint>>;
 
-export interface Card {
-  id: number;
-  personId: string;
-  detaineeName?: string;
-  createdDate?: string;
-  createdPlace?: string;
-  fpFormula?: string;
-  dp?: string;
-  tw?: string;
-  reasonNote?: string;
-  fingerprints?: FingerprintMap;
-  createdAt: string; // ISO string
-}
+// export interface Card {
+//   id: number;
+//   personId: string;
+//   detaineeName?: string;
+//   createdDate?: string;
+//   createdPlace?: string;
+//   fpFormula?: string;
+//   dp?: string;
+//   tw?: string;
+//   reasonNote?: string;
+//   fingerprints?: FingerprintMap;
+//   createdAt: string; // ISO string
+// }
 
 export interface FingerprintImpressionResponse {
   id?: number;
@@ -43,7 +43,7 @@ export interface FingerprintImpressionResponse {
   capturedAt?: string;
 }
 
-export interface FingerprintCardResponse {
+export interface FingerprintCard {
   id: number;
   detaineeId: number;
   detaineeName: string;
@@ -60,13 +60,31 @@ export interface FingerprintCardResponse {
 }
 
 export interface FingerprintState {
-  fingerprints: FingerprintCardResponse[];
+  fingerprints: FingerprintCard[];
   total: number;
   pageNo: number;
   pageSize: number;
   loading: boolean;
   error?: string;
   lastQuery?: PageQuery;
+}
+
+export interface FingerprintCardCreateRequest {
+  detaineeCode?: string;
+  createdPlace?: string;
+  dp?: string;
+  tw?: string;
+  fpFormula?: string;
+  reasonNote?: string;
+}
+
+export interface FingerprintCardUpdateRequest {
+  detaineeCode?: string;
+  createdPlace?: string;
+  dp?: string;
+  tw?: string;
+  fpFormula?: string;
+  reasonNote?: string;
 }
 
 export interface PageQuery {

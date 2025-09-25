@@ -2,7 +2,6 @@
   "name": "smartts-admin",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "limin.zhang <limin.zhang@eveus.com>",
   "private": true,
   "scripts": {
     "dev": "vite",

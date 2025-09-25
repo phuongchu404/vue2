@@ -10,6 +10,8 @@ export default {
     status: "Status",
     notes: "Notes",
 
+    detailTitle: "Department Detail",
+
     placeholder: {
         code: "Enter department code",
         name: "Enter department name",

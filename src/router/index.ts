@@ -137,13 +137,15 @@ export const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/fingerprint/add",
-        name: "FingerprintAdd",
+        name: "fingerprintAdd",
         component: FingerprintForm,
+        meta: { title: "fingerprintadd" },
       },
       {
         path: "/fingerprint/edit/:id",
-        name: "FingerprintEdit",
+        name: "fingerprintEdit",
         component: FingerprintForm,
+        meta: { title: "fingerprintedit" },
       },
       {
         path: "/report",
@@ -153,19 +155,19 @@ export const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/department",
-        name: "DepartmentList",
+        name: "departmentList",
         component: DepartmentList,
         meta: { title: "departmentList" },
       },
       {
         path: "/department/add",
-        name: "DepartmentAdd",
+        name: "departmentAdd",
         component: DepartmentForm,
         meta: { title: "departmentAdd" },
       },
       {
         path: "/department/edit/:id",
-        name: "DepartmentEdit",
+        name: "departmentEdit",
         component: DepartmentForm,
         meta: { title: "departmentEdit" },
       },

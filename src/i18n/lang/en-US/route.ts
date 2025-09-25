@@ -23,6 +23,9 @@ const route: Route = {
   departmentList: "Department Management",
   departmentEdit: "Edit Department",
   departmentAdd: "Add Department",
+  fingerprintList: "Manage Fingerprint Records",
+  fingerprintAdd: "Add Fingerprint Record",
+  fingerprintEdit: "Edit Fingerprint Record",
 };
 
 export default route;

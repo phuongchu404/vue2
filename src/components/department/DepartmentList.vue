@@ -71,11 +71,11 @@
 
     <!-- Data Table -->
     <el-table
-      :data="departments"
-      stripe
-      border
-      v-loading="loading"
-      style="width: 100%"
+        :data="departments"
+        stripe
+        border
+         v-loading="loading"
+        style="width: 100%"
     >
       <el-table-column
         prop="id"
@@ -157,11 +157,53 @@
       @current-change="onPageChange"
       class="pagination"
     />
+
+    <!-- Detail Dialog -->
+    <el-dialog
+        v-model="detailDialogVisible"
+        :title="t('department.detailTitle')"
+        width="60%"
+        class="dialog"
+    >
+      <div v-if="selectedDepartment" class="detail-content">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item :label="t('prison.code')">
+            {{ selectedDepartment.detentionCenterCode }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('prison.name')">
+            {{ selectedDepartment.detentionCenterName }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('department.code')">
+            {{ selectedDepartment.code }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('department.name')">
+            {{ selectedDepartment.name }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('department.description')" :span="2">
+            {{ selectedDepartment.description }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="t('department.status')">
+            <el-tag :type="selectedDepartment.isActive ? 'success' : 'danger'">
+              {{ selectedDepartment.isActive ? t("prison.active") : t("prison.inactive") }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+
+      <template #footer>
+        <el-button @click="detailDialogVisible = false">
+          {{ t("common.close") }}
+        </el-button>
+        <el-button type="primary" @click="handleEdit(selectedDepartment?.id)">
+          {{ t("common.edit") }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, watch } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useDepartmentStore } from "@/stores/department";
 import {
   Search,
@@ -173,11 +215,12 @@ import {
   Download,
 } from "@element-plus/icons-vue";
 import { useI18n } from "vue-i18n";
-import type { PageQuery } from "@/types/department";
+import type {Department, PageQuery} from "@/types/department";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { usePrisonStore } from "@/stores/prison.ts";
+import type {Staff} from "@/types/staff.ts";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -185,6 +228,7 @@ const detailDialogVisible = ref(false);
 const departmentStore = useDepartmentStore();
 const prisonStore = usePrisonStore();
 const { prisons } = storeToRefs(prisonStore);
+const selectedDepartment = ref<Department | null>(null);
 
 // table sẽ bind trực tiếp từ store
 const departments = computed(() => departmentStore.getDepartments);
@@ -245,7 +289,7 @@ const onPageChange = (p: number) => {
 };
 
 const handleView = (department: any) => {
-  // selectedDepartment.value = staff;
+  selectedDepartment.value = department;
   detailDialogVisible.value = true;
 };
 
@@ -299,4 +343,6 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
 }
+
 </style>
+

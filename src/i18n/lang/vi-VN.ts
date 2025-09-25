@@ -13,9 +13,10 @@ import route from "./vi-VN/route";
 import identity from "./vi-VN/identity";
 import detainee from "@/i18n/lang/vi-VN/detainee.ts";
 import department from "./vi-VN/department";
+import fingerprint from "./vi-VN/fingerprint";
+import report from "./vi-VN/report.ts";
 
 export default {
-  department,
   route,
   menu,
   option,
@@ -30,4 +31,7 @@ export default {
   prison,
   identity,
   detainee,
+  department,
+  fingerprint,
+  report,
 };

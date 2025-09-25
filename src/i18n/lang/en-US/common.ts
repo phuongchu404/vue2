@@ -70,6 +70,7 @@ const common: Common = {
   edit: "Edit",
   update: "Update",
   exportUpdating: "Excel export function is under development!",
+  reminder: "Remind",
 };
 
 export default common;

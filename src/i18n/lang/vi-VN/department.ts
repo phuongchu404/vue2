@@ -10,6 +10,8 @@ export default {
     notes: "Ghi chú",
     description: "Mô tả",
 
+    detailTitle: "Chi tiết Phòng ban",
+
     placeholder: {
         code: "Nhập mã phòng ban",
         name: "Nhập tên phòng ban",
