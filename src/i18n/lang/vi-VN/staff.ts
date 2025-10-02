@@ -7,6 +7,7 @@ const staff: Staff = {
   permanentAddressSection: "Địa chỉ thường trú",
   temporaryAddressSection: "Địa chỉ tạm trú",
   jobInfo: "Thông tin công việc",
+  text: "Cán bộ",
 
   // Form Labels
   profileNumber: "Số hồ sơ",

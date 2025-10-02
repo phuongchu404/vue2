@@ -35,7 +35,12 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch" :icon="Search">
+          <el-button
+            type="primary"
+            @click="handleSearch"
+            :icon="Search"
+            :disabled="isButtonEnabled('fingerprint-card:search')"
+          >
             {{ $t("common.Search") }}
           </el-button>
           <el-button @click="handleReset" :icon="Refresh">
@@ -53,6 +58,7 @@
             type="primary"
             @click="$router.push('/fingerprint/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('fingerprint-card:insert')"
           >
             {{ $t("common.add") }}
           </el-button>
@@ -139,7 +145,7 @@
               {{ getIndividualFingerprintCount(scope.row) }}/10
             </el-tag>
             <el-tag :type="getSlapTagType(scope.row)" size="small" class="mt-1">
-              4N: {{ getFourFingerSlapCount(scope.row) }}/2
+              4N: {{ getFourFingerSlapCount(scope.row) }}/3
             </el-tag>
             <el-tag :type="getHandTagType(scope.row)" size="small" class="mt-1">
               BT: {{ getFullHandCount(scope.row) }}/2
@@ -154,7 +160,7 @@
       >
         <template #default="scope">
           <el-tag :type="getTotalFingerprintTagType(scope.row)" size="small">
-            {{ getTotalFingerprintCount(scope.row) }}/14
+            {{ getTotalFingerprintCount(scope.row) }}/15
           </el-tag>
         </template>
       </el-table-column>
@@ -179,6 +185,7 @@
             type="primary"
             @click="handleEdit(scope.row)"
             :icon="Edit"
+            :disabled="isButtonEnabled('fingerprint-card:update')"
           >
           </el-button>
           <!-- <el-button
@@ -194,6 +201,7 @@
             type="danger"
             @click="handleDelete(scope.row)"
             :icon="Delete"
+            :disabled="isButtonEnabled('fingerprint-card:delete')"
           >
           </el-button>
         </template>
@@ -338,6 +346,55 @@
                 <div class="slap-grid">
                   <div class="slap-item">
                     <div class="slap-label">
+                      {{ $t("fingerprint.detail.leftFour") }}
+                    </div>
+                    <div class="slap-container">
+                      <img
+                        v-if="
+                          getFingerprintObjByFinger(selectedCard, 'LEFT_FOUR')
+                        "
+                        :src="
+                          getFingerprintImage(
+                            getFingerprintObjByFinger(selectedCard, 'LEFT_FOUR')
+                          )
+                        "
+                        :alt="$t('fingerprint.detail.leftFour')"
+                        @error="handleFingerprintImageError"
+                      />
+                      <div v-else class="no-slap">
+                        <el-icon><Pointer /></el-icon>
+                        <span>{{ $t("fingerprint.detail.noData") }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slap-item">
+                    <div class="slap-label">
+                      {{ $t("fingerprint.detail.bothThumbs") }}
+                    </div>
+                    <div class="slap-container">
+                      <img
+                        v-if="
+                          getFingerprintObjByFinger(selectedCard, 'BOTH_THUMBS')
+                        "
+                        :src="
+                          getFingerprintImage(
+                            getFingerprintObjByFinger(
+                              selectedCard,
+                              'BOTH_THUMBS'
+                            )
+                          )
+                        "
+                        :alt="$t('fingerprint.detail.bothThumbs')"
+                        @error="handleFingerprintImageError"
+                      />
+                      <div v-else class="no-slap">
+                        <el-icon><Pointer /></el-icon>
+                        <span>{{ $t("fingerprint.detail.noData") }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slap-item">
+                    <div class="slap-label">
                       {{ $t("fingerprint.detail.rightFour") }}
                     </div>
                     <div class="slap-container">
@@ -354,29 +411,6 @@
                           )
                         "
                         :alt="$t('fingerprint.detail.rightFour')"
-                        @error="handleFingerprintImageError"
-                      />
-                      <div v-else class="no-slap">
-                        <el-icon><Pointer /></el-icon>
-                        <span>{{ $t("fingerprint.detail.noData") }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="slap-item">
-                    <div class="slap-label">
-                      {{ $t("fingerprint.detail.leftFour") }}
-                    </div>
-                    <div class="slap-container">
-                      <img
-                        v-if="
-                          getFingerprintObjByFinger(selectedCard, 'LEFT_FOUR')
-                        "
-                        :src="
-                          getFingerprintImage(
-                            getFingerprintObjByFinger(selectedCard, 'LEFT_FOUR')
-                          )
-                        "
-                        :alt="$t('fingerprint.detail.leftFour')"
                         @error="handleFingerprintImageError"
                       />
                       <div v-else class="no-slap">
@@ -625,44 +659,6 @@ const fingerPositions = [
   { key: "LEFT_LITTLE", label: t("fingerprint.fingers.littleleft") },
 ];
 
-// Computed
-// const filteredCards = computed(() => {
-//   return fingerprintStore.fingerprintCards.filter((card) => {
-//     const matchesPersonId =
-//       !searchForm.value.personId ||
-//       card.person_id
-//         .toLowerCase()
-//         .includes(searchForm.value.personId.toLowerCase());
-
-//     const matchesDetaineeName =
-//       !searchForm.value.detaineeName ||
-//       (card.detainee_name &&
-//         card.detainee_name
-//           .toLowerCase()
-//           .includes(searchForm.value.detaineeName.toLowerCase()));
-
-//     const matchesFormula =
-//       !searchForm.value.fpFormula ||
-//       (card.fp_formula &&
-//         card.fp_formula
-//           .toLowerCase()
-//           .includes(searchForm.value.fpFormula.toLowerCase()));
-
-//     const matchesDateRange =
-//       (!searchForm.value.fromDate ||
-//         card.created_date >= searchForm.value.fromDate) &&
-//       (!searchForm.value.toDate ||
-//         card.created_date <= searchForm.value.toDate);
-
-//     return (
-//       matchesPersonId &&
-//       matchesDetaineeName &&
-//       matchesFormula &&
-//       matchesDateRange
-//     );
-//   });
-// });
-
 const onPageChange = (p: number) => {
   page.value = p;
   search();
@@ -691,8 +687,7 @@ const getFourFingerSlapCount = (card: any) => {
 
 // Hàm đếm ảnh bàn tay đầy đủ
 const getFullHandCount = (card: any) => {
-  const fullHands = ["RIGHT_FULL", "LEFT_FULL"];
-  return fullHands.filter((finger) =>
+  return thumbFingers.filter((finger) =>
     card.fingerPrintImages.some((img: any) => img.finger === finger)
   ).length;
 };
@@ -712,8 +707,8 @@ const getIndividualFingerprintTagType = (card: any) => {
 // Màu cho 4 ngón chụm
 const getSlapTagType = (card: any) => {
   const count = getFourFingerSlapCount(card);
-  if (count === 2) return "success"; // Xanh: Đầy đủ 2/2
-  if (count === 1) return "warning"; // Vàng: Một bên 1/2
+  if (count === 3) return "success"; // Xanh: Đầy đủ 2/2
+  if (count === 2) return "warning"; // Vàng: Một bên 1/2
   return "danger"; // Đỏ: Chưa có 0/2
 };
 
@@ -728,7 +723,7 @@ const getHandTagType = (card: any) => {
 // Màu cho tổng số ảnh
 const getTotalFingerprintTagType = (card: any) => {
   const count = getTotalFingerprintCount(card);
-  if (count === 14) return "success"; // Xanh: Hoàn hảo 14/14
+  if (count === 15) return "success"; // Xanh: Hoàn hảo 14/14
   if (count >= 10) return "warning"; // Vàng: Đủ dùng ≥10/14
   return "danger"; // Đỏ: Thiếu nhiều <10/14
 };
@@ -1068,7 +1063,7 @@ onMounted(async () => {
 
 .slap-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 

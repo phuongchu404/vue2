@@ -2,9 +2,12 @@ import { defineStore } from "pinia";
 import { ElMessage } from "element-plus";
 import { EducationLevelService } from "@/services/educationLevel";
 import type {
-  EducationLevel, EducationLevelState
+  EducationLevel,
+  EducationLevelState,
 } from "@/types/educationLevel";
 import type { ServiceResult } from "@/types/common";
+
+import { t } from "@/i18n";
 
 export const useEducationLevelStore = defineStore("educationLevel", {
   state: (): EducationLevelState => ({
@@ -14,7 +17,8 @@ export const useEducationLevelStore = defineStore("educationLevel", {
   }),
 
   getters: {
-    getReligions: (state): EducationLevel[] | undefined => state.educationLevels,
+    getReligions: (state): EducationLevel[] | undefined =>
+      state.educationLevels,
     getLoading: (state): boolean => state.loading,
     getError: (state): string | undefined => state.error,
   },
@@ -24,24 +28,25 @@ export const useEducationLevelStore = defineStore("educationLevel", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<EducationLevel[]> = await EducationLevelService.list();
+        const res: ServiceResult<EducationLevel[]> =
+          await EducationLevelService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.educationLevel.getAll"));
         }
 
         this.educationLevels = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.educationLevel.getAll");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
         this.loading = false;
       }
     },
-
-    
   },
 
   // persist: true,

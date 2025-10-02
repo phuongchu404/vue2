@@ -3,7 +3,7 @@ import { ElMessage } from "element-plus";
 import { ReligionService } from "@/services/religion";
 import type { Religion, ReligionState } from "@/types/religion";
 import type { ServiceResult } from "@/types/common";
-
+import { t } from "@/i18n";
 export const useReligionStore = defineStore("religion", {
   state: (): ReligionState => ({
     religions: undefined,
@@ -25,13 +25,15 @@ export const useReligionStore = defineStore("religion", {
         const res: ServiceResult<Religion[]> = await ReligionService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.religion.getAll"));
         }
 
         this.religions = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.religion.getAll");
         this.error = msg;
         ElMessage.error(msg);
       } finally {

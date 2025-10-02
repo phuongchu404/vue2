@@ -20,6 +20,13 @@ export default {
         notes: "Nhập ghi chú",
     },
 
+    validation: {
+        required: {
+            name: "Vui lòng nhập tên phòng ban",
+            detentionCenterId: "Vui lòng chọn trại giam",
+        }
+    },
+
     message: {
         createSuccess: "Tạo phòng ban thành công",
         updateSuccess: "Cập nhật phòng ban thành công",

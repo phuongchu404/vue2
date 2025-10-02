@@ -3,7 +3,7 @@ export default {
     totalDetainee: "Total Detainees",
     totalStaff: "Total Staff",
     totalIdentity: "Identity Records Created",
-    totalFingerprint: "Fingerprint Records Created",
+    totalFingerprint: "Fingerprint Cards Created",
 
     notChange: "No change",
     compareWith: "compared to last month",
@@ -25,8 +25,8 @@ export default {
     creating: "Creating...",
     create: "Create Report",
 
-    excel: "Export to Excel",
-    pdf: "Export to PDF",
+    excel: "Export Excel",
+    pdf: "Export PDF",
     print: "Print Report",
 
     createAt: "Created at:",
@@ -36,21 +36,21 @@ export default {
     summary: "Summary:",
     insight: "Summary & Analysis",
 
-    unknown: "Unknown Report",
+    unknown: "Unknown report",
     error: {
         loadStatistics: "Error loading statistics!",
         chooseType: "Please select a report type!",
         create: "Error creating report!",
         createQuick: "Error creating quick report!",
-        excel: "Error exporting to Excel!",
-        pdf: "Error exporting to PDF!",
+        excel: "Error exporting Excel!",
+        pdf: "Error exporting PDF!",
         print: "Unable to open print window!"
     },
 
     success: {
         create: "Report created successfully!",
-        excel: "Export to Excel successful!",
-        pdf: "Export to PDF successful!",
+        excel: "Excel exported successfully!",
+        pdf: "PDF exported successfully!",
     },
 
     detaineeByStatus: {
@@ -77,8 +77,8 @@ export default {
             total: "End of Month Total"
         },
         insight: {
-            title: "Peak Month",
-            description: "had the highest number of new detainees",
+            title: "Highest Month",
+            description: "with the highest number of new detainees",
             people: "people"
         }
     },
@@ -93,14 +93,14 @@ export default {
         },
         insight: {
             title: "Largest Department",
-            description: "had the highest number of staff",
+            description: "with the highest number of staff",
             people: "people"
         }
     },
 
     identityRecord: {
-        text: "Identity Records Created",
-        fullText: "Report on Identity Records",
+        text: "Identity Records",
+        fulltext: "Report on Identity Records",
         id: "ID",
         detaineeId: "Detainee ID",
         detaineeName: "Detainee Name",
@@ -108,8 +108,8 @@ export default {
     },
 
     fingerprintCard: {
-        text: "Fingerprint Records Created",
-        fullText: "Report on Fingerprint Records",
+        text: "Fingerprint Cards",
+        fullText: "Report on Fingerprint Cards",
         column: {
             id: "ID",
             personId: "Detainee ID",

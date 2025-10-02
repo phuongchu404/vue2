@@ -71,7 +71,7 @@ export const useReportStore = defineStore("report", {
         }
       } catch (error: any) {
         this.error = error.message;
-        return this.generateSampleReport(type, fromDate, toDate);
+        // return this.generateSampleReport(type, fromDate, toDate);
       } finally {
         this.loading = false;
       }

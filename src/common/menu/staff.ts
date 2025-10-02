@@ -44,7 +44,7 @@ export const staff: MenuItem = {
     },
     {
       tag: "staff:select:id",
-      type: "button",
+      type: "api",
       isWhiteList: false,
       name: t("option.query"),
       pattern: "/api/admin/staff/{id}",
@@ -104,6 +104,14 @@ export const staff: MenuItem = {
       isWhiteList: false,
       name: t("option.query"),
       pattern: "/api/admin/ward/{provinceCode}",
+      method: "GET",
+    },
+    {
+      tag: "staff:export-excel",
+      type: "button",
+      isWhiteList: false,
+      name: t("option.excel"),
+      pattern: "/api/admin/staff/export",
       method: "GET",
     },
   ],

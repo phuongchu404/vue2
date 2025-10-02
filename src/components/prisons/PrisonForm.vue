@@ -17,32 +17,34 @@
         @submit.prevent="handleSubmit"
       >
         <el-row :gutter="20">
-          <el-col :md="8" :span="24">
+          <el-col :md="12" :span="24">
             <el-form-item :label="t('prison.code')" prop="code">
               <el-input
                 v-model="form.code"
                 :placeholder="t('prison.placeholder.code')"
                 :disabled="isEdit"
+                :maxlength="50"
               />
             </el-form-item>
           </el-col>
-          <el-col :md="8" :span="24">
+          <el-col :md="12" :span="24">
             <el-form-item :label="t('prison.name')" prop="name">
               <el-input
                 v-model="form.name"
                 :placeholder="t('prison.placeholder.name')"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :md="8" :span="24">
-            <el-form-item :label="t('prison.phone')" prop="phone">
-              <el-input
-                v-model="form.phone"
-                :placeholder="t('prison.placeholder.phone')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
         </el-row>
+
+        <el-form-item :label="t('prison.phone')" prop="phone">
+          <el-input
+              v-model="form.phone"
+              :placeholder="t('prison.placeholder.phone')"
+              :maxlength="20"
+          />
+        </el-form-item>
 
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
@@ -104,6 +106,7 @@
               <el-input
                 v-model="form.director"
                 :placeholder="t('prison.placeholder.director')"
+                :maxlength="100"
               />
             </el-form-item>
           </el-col>
@@ -115,6 +118,7 @@
               <el-input
                 v-model="form.deputyDirector"
                 :placeholder="t('prison.placeholder.deputyDirector')"
+                :maxlength="100"
               />
             </el-form-item>
           </el-col>
@@ -169,7 +173,7 @@
         </el-form-item> -->
 
         <el-form-item class="form-actions">
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="isButtonEnabled(isEdit ? 'prison:update' : 'prison:insert')">
             {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
           <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
@@ -198,6 +202,8 @@ import { useProvinceStore } from "@/stores/province";
 import { useWardStore } from "@/stores/ward";
 // import {ACTIVE, INACTIVE} from "@/constants/staff.ts";
 import { useI18n } from "vue-i18n";
+import {useBaseMixin} from "@/components/BaseMixin.ts";
+const { isButtonEnabled } = useBaseMixin();
 
 const { t } = useI18n();
 const route = useRoute();
@@ -237,75 +243,75 @@ const form = reactive<Partial<Prison>>({
 
 // Validation rules
 const rules: FormRules = {
-  code: [
-    { required: true, message: "Vui lòng nhập mã trại giam", trigger: "blur" },
-    {
-      min: 3,
-      max: 20,
-      message: "Mã trại giam phải từ 3-20 ký tự",
-      trigger: "blur",
-    },
-  ],
+  // code: [
+  //   { required: true, message: "Vui lòng nhập mã trại giam", trigger: "blur" },
+  //   {
+  //     min: 3,
+  //     max: 20,
+  //     message: "Mã trại giam phải từ 3-20 ký tự",
+  //     trigger: "blur",
+  //   },
+  // ],
   name: [
-    { required: true, message: "Vui lòng nhập tên trại giam", trigger: "blur" },
+    { required: true, message: t("prison.validation.required.name"), trigger: "blur" },
     {
       min: 5,
-      max: 100,
-      message: "Tên trại giam phải từ 5-100 ký tự",
+      max: 255,
+      message: t("prison.validation.invalid.name"),
       trigger: "blur",
     },
   ],
   address: [
-    { required: true, message: "Vui lòng nhập địa chỉ", trigger: "blur" },
+    { required: true, message: t("prison.validation.required.address"), trigger: "blur" },
   ],
   provinceId: [
-    { required: true, message: "Vui lòng chọn tỉnh/thành", trigger: "change" },
+    { required: true, message: t("prison.validation.required.province"), trigger: "change" },
   ],
   wardId: [
-    { required: true, message: "Vui lòng chọn xã/phường", trigger: "change" },
+    { required: true, message: t("prison.validation.required.ward"), trigger: "change" },
   ],
   director: [
-    { required: true, message: "Vui lòng nhập tên giám thị", trigger: "blur" },
+    { required: true, message: t("prison.validation.required.director"), trigger: "blur" },
   ],
   deputyDirector: [
     {
       required: true,
-      message: "Vui lòng nhập tên phó giám thị",
+      message: t("prison.validation.required.deputyDirector"),
       trigger: "blur",
     },
   ],
   phone: [
-    { required: true, message: "Vui lòng nhập số điện thoại", trigger: "blur" },
+    { required: true, message: t("prison.validation.required.phone"), trigger: "blur" },
     {
       pattern: /^[0-9]{10,11}$/,
-      message: "Số điện thoại không hợp lệ",
+      message: t("prison.validation.invalid.phone"),
       trigger: "blur",
     },
   ],
   capacity: [
-    { required: true, message: "Vui lòng nhập sức chứa", trigger: "blur" },
+    { required: true, message: t("prison.validation.required.capacity"), trigger: "blur" },
     {
       type: "number",
       min: 1,
-      message: "Sức chứa phải lớn hơn 0",
+      message: t("prison.validation.invalid.capacity"),
       trigger: "blur",
     },
   ],
   currentPopulation: [
     {
       required: true,
-      message: "Vui lòng nhập số phạm nhân hiện tại",
+      message: t("prison.validation.required.currentPopulation"),
       trigger: "blur",
     },
     {
       type: "number",
       min: 0,
-      message: "Số phạm nhân không thể âm",
+      message: t("prison.validation.invalid.currentPopulation"),
       trigger: "blur",
     },
   ],
   isActive: [
-    { required: true, message: "Vui lòng chọn trạng thái", trigger: "change" },
+    { required: true, message: t("prison.validation.required.isActive"), trigger: "change" },
   ],
 };
 
@@ -327,7 +333,7 @@ const loadData = async () => {
     if (prison) {
       Object.assign(form, prison);
     } else {
-      ElMessage.error("Không tìm thấy thông tin trại giam!");
+      ElMessage.error(t("prison.notFound"));
       router.push("/prisons");
     }
   }
@@ -348,7 +354,7 @@ const handleSubmit = async () => {
   try {
     // Check current inmates doesn't exceed capacity
     if ((form?.currentPopulation || 0) > (form?.capacity || 0)) {
-      ElMessage.error("Số phạm nhân hiện tại không thể vượt quá sức chứa!");
+      ElMessage.error(t("prison.validation.invalid.currentPopulationOver"));
       return;
     }
 

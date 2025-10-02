@@ -49,7 +49,7 @@
         <!-- Sidebar -->
         <el-aside width="auto" class="sidebar">
           <el-menu
-            :default-active="$route.path"
+            :default-active="activeMenu"
             unique-opene
             text-color="#7f8c8d"
             router
@@ -101,7 +101,7 @@
             </div> -->
             <!-- Router View -->
             <div class="router-view-container">
-              <el-page-header @back="$router.go(-1)">
+              <el-page-header @back="$router.go(-1)" :title="t('common.back')">
                 <template #content>
                   <span class="text-large font-600 mr-3">
                     {{ $t(`route.${$route.meta?.title || $route.name}`) }}
@@ -130,7 +130,7 @@
       v-model="ui.dialogVisible"
       width="650px"
       center
-      class="change-password-dialog"
+      class="change-password-dialog dialog"
     >
       <el-form
         :model="editForm"
@@ -183,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import {ref, reactive, onMounted, computed} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAppStore } from "@/stores";
 import { useI18n } from "vue-i18n";
@@ -270,6 +270,8 @@ const getIconComponent = (iconClass: string) => {
   return iconMap[iconClass] || Document;
 };
 
+const activeMenu = computed(() => route.meta.activeMenu || route.path)
+
 const handleChangePassword = async () => {
   editFormRef.value?.resetFields();
   Object.assign(editForm, {});
@@ -284,7 +286,11 @@ const changePassword = async () => {
       await ElMessageBox.confirm(
         t("home.changePasswordConfirm"),
         t("home.confirmTip"),
-        { type: "warning" }
+        {
+          type: "warning",
+          confirmButtonText: t("common.confirm"),
+          cancelButtonText: t("el.messagebox.cancel"),
+        }
       );
 
       const record = editForm;
@@ -319,6 +325,8 @@ const logout = async () => {
   try {
     await ElMessageBox.confirm(t("home.logoutMessage"), t("home.confirmTip"), {
       type: "warning",
+      confirmButtonText: t("common.confirm"),
+      cancelButtonText: t("el.messagebox.cancel"),
     });
 
     sessionStorage.removeItem("TOKEN");

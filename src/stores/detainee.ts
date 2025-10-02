@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+import { ElMessage } from "element-plus";
+import { t } from "@/i18n";
 import { DetaineeService } from "@/services/detainee";
 import type {
   DetaineeState,
@@ -33,7 +33,7 @@ export const useDetaineeStore = defineStore("detainee", {
   },
 
   actions: {
-    async listPage(query: PageQuery) {
+    async listPage(query: PageQuery, isCombineOld?: any) {
       this.loading = true;
       this.error = undefined;
       try {
@@ -49,10 +49,10 @@ export const useDetaineeStore = defineStore("detainee", {
 
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.detainee.fetchList"));
         }
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.detainee.noData"));
         }
 
         const {
@@ -62,14 +62,16 @@ export const useDetaineeStore = defineStore("detainee", {
           size: pageSize,
         } = res.data;
 
-        this.detainees = content;
+        this.detainees = isCombineOld ? (this.detainees ?? []).concat(content) : content;
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -84,14 +86,16 @@ export const useDetaineeStore = defineStore("detainee", {
         const res: ServiceResult<Detainee> = await DetaineeService.getById(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.detainee.fetchDetail"));
         }
 
         const detail = res.data;
         return detail;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.fetchDetail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -109,15 +113,17 @@ export const useDetaineeStore = defineStore("detainee", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("error.detainee.create"));
         }
 
         const created = res.data;
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
         return created;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -136,15 +142,17 @@ export const useDetaineeStore = defineStore("detainee", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("error.detainee.update"));
         }
 
         const updated = res.data;
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
         return updated;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -160,15 +168,17 @@ export const useDetaineeStore = defineStore("detainee", {
         const res: ServiceResult<boolean> = await DetaineeService.delete(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.detainee.delete"));
         }
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         // if (this.lastQuery) {
         //   await this.fetchList(this.lastQuery);
         // }
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -184,13 +194,15 @@ export const useDetaineeStore = defineStore("detainee", {
         const res: ServiceResult<Detainee[]> = await DetaineeService.getAll();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.detainee.fetchAll"));
         }
 
         this.detainees = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.fetchAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -210,7 +222,9 @@ export const useDetaineeStore = defineStore("detainee", {
         await DetaineeService.exportExcel(params);
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Export Excel failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.exportExcel");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -225,12 +239,14 @@ export const useDetaineeStore = defineStore("detainee", {
         const res: ServiceResult<Detainee[]> =
           await DetaineeService.getTop3Recent();
         if (!res.success) {
-          throw new Error(res.message || "Fetch detainees failed");
+          throw new Error(res.message || t("error.detainee.top3Recent"));
         }
         this.detainees = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch detainees failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.detainee.top3Recent");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -245,13 +261,13 @@ export const useDetaineeStore = defineStore("detainee", {
       try {
         const res: ServiceResult<number> = await DetaineeService.count();
         if (!res.success) {
-          throw new Error(res.message || "Count detainees failed");
+          throw new Error(res.message || t("error.detainee.count"));
         }
         this.total = res.data || 0;
         return res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Count detainees failed";
+          e?.response?.data?.message || e?.message || t("error.detainee.count");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

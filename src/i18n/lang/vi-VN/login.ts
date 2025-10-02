@@ -4,6 +4,7 @@ const login: Login = {
   password: "Mật khẩu",
   otp: "OTP",
   login: "Đăng nhập",
+  reLogin: "Đăng nhập lại",
   userIsNull: "Hãy điền thông tin này",
   passwordIsNull: "Hãy điền thông tin này",
   OTPtip: "Đã bật xác thực 2 bước, hãy điền mã OTP",

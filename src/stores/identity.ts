@@ -10,6 +10,8 @@ import type {
 } from "@/types/identity";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
+import { t } from "@/i18n";
+
 export const useIdentityStore = defineStore("identity", {
   state: (): IdentityState => ({
     identities: undefined,
@@ -47,11 +49,11 @@ export const useIdentityStore = defineStore("identity", {
 
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.identity.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.identity.noData"));
         }
 
         const {
@@ -68,7 +70,9 @@ export const useIdentityStore = defineStore("identity", {
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.identity.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -83,14 +87,16 @@ export const useIdentityStore = defineStore("identity", {
         const res: ServiceResult<Identity> = await IdentityService.getById(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.identity.fetchDetail"));
         }
 
         const detail = res.data;
         return detail;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.identity.fetchDetail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -108,15 +114,17 @@ export const useIdentityStore = defineStore("identity", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("error.identity.create"));
         }
 
         const created = res.data;
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
         return created;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.identity.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -135,15 +143,17 @@ export const useIdentityStore = defineStore("identity", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("error.identity.update"));
         }
 
         const updated = res.data;
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
         return updated;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.identity.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -159,15 +169,17 @@ export const useIdentityStore = defineStore("identity", {
         const res: ServiceResult<boolean> = await IdentityService.delete(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.identity.delete"));
         }
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         if (this.lastQuery) {
           await this.listPage(this.lastQuery);
         }
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.identity.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -182,14 +194,12 @@ export const useIdentityStore = defineStore("identity", {
       try {
         const res: ServiceResult<number> = await IdentityService.count();
         if (!res.success) {
-          throw new Error(res.message || "Count identity records failed");
+          throw new Error(res.message || t("error.identity.count"));
         }
         this.total = res.data || 0;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message ||
-          e?.message ||
-          "Count identity records failed";
+          e?.response?.data?.message || e?.message || t("error.identity.count");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

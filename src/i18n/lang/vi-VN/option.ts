@@ -13,6 +13,11 @@ const option: Option = {
   import: "Nhập",
   syn: "Đồng bộ",
   detail: "Chi tiết",
+  view: "Xem",
+  generate: "Tạo",
+  excel: "Xuất Excel",
+  pdf: "Xuất PDF",
+  print: "In",
 };
 
 export default option;

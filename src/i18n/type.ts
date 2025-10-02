@@ -1,3 +1,5 @@
+import { role } from "./../common/menu/system/role";
+import { EducationLevel } from "./../types/educationLevel";
 export interface Common {
   id: string;
   index: string;
@@ -68,6 +70,8 @@ export interface Common {
   update: string;
   exportUpdating: string;
   reminder: string;
+  back: string;
+  preview: string;
 }
 
 export interface Home {
@@ -96,6 +100,7 @@ export interface Login {
   password: string;
   otp: string;
   login: string;
+  reLogin: string;
   userIsNull: string;
   passwordIsNull: string;
   OTPtip: string;
@@ -110,6 +115,7 @@ export interface Identity {
   infoSection: string;
   photoSection: string;
   anthropometry: string;
+  text: string;
 
   // Search Section
   detaineeId: string;
@@ -133,6 +139,18 @@ export interface Identity {
     earLowerFold: string;
     earLobe: string;
     distinctiveMarks: string;
+  };
+
+  validation: {
+    required: {
+      detaineeCode: string;
+    },
+    image: {
+      notImage: string;
+      overSize: string;
+      successUpload1: string;
+      successUpload2: string;
+    }
   };
 
   // Form Labels
@@ -191,6 +209,11 @@ export interface Option {
   import: string;
   syn: string;
   detail: string;
+  view: string;
+  generate: string;
+  excel: string;
+  pdf: string;
+  print: string;
 }
 
 export interface Permission {
@@ -198,6 +221,7 @@ export interface Permission {
   options: string;
   description: string;
   url: string;
+  synchronizeSuccess: string;
 }
 
 export interface Prison {
@@ -238,6 +262,30 @@ export interface Prison {
     description: string;
     status: string;
   };
+
+  notFound: string;
+
+  validation: {
+    required: {
+      name: string;
+      address: string;
+      province: string;
+      ward: string;
+      director: string;
+      deputyDirector: string;
+      phone: string;
+      capacity: string;
+      currentPopulation: string;
+      isActive: string;
+    },
+    invalid: {
+      name: string;
+      phone: string;
+      capacity: string;
+      currentPopulation: string;
+      currentPopulationOver: string;
+    }
+  }
 }
 
 export interface Profile {
@@ -306,6 +354,7 @@ export interface Staff {
   permanentAddressSection: string;
   temporaryAddressSection: string;
   jobInfo: string;
+  text: string;
 
   // Form Labels
   profileNumber: string;
@@ -412,6 +461,7 @@ export interface User {
   phoneNumber: string;
   description: string;
   selectDetentionCenter: string;
+  usernamePlaceHolder: string;
 }
 
 export interface Detainee {
@@ -508,5 +558,139 @@ export interface Detainee {
     province: string;
     ward: string;
     addressDetail: string;
+  };
+
+  validate: {
+    fullNameRequired: string;
+    fullNameInvalid: string;
+    genderRequired: string;
+    birthdayRequired: string;
+    idNumberInvalid: string;
+    detentionDateRequired: string;
+    detentionCenterIdRequired: string;
+    statusRequired: string;
+    detentionDateInvalid: string;
+    detaineeUnder14: string;
+  };
+}
+export interface Error {
+  country: {
+    getAll: string;
+  };
+  department: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+  };
+  detainee: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+    exportExcel: string;
+    top3Recent: string;
+    count: string;
+  };
+  educationLevel: {
+    getAll: string;
+  };
+  ethnicity: {
+    getAll: string;
+  };
+  fingerprint: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+  };
+  identity: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+    count: string;
+  };
+  menu: {
+    loadAllMenu: string;
+    noData: string;
+  };
+  permission: {
+    synchronize: string;
+    getAllMenus: string;
+  };
+  position: {
+    getAll: string;
+  };
+  province: {
+    getAll: string;
+  };
+  religion: {
+    getAll: string;
+  };
+  role: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+  };
+  prison: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+    exportExcel: string;
+    top3Recent: string;
+    count: string;
+  };
+  rolePermission: {
+    getPermissionByRoleId: string;
+    updatePermissionByRoleId: string;
+  };
+  staff: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+    exportExcel: string;
+    top3Recent: string;
+    count: string;
+  };
+  user: {
+    fetchList: string;
+    noData: string;
+    fetchDetail: string;
+    fetchAll: string;
+    create: string;
+    update: string;
+    delete: string;
+    resetPassword: string;
+  };
+  userRole: {
+    updateRoleByUserId: string;
+  };
+  ward: {
+    getByProvinceCode: string;
   };
 }

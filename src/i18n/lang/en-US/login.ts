@@ -5,6 +5,7 @@ const login: Login = {
   password: "Password",
   otp: "OTP",
   login: "Login",
+  reLogin: "Re-Login",
   userIsNull: "Please enter this information",
   passwordIsNull: "Please enter this information",
   OTPtip: "Two-factor authentication is enabled, please enter the OTP code",

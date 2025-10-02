@@ -6,6 +6,7 @@ const identity: Identity = {
   infoSection: "Thông tin danh bản",
   photoSection: "Ảnh danh bản",
   anthropometry: "Đặc điểm hình thái học",
+  text: "Danh bản",
 
   detaineeId: "Mã phạm nhân",
   detaineeName: "Tên phạm nhân",
@@ -30,6 +31,18 @@ const identity: Identity = {
     distinctiveMarks: "Mô tả các dấu vết đặc biệt, scar, hình xăm...",
   },
 
+  validation: {
+    required: {
+      detaineeCode: "Vui lòng chọn phạm nhân",
+    },
+    image: {
+      notImage: "Chỉ được tải lên file ảnh!",
+      overSize: "Kích thước ảnh phải nhỏ hơn 2MB!",
+      successUpload1: "Tải ảnh",
+      successUpload2: "thành công!",
+    }
+  },
+
   createdPlace: "Tạo tại",
   arrestDate: "Ngày bắt",
   fpClassification: "Phân loại vân tay",
@@ -47,6 +60,7 @@ const identity: Identity = {
   photoFront: "Ảnh mặt trước",
   photoLeft: "Ảnh nghiêng trái",
   photoRight: "Ảnh nghiêng phải",
+
 
   id: "ID",
   arrestDateTable: "Ngày bắt",

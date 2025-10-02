@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+import { t } from "@/i18n";
 import { WardService } from "@/services/ward";
 import type { WardState, Ward } from "@/types/ward";
 import type { ServiceResult } from "@/types/common";
@@ -28,13 +28,15 @@ export const useWardStore = defineStore("ward", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.ward.getByProvinceCode"));
         }
 
         this.wards = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.ward.getByProvinceCode");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

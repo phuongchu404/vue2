@@ -22,15 +22,16 @@
               <el-input
                 v-model="form.profileNumber"
                 :placeholder="t('staff.profileNumber')"
+                :maxlength="50"
               />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item v-if="isEdit" :label="t('staff.staffCode')">
+            <el-form-item v-if="isEdit" :label="t('staff.code')">
               <el-input
                 v-model="form.staffCode"
                 :disabled="isEdit"
-                :placeholder="t('staff.staffCode')"
+                :placeholder="t('staff.code')"
               />
             </el-form-item>
           </el-col>
@@ -42,6 +43,7 @@
               <el-input
                 v-model="form.fullName"
                 :placeholder="t('staff.fullName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -69,6 +71,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disableFutureDate"
               />
             </el-form-item>
           </el-col>
@@ -121,6 +124,7 @@
               <el-input
                 v-model="form.idNumber"
                 :placeholder="t('staff.idNumber')"
+                :maxlength="20"
               />
             </el-form-item>
           </el-col>
@@ -133,6 +137,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disableFutureDate"
               />
             </el-form-item>
           </el-col>
@@ -142,6 +147,7 @@
           <el-input
             v-model="form.idIssuePlace"
             :placeholder="t('staff.idIssuePlace')"
+            :maxlength="255"
           />
         </el-form-item>
 
@@ -153,7 +159,12 @@
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
             <el-form-item :label="t('staff.phone')" prop="phone">
-              <el-input v-model="form.phone" :placeholder="t('staff.phone')" />
+              <el-input
+                v-model="form.phone"
+                :placeholder="t('staff.phone')"
+                :maxlength="20"
+                v-only-number
+              />
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
@@ -162,6 +173,7 @@
                 v-model="form.email"
                 type="email"
                 :placeholder="t('staff.email')"
+                :maxlength="100"
               />
             </el-form-item>
           </el-col>
@@ -173,6 +185,7 @@
               <el-input
                 v-model="form.emergencyContact"
                 :placeholder="t('staff.emergencyContact')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -181,6 +194,8 @@
               <el-input
                 v-model="form.emergencyPhone"
                 :placeholder="t('staff.emergencyPhone')"
+                :maxlength="20"
+                v-only-number
               />
             </el-form-item>
           </el-col>
@@ -210,7 +225,7 @@
         </el-row> -->
 
         <el-divider content-position="left">{{
-          t("staff.permanentAddress")
+          t("staff.permanentAddressSection")
         }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
@@ -270,7 +285,7 @@
         </el-row>
 
         <el-divider content-position="left">{{
-          t("staff.temporaryAddress")
+          t("staff.temporaryAddressSection")
         }}</el-divider>
         <el-row :gutter="12">
           <!-- Chọn Tỉnh -->
@@ -336,7 +351,7 @@
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
             <el-form-item :label="t('staff.rank')" prop="rank">
-              <el-input v-model="form.rank" :placeholder="t('staff.rank')" />
+              <el-input v-model="form.rank" :placeholder="t('staff.rank')" :maxlength="50" />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
@@ -348,6 +363,9 @@
                 clearable
                 style="width: 100%"
                 :disabled="!form.detentionCenterId"
+                @visible-change="onDepartmentVisibleChange"
+                remote
+                :remote-method="remoteSearchDepartment"
               >
                 <el-option
                   v-for="d in departments"
@@ -385,6 +403,9 @@
                 v-model="form.detentionCenterId"
                 :placeholder="t('staff.prison')"
                 @change="onDetentionCenterChange"
+                @visible-change="onPrisonVisibleChange"
+                remote
+                :remote-method="remoteSearchPrison"
               >
                 <el-option
                   v-for="prison in prisons"
@@ -449,7 +470,7 @@
 
         <!-- Buttons -->
         <el-form-item class="form-actions">
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="isButtonEnabled(isEdit ? 'staff:update' : 'staff:insert')">
             {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
           <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
@@ -483,10 +504,15 @@ import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import type { Province } from "@/types/province";
 import type { Ward } from "@/types/ward";
+import {useBaseMixin} from "@/components/BaseMixin.ts";
+import {Department} from "@/types/department.ts";
+import {useInfiniteSelect} from "@/composables/useInfiniteSelect.ts";
+import {debounce} from "lodash";
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
+const { isButtonEnabled } = useBaseMixin();
 const staffStore = useStaffStore();
 const prisonStore = usePrisonStore();
 const provinceStore = useProvinceStore();
@@ -532,8 +558,10 @@ const form = reactive<Partial<Staff>>({
   temporaryAddress: "",
   rank: "",
   departmentId: undefined,
+  departmentName: undefined,
   positionId: undefined,
   detentionCenterId: undefined,
+  detentionCenterName: undefined,
   status: "ACTIVE",
   educationLevelId: undefined,
 });
@@ -542,6 +570,15 @@ const permanentWards = ref<Ward[]>([]);
 
 const temporaryProvinces = ref<Province[]>([]);
 const temporaryWards = ref<Ward[]>([]);
+
+const detentionCenterPage = ref(1);
+const departmentPage = ref(1);
+const detentionName = ref();
+const departmentKeyword = ref();
+
+const disableFutureDate = (time: Date) => {
+  return time.getTime() > Date.now();
+}
 
 // Validation rules
 const rules: FormRules = {
@@ -561,7 +598,7 @@ const rules: FormRules = {
   fullName: [
     {
       required: true,
-      message: t("staff.validation.required.name"),
+      message: t("staff.validation.required.fullName"),
       trigger: "blur",
     },
     {
@@ -641,7 +678,9 @@ const onDetentionCenterChange = async (code: number) => {
     return;
   }
   try {
-    await departmentStore.getByDetentionCenterId(code);
+    departmentPage.value = 1;
+    departmentKeyword.value = "";
+    await getAllDepartment();
   } catch {}
 };
 
@@ -658,7 +697,20 @@ const getAllPositions = async () => {
 };
 
 const getAllPrisons = async () => {
-  await prisonStore.getAll();
+  await prisonStore.fetchList({
+    pageNo: detentionCenterPage.value,
+    pageSize: 10,
+    name: detentionName.value,
+  });
+};
+
+const getAllDepartment = async () => {
+    await departmentStore.fetchList({
+    pageNo: departmentPage.value,
+    pageSize: 10,
+    detentionCenterId: form.detentionCenterId,
+    keyword: departmentKeyword.value,
+  });
 };
 
 const getAllEducationLevels = async () => {
@@ -672,6 +724,45 @@ const getAllEthnicities = async () => {
 const getAllReligions = async () => {
   await religionStore.getAll();
 };
+
+const loadMorePrison = () => {
+  detentionCenterPage.value = detentionCenterPage.value + 1;
+  prisonStore.fetchList({
+    pageNo: detentionCenterPage.value,
+    pageSize: 10,
+    name: detentionName.value,
+  }, true);
+};
+
+const loadMoreDepartment = () => {
+  departmentPage.value = departmentPage.value + 1;
+  departmentStore.fetchList({
+    pageNo: departmentPage.value,
+    pageSize: 10,
+    detentionCenterId: Number(form.detentionCenterId)
+  }, true);
+};
+
+const { onVisibleChange: onPrisonVisibleChange } = useInfiniteSelect(loadMorePrison);
+const { onVisibleChange: onDepartmentVisibleChange } = useInfiniteSelect(loadMoreDepartment);
+
+const remoteSearchPrison = debounce(((text: string) => {
+  if (!text && !detentionName.value) {
+    return;
+  }
+  detentionCenterPage.value = 1;
+  detentionName.value = text;
+  getAllPrisons();
+}), 300);
+
+const remoteSearchDepartment = debounce(((text: string) => {
+  if (!text && !departmentKeyword.value) {
+    return;
+  }
+  departmentPage.value = 1;
+  departmentKeyword.value = text;
+  getAllDepartment();
+}), 300);
 
 const onTemporaryProvinceChange = async (code: string) => {
   form.temporaryWardId = "";
@@ -805,14 +896,15 @@ const handleReset = () => {
     });
   }
 };
+
 onMounted(async () => {
   await getAllProvinces();
   getAllPositions();
-  getAllPrisons();
   getAllEducationLevels();
   getAllEthnicities();
   getAllReligions();
   await loadData();
+
   if (isEdit.value) {
     if (form.permanentProvinceId) {
       await wardStore.getByProvinceCode(form.permanentProvinceId as string);
@@ -827,10 +919,19 @@ onMounted(async () => {
       }
     }
     if (form.detentionCenterId) {
-      await departmentStore.getByDetentionCenterId(
-        form.detentionCenterId as number
-      );
+      await prisonStore.loadForSelect({
+        pageNo: detentionCenterPage.value,
+        pageSize: 10,
+      }, form.detentionCenterId, form.detentionCenterName);
+
+      await departmentStore.loadForSelect({
+        pageNo: departmentPage.value,
+        pageSize: 10,
+        detentionCenterId: Number(form.detentionCenterId)
+      }, form.departmentId, form.departmentName);
     }
+  } else {
+    await getAllPrisons();
   }
 });
 </script>

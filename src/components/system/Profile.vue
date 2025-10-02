@@ -137,7 +137,11 @@ const handleActivate = async () => {
     await ElMessageBox.confirm(
       t("profile.confirmactivatetip"),
       t("common.confirm"),
-      { type: "warning" }
+      {
+        type: "warning",
+        confirmButtonText: t("common.confirm"),
+        cancelButtonText: t("el.messagebox.cancel"),
+      }
     );
 
     const result = await Utils.doGet("/api/sessions/secret");

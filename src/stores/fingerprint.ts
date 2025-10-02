@@ -3,10 +3,11 @@ import { ElMessage } from "element-plus";
 import { FingerprintService } from "@/services/fingerprint";
 import type {
   FingerprintState,
-  FingerprintCardResponse,
+  FingerprintCard,
   PageQuery,
 } from "@/types/fingerprint";
 import type { ServiceResult, PagingResult } from "@/types/common";
+import { t } from "@/i18n";
 
 export const useFingerprintStore = defineStore("fingerprint", {
   state: (): FingerprintState => ({
@@ -20,7 +21,7 @@ export const useFingerprintStore = defineStore("fingerprint", {
   }),
 
   getters: {
-    getFingerprints: (state): FingerprintCardResponse[] | undefined =>
+    getFingerprints: (state): FingerprintCard[] | undefined =>
       state.fingerprints,
     getTotal: (state): number => state.total,
     getPage: (state): number => state.pageNo,
@@ -41,16 +42,16 @@ export const useFingerprintStore = defineStore("fingerprint", {
         };
 
         // Call API
-        const res: ServiceResult<PagingResult<FingerprintCardResponse>> =
+        const res: ServiceResult<PagingResult<FingerprintCard>> =
           await FingerprintService.list(params);
 
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Get fingerprints failed");
+          throw new Error(res.message || t("error.fingerprint.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from get fingerprints");
+          throw new Error(t("error.fingerprint.noData"));
         }
 
         const {
@@ -67,7 +68,9 @@ export const useFingerprintStore = defineStore("fingerprint", {
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Get fingerprints failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.fingerprint.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -79,21 +82,21 @@ export const useFingerprintStore = defineStore("fingerprint", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<FingerprintCardResponse> =
+        const res: ServiceResult<FingerprintCard> =
           await FingerprintService.create(payload);
 
         if (!res.success) {
-          throw new Error(res.message || "Create fingerprint failed");
+          throw new Error(res.message || t("error.fingerprint.create"));
         }
 
         const created = res.data;
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
         return created;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message ||
           e?.message ||
-          "Create fingerprint failed";
+          t("error.fingerprint.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -106,21 +109,21 @@ export const useFingerprintStore = defineStore("fingerprint", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<FingerprintCardResponse> =
+        const res: ServiceResult<FingerprintCard> =
           await FingerprintService.update(id, payload);
 
         if (!res.success) {
-          throw new Error(res.message || "Update Fingerprint failed");
+          throw new Error(res.message || t("error.fingerprint.update"));
         }
 
         const updated = res.data;
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
         return updated;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message ||
           e?.message ||
-          "Update Fingerprint failed";
+          t("error.fingerprint.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -136,9 +139,9 @@ export const useFingerprintStore = defineStore("fingerprint", {
         const res: ServiceResult<boolean> = await FingerprintService.delete(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Delete Fingerprint failed");
+          throw new Error(res.message || t("error.fingerprint.delete"));
         }
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         if (this.lastQuery) {
           await this.listPage(this.lastQuery);
         }
@@ -146,7 +149,7 @@ export const useFingerprintStore = defineStore("fingerprint", {
         const msg =
           e?.response?.data?.message ||
           e?.message ||
-          "Delete Fingerprint failed";
+          t("error.fingerprint.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -158,15 +161,17 @@ export const useFingerprintStore = defineStore("fingerprint", {
       this.loading = true;
       this.error = undefined;
       try {
-        const res: ServiceResult<FingerprintCardResponse> =
+        const res: ServiceResult<FingerprintCard> =
           await FingerprintService.getById(id);
         if (!res.success) {
-          throw new Error(res.message || "Get Fingerprint failed");
+          throw new Error(res.message || t("error.fingerprint.fetchDetail"));
         }
         return res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Get Fingerprint failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.fingerprint.fetchDetail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

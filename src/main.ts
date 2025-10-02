@@ -20,6 +20,8 @@ import AppLanguage from "@/components/common/Language.vue";
 import router from "./router";
 import { i18n } from "./i18n";
 
+import { vOnlyNumber } from './directives/onlyNumber'
+
 // ✅ Pinia
 import { createPinia, setActivePinia } from "pinia";
 // import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
@@ -31,6 +33,8 @@ const app = createApp(App);
 // ✅ Create Pinia (thay cho Vuex)
 const pinia = createPinia();
 // pinia.use(piniaPluginPersistedstate);
+
+
 
 // Axios interceptors
 axios.interceptors.request.use((config: any) => {
@@ -95,6 +99,8 @@ app.use(i18n);
 import { useAuthStore } from "@/stores/login";
 const authStore = useAuthStore();
 authStore.loadFromSession();
+
+app.directive('only-number', vOnlyNumber);
 
 // Mount app
 app.mount("#app");

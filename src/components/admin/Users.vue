@@ -18,25 +18,39 @@
             type="primary"
             @click="onSearch"
             :disabled="isButtonEnabled('system:user:search')"
-            size="mini"
             :icon="Search"
           >
             {{ t("option.query") }}
           </el-button>
         </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            @click="handleAdd"
-            :disabled="isButtonEnabled('system:user:insert')"
-          >
-            <el-icon><Plus /></el-icon><span>{{ t("option.add") }}</span>
-          </el-button>
-        </el-form-item>
       </el-form>
     </div>
 
-    <el-table :data="users" align="center" border>
+    <div class="action-card">
+      <div class="action-bar">
+        <div>
+          <el-button
+            type="primary"
+            @click="handleAdd()"
+            :icon="Plus"
+            :disabled="isButtonEnabled('system:user:insert')"
+          >
+            {{ t("common.add") }}
+          </el-button>
+        </div>
+        <div class="result-info">
+          {{ t("common.total") }}: {{ userStore.getTotal }}
+          {{ t("common.unit") }}
+        </div>
+      </div>
+    </div>
+
+    <el-table
+      :data="users"
+      align="center"
+      border
+      v-loading="userStore.getLoading"
+    >
       <el-table-column
         type="index"
         prop="id"
@@ -74,56 +88,95 @@
         :formatter="defaultTimeFormatter"
         show-overflow-tooltip
       ></el-table-column>
-      <el-table-column fixed="right" :label="t('common.option')" width="500">
+      <el-table-column
+        fixed="right"
+        :label="t('common.option')"
+        width="250"
+        class-name="sticky"
+      >
         <template #default="scope">
-          <el-button
-            type="primary"
-            :disabled="isButtonEnabled('system:user:update')"
-            @click="handleEdit(scope.row)"
-            >{{ t("option.update") }}
-          </el-button>
-          <el-button
-            type="success"
-            :disabled="
-              isButtonEnabled('system:user:assign-roles') ||
-              scope.row.userName === userNameLogin ||
-              scope.row.removable != '1'
-            "
-            @click="handleSelectRoles(scope.row)"
-            >{{ t("user.allocateRole") }}
-          </el-button>
-          <el-button
-            type="warning"
-            :disabled="
-              isButtonEnabled('system:user:reset-password') ||
-              scope.row.userName === userNameLogin
-            "
-            @click="resetPassword(scope.row)"
-            >{{ t("user.resetPassword") }}
-          </el-button>
-          <el-button
-            type="danger"
-            :disabled="
-              isButtonEnabled('system:user:delete') ||
-              scope.row.userName === userNameLogin ||
-              scope.row.removable != '1'
-            "
-            @click="handleDelete(scope.row.id)"
-            >{{ t("option.delete") }}
-          </el-button>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('common.update')"
+          >
+            <el-button
+              type="primary"
+              :disabled="isButtonEnabled('system:user:update')"
+              @click="handleEdit(scope.row)"
+              icon="Edit"
+            >
+            </el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('user.allocateRole')"
+          >
+            <el-button
+              type="success"
+              :disabled="
+                isButtonEnabled('system:user:assign-roles') ||
+                scope.row.userName === userNameLogin ||
+                scope.row.removable != '1'
+              "
+              @click="handleSelectRoles(scope.row)"
+              icon="Rank"
+            >
+            </el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('user.resetPassword')"
+          >
+            <el-button
+              type="warning"
+              :disabled="
+                isButtonEnabled('system:user:reset-password') ||
+                scope.row.userName === userNameLogin
+              "
+              @click="resetPassword(scope.row)"
+              icon="RefreshRight"
+            >
+            </el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('option.delete')"
+          >
+            <el-button
+              type="danger"
+              :disabled="
+                isButtonEnabled('system:user:delete') ||
+                scope.row.userName === userNameLogin ||
+                scope.row.removable != '1'
+              "
+              @click="handleDelete(scope.row.id)"
+              icon="Delete"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="userStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="userStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
 
     <el-dialog
       :title="ui.addRecord ? t('user.add') : t('user.update')"
@@ -137,10 +190,16 @@
             v-model="form.userName"
             autofocus
             :readonly="!ui.addRecord"
+            :placeholder="t('user.usernamePlaceHolder')"
+            :maxlength="25"
           ></el-input>
         </el-form-item>
         <el-form-item :label="t('user.realName')" prop="realName">
-          <el-input v-model="form.realName"></el-input>
+          <el-input
+            v-model="form.realName"
+            :maxlength="50"
+            :placeholder="t('detainee.placeholder.fullName')"
+          ></el-input>
         </el-form-item>
         <el-form-item
           :label="t('detainee.detentionCenter')"
@@ -173,15 +232,22 @@
           <el-button @click="ui.dialogVisible = false">{{
             t("common.cancel")
           }}</el-button>
-          <el-button type="primary" @click="handleSaveOrUpdate()">{{
-            t("common.ok")
-          }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSaveOrUpdate()"
+            :disabled="
+              isButtonEnabled(
+                ui.addRecord ? 'system:user:insert' : 'system:user:update'
+              )
+            "
+            >{{ t("common.ok") }}</el-button
+          >
         </div>
       </template>
     </el-dialog>
 
     <el-dialog
-      :title="t('ResetPassword')"
+      :title="t('user.resetPassword')"
       v-model="ui.resetPassword"
       width="40%"
       class="dialog"
@@ -205,9 +271,12 @@
           <el-button @click="ui.resetPassword = false">{{
             t("common.cancel")
           }}</el-button>
-          <el-button type="primary" @click="handleResetPassword()">{{
-            t("common.ok")
-          }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleResetPassword()"
+            :disabled="isButtonEnabled('system:user:reset-password')"
+            >{{ t("common.ok") }}</el-button
+          >
         </div>
       </template>
     </el-dialog>
@@ -278,8 +347,10 @@ import { useRoleStore } from "@/stores/role";
 import { useUserRoleStore } from "@/stores/userRole";
 import { useMessage } from "@/composables/useMessage";
 import { usePrisonStore } from "@/stores/prison";
+import { useLocalePagination } from "@/composables/useLocalePagination.ts";
 
 const { messageInfoPassword } = useMessage();
+const { localePagination } = useLocalePagination();
 
 const { t } = useI18n();
 const { isButtonEnabled } = useBaseMixin();
@@ -396,6 +467,8 @@ const handleDelete = async (id: number) => {
   try {
     await ElMessageBox.confirm(t("common.deleteConfirm"), t("common.confirm"), {
       type: "warning",
+      confirmButtonText: t("common.confirm"),
+      cancelButtonText: t("el.messagebox.cancel"),
     });
     await userStore.deleteUser(id);
     await loadTableData();
@@ -490,7 +563,11 @@ const handleResetPassword = async () => {
     await ElMessageBox.confirm(
       t("user.resetPasswordConfirm"),
       t("common.confirm"),
-      { type: "warning" }
+      {
+        type: "warning",
+        confirmButtonText: t("common.confirm"),
+        cancelButtonText: t("el.messagebox.cancel"),
+      }
     );
     await userStore.resetPassword(password);
     if (userStore.getSuccess) {
@@ -567,6 +644,13 @@ onMounted(async () => {
 .danger:disabled {
   color: #bfcbd9;
 }
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .pagination {
   margin-top: 20px;
   display: flex;

@@ -66,7 +66,10 @@
 
         <div class="form-group">
           <label>{{ t("report.exportFormat") }}</label>
-          <el-select v-model="reportForm.format" :placeholder="t('report.exportFormatPlace')">
+          <el-select
+            v-model="reportForm.format"
+            :placeholder="t('report.exportFormatPlace')"
+          >
             <el-option :label="t('report.table')" value="table" />
             <el-option :label="t('report.chart')" value="chart" />
             <el-option :label="t('report.both')" value="both" />
@@ -120,9 +123,13 @@
       <div class="report-header">
         <h3>{{ currentReport.title }}</h3>
         <div class="report-meta">
-          <span>{{ t("report.createAt") }} {{ formatDateTime(currentReport.createdAt) }}</span>
+          <span
+            >{{ t("report.createAt") }}
+            {{ formatDateTime(currentReport.createdAt) }}</span
+          >
           <span v-if="reportForm.fromDate && reportForm.toDate">
-            {{t("report.from")}} {{ formatDate(reportForm.fromDate) }} {{t("report.to")}}
+            {{ t("report.from") }} {{ formatDate(reportForm.fromDate) }}
+            {{ t("report.to") }}
             {{ formatDate(reportForm.toDate) }}
           </span>
         </div>
@@ -202,7 +209,9 @@ import {
 import Chart from "chart.js/auto";
 import { useReportStore } from "@/stores/report";
 import { useI18n } from "vue-i18n";
+import { useBaseMixin } from "@/components/BaseMixin.ts";
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 
 // Stores
 const reportStore = useReportStore();
@@ -809,8 +818,12 @@ onMounted(() => {
 }
 
 .chart-container {
-  margin: 30px 0;
+  margin: 30px auto;
   text-align: center;
+  height: 550px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .chart-container canvas {

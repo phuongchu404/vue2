@@ -3,7 +3,7 @@ import { ElMessage } from "element-plus";
 import { CountryService } from "@/services/country";
 import type { Country, CountryState } from "@/types/country";
 import type { ServiceResult } from "@/types/common";
-
+import { t } from "@/i18n";
 export const useCountryStore = defineStore("country", {
   state: (): CountryState => ({
     countries: undefined,
@@ -25,13 +25,13 @@ export const useCountryStore = defineStore("country", {
         const res: ServiceResult<Country[]> = await CountryService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.country.getAll"));
         }
 
         this.countries = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message || e?.message || t("error.country.getAll");
         this.error = msg;
         ElMessage.error(msg);
       } finally {

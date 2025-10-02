@@ -13,6 +13,11 @@ const option: Option = {
   import: "Import",
   syn: "Synchronize",
   detail: "Detail",
+  view: "View",
+  generate: "Generate",
+  excel: "Export Excel",
+  pdf: "Export PDF",
+  print: "Print",
 };
 
 export default option;

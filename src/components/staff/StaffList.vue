@@ -81,14 +81,14 @@
             type="success"
             @click="handleExport"
             :icon="Download"
-            :disabled="isButtonEnabled('staff:search')"
+            :disabled="isButtonEnabled('staff:export-excel')"
           >
             {{ t("common.export") }}
           </el-button>
         </div>
         <div class="result-info">
           {{ t("common.total") }}: {{ staffStore.getTotal }}
-          {{ t("common.unit") }}
+          {{ t("staff.text") }}
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@
     <el-table
       :data="staffs"
       style="width: 100%"
-      v-loading="loading"
+      v-loading="staffStore.getLoading"
       stripe
       border
     >
@@ -107,6 +107,7 @@
         width="130"
         sortable
         fixed="left"
+        class-name="sticky"
       />
       <el-table-column
         prop="fullName"
@@ -116,7 +117,7 @@
       <el-table-column
         prop="idNumber"
         :label="t('staff.idNumber')"
-        min-width="170"
+        min-width="190"
         align="center"
       />
       <el-table-column :label="t('staff.gender')" width="120" align="center ">
@@ -124,8 +125,18 @@
           {{ getGenderLabel(row.gender) }}
         </template>
       </el-table-column>
-      <el-table-column prop="rank" :label="t('staff.rank')" width="120" align="center"/>
-      <el-table-column prop="phone" :label="t('staff.phone')" width="150" align="center" />
+      <el-table-column
+        prop="rank"
+        :label="t('staff.rank')"
+        width="120"
+        align="center"
+      />
+      <el-table-column
+        prop="phone"
+        :label="t('staff.phone')"
+        width="170"
+        align="center"
+      />
       <el-table-column
         prop="email"
         :label="t('staff.email')"
@@ -143,14 +154,10 @@
         :label="t('common.actions')"
         min-width="160"
         fixed="right"
+        class-name="sticky"
       >
         <template #default="scope">
-          <el-button
-            :disabled="isButtonEnabled('staff:select:id')"
-            size="small"
-            @click="handleView(scope.row)"
-            :icon="View"
-          />
+          <el-button size="small" @click="handleView(scope.row)" :icon="View" />
           <el-button
             size="small"
             type="primary"
@@ -170,16 +177,18 @@
     </el-table>
 
     <!-- Pagination -->
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="staffStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="staffStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
 
     <!-- Detail Dialog -->
     <el-dialog
@@ -217,7 +226,7 @@
               selectedStaff.idNumber || "-"
             }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.idIssueDate')">{{
-              selectedStaff.idIssueDate || "-"
+              formatDate(selectedStaff.idIssueDate)
             }}</el-descriptions-item>
             <el-descriptions-item :label="t('staff.idIssuePlace')">{{
               selectedStaff.idIssuePlace || "-"
@@ -240,17 +249,17 @@
             <el-descriptions-item :label="t('staff.emergencyPhone')">{{
               selectedStaff.emergencyPhone || "-"
             }}</el-descriptions-item>
-            <el-descriptions-item :label="t('staff.emergencyContact')">{{
+            <el-descriptions-item :label="t('staff.emergencyContact')" :span="2">{{
               selectedStaff.emergencyContact || "-"
             }}</el-descriptions-item>
             <el-descriptions-item
-              :label="t('staff.permanentAddress')"
+              :label="t('staff.permanentAddressSection')"
               :span="2"
             >
               {{ permanentFullAddress }}
             </el-descriptions-item>
             <el-descriptions-item
-              :label="t('staff.temporaryAddress')"
+              :label="t('staff.temporaryAddressSection')"
               :span="2"
             >
               {{ temporaryFullAddress }}
@@ -298,7 +307,11 @@
         <el-button @click="handleDetailClose()">
           {{ t("common.close") }}
         </el-button>
-        <el-button type="primary" @click="handleEdit(selectedStaff)">
+        <el-button
+          type="primary"
+          @click="handleEdit(selectedStaff)"
+          :disabled="isButtonEnabled('staff:update')"
+        >
           {{ t("common.edit") }}
         </el-button>
       </template>
@@ -324,6 +337,8 @@ import type { Staff, PageQuery, ExportStaffQuery } from "@/types/staff";
 import { statusOptions, Gender, Status, genderOptions } from "@/constants";
 import { useI18n } from "vue-i18n";
 import { useBaseMixin } from "@/components/BaseMixin";
+import { useLocalePagination } from "@/composables/useLocalePagination";
+const { localePagination } = useLocalePagination();
 // import { headerMap, columnWidths } from "@/excel/staff";
 
 const { t } = useI18n();
@@ -333,7 +348,6 @@ const staffStore = useStaffStore();
 const staffs = ref<Staff[]>([]);
 
 // Reactive data
-const loading = ref(false);
 const searchForm = reactive<{
   staffCode?: string;
   fullName?: string;
@@ -398,40 +412,26 @@ const handleView = (staff: any) => {
 };
 
 const handleExport = async () => {
-  try {
-    await staffStore.exportExcel({
-      staffCode: searchForm.staffCode?.trim() ?? null,
-      fullName: searchForm.fullName?.trim() ?? null,
-      rank: searchForm.rank?.trim() ?? null,
-      status: searchForm.status?.trim() ?? null,
-    } as ExportStaffQuery);
-  } catch (error) {
-    console.error("Export error:", error);
-    ElMessage.error("Lỗi khi xuất Excel!");
-  } finally {
-  }
+  await staffStore.exportExcel({
+    staffCode: searchForm.staffCode?.trim() ?? null,
+    fullName: searchForm.fullName?.trim() ?? null,
+    rank: searchForm.rank?.trim() ?? null,
+    status: searchForm.status?.trim() ?? null,
+  } as ExportStaffQuery);
 };
 
 const search = async (extra?: Partial<PageQuery>) => {
-  try {
-    loading.value = true;
+  await staffStore.fetchList({
+    pageNo: page.value,
+    pageSize: size.value,
+    staffCode: searchForm.staffCode ?? null,
+    fullName: searchForm.fullName ?? null,
+    rank: searchForm.rank ?? null,
+    status: searchForm.status ?? null,
+    ...extra,
+  } as PageQuery);
 
-    await staffStore.fetchList({
-      pageNo: page.value,
-      pageSize: size.value,
-      staffCode: searchForm.staffCode ?? null,
-      fullName: searchForm.fullName ?? null,
-      rank: searchForm.rank ?? null,
-      status: searchForm.status ?? null,
-      ...extra,
-    } as PageQuery);
-
-    staffs.value = staffStore.getStaffs || [];
-  } catch (error) {
-    ElMessage.error(t("common.dataFail"));
-  } finally {
-    loading.value = false;
-  }
+  staffs.value = staffStore.getStaffs || [];
 };
 function toExportRow(item: any) {
   const genderText =
@@ -558,7 +558,11 @@ const onDelete = async (id: number) => {
   const ok = await ElMessageBox.confirm(
     t("common.deleteConfirm"),
     t("common.reminder"),
-    { type: "warning" }
+    {
+      type: "warning",
+      confirmButtonText: t("el.messagebox.confirm"), // "OK"
+      cancelButtonText: t("el.messagebox.cancel"),
+    }
   )
     .then(() => true)
     .catch(() => false);
@@ -598,5 +602,10 @@ const onDelete = async (id: number) => {
 
 .detail-content {
   padding: 20px 0;
+}
+
+.space-y-6 {
+  max-height: 60vh;
+  overflow: auto;
 }
 </style>

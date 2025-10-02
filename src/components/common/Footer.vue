@@ -1,5 +1,5 @@
 <template>
-  <div class="infinite-list-wrapper" style="overflow:auto">
+  <div style="overflow:auto">
     <el-row type="flex" justify="center" class="appfooter" style="padding-bottom: 20px">
       <el-col :span="24">
         <div style="padding-bottom: 10px">V1.0.0</div>

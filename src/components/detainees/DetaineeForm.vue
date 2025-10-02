@@ -21,6 +21,7 @@
               <el-input
                 v-model="form.profileNumber"
                 :placeholder="t('detainee.placeholder.profileNumber')"
+                :maxlength="50"
               />
             </el-form-item>
           </el-col>
@@ -45,6 +46,7 @@
               <el-input
                 v-model="form.fullName"
                 :placeholder="t('detainee.placeholder.fullName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -53,6 +55,7 @@
               <el-input
                 v-model="form.aliasName"
                 :placeholder="t('detainee.placeholder.aliasName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -83,6 +86,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disableFutureDate"
               />
             </el-form-item>
           </el-col>
@@ -118,6 +122,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disableFutureDate"
               />
             </el-form-item>
           </el-col>
@@ -126,6 +131,7 @@
               <el-input
                 v-model="form.idIssuePlace"
                 :placeholder="t('detainee.placeholder.idIssuePlace')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -192,6 +198,7 @@
               <el-input
                 v-model="form.fatherName"
                 :placeholder="t('detainee.placeholder.fatherName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -200,6 +207,7 @@
               <el-input
                 v-model="form.motherName"
                 :placeholder="t('detainee.placeholder.motherName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -208,6 +216,7 @@
               <el-input
                 v-model="form.spouseName"
                 :placeholder="t('detainee.placeholder.spouseName')"
+                :maxlength="255"
               />
             </el-form-item>
           </el-col>
@@ -434,6 +443,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disableFutureDate"
               />
             </el-form-item>
           </el-col>
@@ -449,6 +459,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disablePastDate"
               />
             </el-form-item>
           </el-col>
@@ -464,6 +475,7 @@
                 style="width: 100%"
                 format="DD/MM/YYYY"
                 value-format="YYYY-MM-DD"
+                :disabled-date="disablePastDate"
               />
             </el-form-item>
           </el-col>
@@ -474,6 +486,7 @@
               <el-input
                 v-model="form.sentenceDuration"
                 :placeholder="t('detainee.placeholder.sentenceDuration')"
+                :maxlength="50"
               />
             </el-form-item>
           </el-col>
@@ -482,6 +495,7 @@
               <el-input
                 v-model="form.caseNumber"
                 :placeholder="t('detainee.placeholder.caseNumber')"
+                :maxlength="50"
               />
             </el-form-item>
           </el-col>
@@ -490,6 +504,7 @@
               <el-input
                 v-model="form.cellNumber"
                 :placeholder="t('detainee.placeholder.cellNumber')"
+                :maxlength="20"
               />
             </el-form-item>
           </el-col>
@@ -553,7 +568,7 @@
         </el-form-item>
 
         <el-form-item class="form-actions">
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="isButtonEnabled(isEdit ? 'detainee:update' : 'detainee:insert')">
             {{ isEdit ? t("common.update") : t("common.add") }}
           </el-button>
           <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
@@ -588,6 +603,7 @@ import type {
   UpdateDetaineeRequest,
 } from "@/types/detainee";
 import { useI18n } from "vue-i18n";
+import {useBaseMixin} from "@/components/BaseMixin.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -599,6 +615,7 @@ const ethnicityStore = useEthnicityStore();
 const religionStore = useReligionStore();
 const countryStore = useCountryStore();
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 
 const { prisons } = storeToRefs(prisonStore);
 const { ethnicities } = storeToRefs(ethnicityStore);
@@ -670,30 +687,30 @@ const rules: FormRules = {
     },
   ],
   fullName: [
-    { required: true, message: "Vui lòng nhập họ và tên", trigger: "blur" },
-    { min: 2, max: 50, message: "Họ tên phải từ 2-50 ký tự", trigger: "blur" },
+    { required: true, message: t("detainee.validate.fullNameRequired"), trigger: "blur" },
+    { min: 2, max: 255, message: t("detainee.validate.fullNameInvalid"), trigger: "blur" },
   ],
   gender: [
-    { required: true, message: "Vui lòng chọn giới tính", trigger: "change" },
+    { required: true, message: t("detainee.validate.genderRequired"), trigger: "change" },
   ],
   dateOfBirth: [
-    { required: true, message: "Vui lòng chọn ngày sinh", trigger: "change" },
+    { required: true, message: t("detainee.validate.birthdayRequired"), trigger: "change" },
   ],
   idNumber: [
     {
       pattern: /^[0-9]{9,12}$/,
-      message: "Số CCCD/CMND không hợp lệ",
+      message: t("detainee.validate.idNumberInvalid"),
       trigger: "blur",
     },
   ],
   detentionDate: [
-    { required: true, message: "Vui lòng chọn ngày bắt", trigger: "change" },
+    { required: true, message: t("detainee.validate.detentionDateRequired"), trigger: "change" },
   ],
   detentionCenterId: [
-    { required: true, message: "Vui lòng chọn trại giam", trigger: "change" },
+    { required: true, message: t("detainee.validate.detentionCenterIdRequired"), trigger: "change" },
   ],
   status: [
-    { required: true, message: "Vui lòng chọn trạng thái", trigger: "change" },
+    { required: true, message: t("detainee.validate.statusRequired"), trigger: "change" },
   ],
 };
 
@@ -737,6 +754,16 @@ const onCurrentProvinceChange = async (code: string) => {
     }
   } catch {}
 };
+
+const disableFutureDate = (time: Date) => {
+  return time.getTime() > Date.now() // chặn ngày lớn hơn hôm nay
+}
+
+const disablePastDate = (time: Date) => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return time.getTime() < today.getTime(); // chặn ngày nhỏ hơn hôm nay
+}
 
 const getAllProvinces = async () => {
   await provinceStore.getAll();
@@ -783,13 +810,13 @@ const handleSubmit = async () => {
       const detentionDate = new Date(form.detentionDate);
 
       if (birthDate >= detentionDate) {
-        ElMessage.error("Ngày bắt phải sau ngày sinh!");
+        ElMessage.error(t("detainee.validate.detentionDateInvalid"));
         return;
       }
 
       const age = detentionDate.getFullYear() - birthDate.getFullYear();
       if (age < 14) {
-        ElMessage.error("Phạm nhân phải từ 14 tuổi trở lên!");
+        ElMessage.error(t("detainee.validate.detaineeUnder14"));
         return;
       }
     }

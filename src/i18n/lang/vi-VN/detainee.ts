@@ -94,6 +94,19 @@ const detainee: Detainee = {
     ward: "Chọn xã/phường",
     addressDetail: "Số nhà, đường, thôn/xóm...",
   },
+
+  validate: {
+    fullNameRequired: "Vui lòng nhập họ và tên",
+    fullNameInvalid: "Họ tên phải từ 2 - 255 ký tự",
+    genderRequired: "Vui lòng chọn giới tính",
+    birthdayRequired: "Vui lòng chọn ngày sinh",
+    idNumberInvalid: "Số CCCD/CMND không hợp lệ",
+    detentionDateRequired: "Vui lòng chọn ngày bắt",
+    detentionCenterIdRequired: "Vui lòng chọn trại giam",
+    statusRequired: "Vui lòng chọn trạng thái",
+    detentionDateInvalid: "Ngày bắt phải sau ngày sinh!",
+    detaineeUnder14: "Phạm nhân phải từ 14 tuổi trở lên!",
+  },
 };
 
 export default detainee;

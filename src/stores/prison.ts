@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+import { t } from "@/i18n";
 import { PrisonService } from "@/services/prison";
 import type {
   PrisonState,
@@ -11,7 +11,6 @@ import type {
   ExportExcelQuery,
 } from "@/types/prison";
 import type { ServiceResult, PagingResult } from "@/types/common";
-import { get } from "lodash";
 
 export const usePrisonStore = defineStore("prison", {
   state: (): PrisonState => ({
@@ -34,7 +33,7 @@ export const usePrisonStore = defineStore("prison", {
   },
 
   actions: {
-    async fetchList(query: PageQuery) {
+    async fetchList(query: PageQuery, isCombineOld?: boolean): Promise<void> {
       this.loading = true;
       this.error = undefined;
       try {
@@ -49,11 +48,11 @@ export const usePrisonStore = defineStore("prison", {
           await PrisonService.list(params);
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.prison.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.prison.noData"));
         }
         const {
           content,
@@ -62,14 +61,16 @@ export const usePrisonStore = defineStore("prison", {
           size: pageSize,
         } = res.data;
 
-        this.prisons = content;
+        this.prisons = isCombineOld ? (this.prisons ?? []).concat(content) : content;
         this.total = totalElements;
         this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.prison.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -83,13 +84,15 @@ export const usePrisonStore = defineStore("prison", {
         const res: ServiceResult<Prison[]> = await PrisonService.getAll();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.prison.fetchAll"));
         }
 
         this.prisons = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.prison.fetchAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -105,14 +108,16 @@ export const usePrisonStore = defineStore("prison", {
         const res: ServiceResult<Prison> = await PrisonService.getById(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.prison.fetchDetail"));
         }
 
         const detail = res.data;
         return detail;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.prison.fetchDetail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -128,15 +133,15 @@ export const usePrisonStore = defineStore("prison", {
         const res: ServiceResult<Prison> = await PrisonService.create(payload);
 
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("error.prison.create"));
         }
 
         const created = res.data;
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
         return created;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message || e?.message || t("error.prison.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -155,7 +160,7 @@ export const usePrisonStore = defineStore("prison", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("error.prison.update"));
         }
 
         const updated = res.data;
@@ -163,11 +168,11 @@ export const usePrisonStore = defineStore("prison", {
         // if (idx >= 0 && this.items) {
         //   this.items[idx] = { ...this.items[idx], ...updated };
         // }
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
         return updated;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message || e?.message || t("error.prison.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -182,19 +187,19 @@ export const usePrisonStore = defineStore("prison", {
       try {
         const res: ServiceResult<number> = await PrisonService.delete(id);
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.prison.delete"));
         }
 
         // this.items = (this.items ?? []).filter((x) => x.id !== id);
         // this.total = Math.max(0, this.total - 1);
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         if (this.lastQuery) {
           await this.fetchList(this.lastQuery);
         }
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message || e?.message || t("error.prison.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -215,7 +220,9 @@ export const usePrisonStore = defineStore("prison", {
         await PrisonService.exportExcel(params);
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Export Excel failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.prison.exportExcel");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -230,14 +237,14 @@ export const usePrisonStore = defineStore("prison", {
         const res: ServiceResult<Prison[]> =
           await PrisonService.getTop3Recent();
         if (!res.success) {
-          throw new Error(res.message || "Fetch recent prisons failed");
+          throw new Error(res.message || t("error.prison.top3Recent"));
         }
         this.prisons = res.data;
       } catch (e: any) {
         const msg =
           e?.response?.data?.message ||
           e?.message ||
-          "Fetch recent prisons failed";
+          t("error.prison.top3Recent");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -251,17 +258,29 @@ export const usePrisonStore = defineStore("prison", {
       try {
         const res: ServiceResult<number> = await PrisonService.count();
         if (!res.success) {
-          throw new Error(res.message || "Count prisons failed");
+          throw new Error(res.message || t("error.prison.count"));
         }
         this.total = res.data || 0;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Count prisons failed";
+          e?.response?.data?.message || e?.message || t("error.prison.count");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async loadForSelect(query: PageQuery, id?: number, name?: string) {
+      await this.fetchList(query);
+      let item = this.prisons?.find((s) => s.id === id);
+      if (!item) {
+        this.prisons = (this.prisons ?? []).concat({
+          id: id,
+          name: name,
+          code: name
+        })
       }
     },
 

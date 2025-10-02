@@ -34,6 +34,30 @@ const prison: Prison = {
     description: "Enter prison description...",
     status: "Select status...",
   },
+
+  notFound: "Prison information not found!",
+
+  validation: {
+    required: {
+      name: "Please enter prison name",
+      address: "Please enter address",
+      province: "Please select province/city",
+      ward: "Please select ward/commune",
+      director: "Please enter director's name",
+      deputyDirector: "Please enter deputy director's name",
+      phone: "Please enter phone number",
+      capacity: "Please enter capacity",
+      currentPopulation: "Please enter current number of detainees",
+      isActive: "Please select status",
+    },
+    invalid: {
+      name: "Prison name must be between 5 and 255 characters",
+      phone: "Invalid phone number",
+      capacity: "Capacity must be greater than 0",
+      currentPopulation: "Number of detainees cannot be negative",
+      currentPopulationOver: "Current number of detainees cannot exceed capacity!",
+    }
+  }
 };
 
 export default prison;

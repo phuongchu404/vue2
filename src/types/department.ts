@@ -36,4 +36,5 @@ export interface PageQuery {
   detentionCenterCode?: string;
   description?: string
   isActive?: boolean;
+  keyword?: string;
 }

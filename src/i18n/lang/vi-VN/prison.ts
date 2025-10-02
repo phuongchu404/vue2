@@ -34,6 +34,30 @@ const prison: Prison = {
     description: "Nhập mô tả về trại giam...",
     status: "Chọn trạng thái...",
   },
+
+  notFound: "Không tìm thấy thông tin trại giam!",
+
+  validation: {
+    required: {
+      name: "Vui lòng nhập tên trại giam",
+      address: "Vui lòng nhập địa chỉ",
+      province: "Vui lòng chọn tỉnh/thành",
+      ward: "Vui lòng chọn xã/phường",
+      director: "Vui lòng nhập tên giám thị",
+      deputyDirector: "Vui lòng nhập tên phó giám thị",
+      phone: "Vui lòng nhập số điện thoại",
+      capacity: "Vui lòng nhập sức chứa",
+      currentPopulation: "Vui lòng nhập số phạm nhân hiện tại",
+      isActive: "Vui lòng chọn trạng thái",
+    },
+    invalid: {
+      name: "Tên trại giam phải từ 5 - 255 ký tự",
+      phone: "Số điện thoại không hợp lệ",
+      capacity: "Sức chứa phải lớn hơn 0",
+      currentPopulation: "Số phạm nhân không thể âm",
+      currentPopulationOver: "Số phạm nhân hiện tại không thể vượt quá sức chứa!",
+    }
+  }
 };
 
 export default prison;

@@ -1,12 +1,9 @@
 import { defineStore } from "pinia";
 import { ElMessage } from "element-plus";
 import { ProvinceService } from "@/services/province";
-import type {
-  ProvinceState,
-  Province
-} from "@/types/province";
+import type { ProvinceState, Province } from "@/types/province";
 import type { ServiceResult } from "@/types/common";
-
+import { t } from "@/i18n";
 export const useProvinceStore = defineStore("province", {
   state: (): ProvinceState => ({
     provinces: undefined,
@@ -28,13 +25,15 @@ export const useProvinceStore = defineStore("province", {
         const res: ServiceResult<Province[]> = await ProvinceService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.province.getAll"));
         }
 
         this.provinces = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.province.getAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -42,8 +41,6 @@ export const useProvinceStore = defineStore("province", {
         this.loading = false;
       }
     },
-
-    
   },
 
   // persist: true,

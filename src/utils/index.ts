@@ -57,7 +57,7 @@ export async function confirmRelogin(
   return new Promise((resolve) => {
     ElMessageBox.alert(message, finalTitle, {
       type: "error",
-      confirmButtonText: "Re-login",
+      confirmButtonText: "login.reLogin",
       callback: (action: any) => {
         console.log(action);
         resolve("confirmed");

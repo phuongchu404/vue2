@@ -1,12 +1,6 @@
 <!--suppress ALL -->
 <template>
   <div class="prison-list">
-    <!-- <el-page-header @back="$router.go(-1)">
-      <template #content>
-        <span class="text-large font-600 mr-3">Quản lý trại giam</span>
-      </template>
-    </el-page-header> -->
-
     <!-- Search Section -->
     <div class="search-section">
       <el-form
@@ -51,7 +45,12 @@
           </el-col>
           <el-col :span="8">
             <el-form-item>
-              <el-button type="primary" @click="onSearch" :icon="Search">
+              <el-button
+                type="primary"
+                @click="onSearch"
+                :icon="Search"
+                :disabled="isButtonEnabled('prison:search')"
+              >
                 {{ t("common.Search") }}
               </el-button>
               <el-button @click="onReset" :icon="Refresh">
@@ -83,10 +82,16 @@
             type="primary"
             @click="$router.push('/prisons/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('prison:insert')"
           >
             {{ t("common.add") }}
           </el-button>
-          <el-button type="success" @click="handleExport" :icon="Download">
+          <el-button
+            type="success"
+            @click="handleExport"
+            :icon="Download"
+            :disabled="isButtonEnabled('prison:export-excel')"
+          >
             {{ t("common.export") }}
           </el-button>
         </div>
@@ -112,6 +117,7 @@
         width="145"
         sortable
         fixed="left"
+        class-name="sticky"
       />
       <el-table-column prop="name" :label="t('prison.name')" width="200" />
       <el-table-column
@@ -129,14 +135,14 @@
         :label="t('prison.director')"
         width="150"
       />
-      <el-table-column :label="t('prison.capacity')" width="130" align="center">
+      <el-table-column :label="t('prison.capacity')" width="182" align="center">
         <template #default="scope">
           <el-tag type="info">
             {{ scope.row.currentPopulation }}/{{ scope.row.capacity }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('prison.occupancyRate')" width="150" >
+      <el-table-column :label="t('prison.occupancyRate')" width="170">
         <template #default="scope">
           <el-progress
             :percentage="
@@ -153,7 +159,12 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="phone" :label="t('prison.phone')" width="150" align="center"/>
+      <el-table-column
+        prop="phone"
+        :label="t('prison.phone')"
+        width="170"
+        align="center"
+      />
       <el-table-column :label="t('prison.status')" width="130" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.isActive === true ? 'success' : 'danger'">
@@ -165,7 +176,12 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="200" fixed="right">
+      <el-table-column
+        :label="t('common.actions')"
+        width="160"
+        fixed="right"
+        class-name="sticky"
+      >
         <template #default="scope">
           <el-button size="small" @click="handleView(scope.row)" :icon="View">
           </el-button>
@@ -174,6 +190,7 @@
             type="primary"
             @click="handleEdit(scope.row)"
             :icon="Edit"
+            :disabled="isButtonEnabled('prison:update')"
           >
           </el-button>
           <el-button
@@ -181,6 +198,7 @@
             type="danger"
             @click="onDelete(scope.row.id)"
             :icon="Delete"
+            :disabled="isButtonEnabled('prison:delete')"
           >
           </el-button>
         </template>
@@ -188,16 +206,18 @@
     </el-table>
 
     <!-- Pagination -->
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="prisonStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="prisonStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
 
     <!-- Detail Dialog -->
     <el-dialog
@@ -273,8 +293,12 @@
         <el-button @click="detailDialogVisible = false">
           {{ t("common.close") }}
         </el-button>
-        <el-button type="primary" @click="handleEdit(selectedPrison)">
-          {{ t("common.ok") }}
+        <el-button
+          type="primary"
+          @click="handleEdit(selectedPrison)"
+          :disabled="isButtonEnabled('prison:update')"
+        >
+          {{ t("common.edit") }}
         </el-button>
       </template>
     </el-dialog>
@@ -298,10 +322,12 @@ import { useRouter } from "vue-router";
 import type { PageQuery, Prison, ExportExcelQuery } from "@/types/prison";
 import { useBaseMixin } from "@/components/BaseMixin";
 import { useI18n } from "vue-i18n";
+import { useLocalePagination } from "@/composables/useLocalePagination.ts";
 
 const { isButtonEnabled } = useBaseMixin();
 
 const { t } = useI18n();
+const { localePagination } = useLocalePagination();
 
 const prisonStore = usePrisonStore();
 const router = useRouter();
@@ -420,7 +446,11 @@ const onDelete = async (id: number) => {
   const ok = await ElMessageBox.confirm(
     t("common.deleteConfirm"),
     t("common.reminder"),
-    { type: "warning" }
+    {
+      type: "warning",
+      confirmButtonText: t("el.messagebox.confirm"), // "OK"
+      cancelButtonText: t("el.messagebox.cancel"),
+    }
   )
     .then(() => true)
     .catch(() => false);

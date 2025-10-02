@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" v-loading="loading">
     <!-- Statistics Cards -->
     <el-row :gutter="20" class="stats-row">
       <el-col :xs="24" :sm="12" :md="6">
@@ -10,7 +10,7 @@
             </div>
             <div class="stats-info">
               <div class="stats-number">{{ prisonStore.getTotal }}</div>
-              <div class="stats-label">Trại giam</div>
+              <div class="stats-label">{{ t("staff.prison") }}</div>
             </div>
           </div>
         </el-card>
@@ -26,7 +26,7 @@
               <div class="stats-number">
                 {{ detaineeStore.getTotal }}
               </div>
-              <div class="stats-label">Phạm nhân</div>
+              <div class="stats-label">{{ t("route.detainees") }}</div>
             </div>
           </div>
         </el-card>
@@ -40,7 +40,7 @@
             </div>
             <div class="stats-info">
               <div class="stats-number">{{ staffStore.getTotal }}</div>
-              <div class="stats-label">Cán bộ</div>
+              <div class="stats-label">{{ t("staff.text") }}</div>
             </div>
           </div>
         </el-card>
@@ -56,7 +56,7 @@
               <div class="stats-number">
                 {{ identityStore.getTotal }}
               </div>
-              <div class="stats-label">Danh bản</div>
+              <div class="stats-label">{{ t("identity.text") }}</div>
             </div>
           </div>
         </el-card>
@@ -69,18 +69,26 @@
         <el-card class="mt-4">
           <template #header>
             <div class="card-header">
-              <span>Tình hình các trại giam</span>
-              <el-button type="primary" @click="$router.push('/prisons')">
-                Xem tất cả
+              <span>{{ t("dashboard.prisonNew") }}</span>
+              <el-button
+                type="primary"
+                @click="$router.push('/prisons')"
+                :disabled="isButtonEnabled('prison')"
+              >
+                {{ t("dashboard.viewAll") }}
               </el-button>
             </div>
           </template>
 
           <el-table :data="prisonStore.prisons" style="width: 100%">
-            <el-table-column prop="code" label="Mã trại giam" width="120" />
-            <el-table-column prop="name" label="Tên trại giam" />
-            <el-table-column prop="warden" label="Giám thị" />
-            <el-table-column label="Sức chứa">
+            <el-table-column
+              prop="code"
+              :label="t('prison.code')"
+              width="120"
+            />
+            <el-table-column prop="name" :label="t('prison.name')" />
+            <el-table-column prop="director" :label="t('prison.director')" />
+            <el-table-column :label="t('prison.capacity')">
               <template #default="scope">
                 {{ scope.row.currentPopulation }}/{{ scope.row.capacity }}
               </template>
@@ -106,7 +114,7 @@
             </el-table-column>
             <el-table-column
               :label="t('prison.status')"
-              width="110"
+              width="130"
               align="center"
             >
               <template #default="scope">
@@ -131,7 +139,7 @@
       <el-col :md="12" :span="24">
         <el-card>
           <template #header>
-            <span>Phạm nhân mới nhập</span>
+            <span>{{ t("dashboard.detaineeNew") }}</span>
           </template>
           <el-timeline>
             <el-timeline-item
@@ -142,8 +150,8 @@
             >
               <el-card>
                 <h4>{{ detainee.fullName }}</h4>
-                <p>Mã: {{ detainee.detaineeCode }}</p>
-                <p>Tội danh: {{ detainee.charges }}</p>
+                <p>{{ t("detainee.code") }}: {{ detainee.detaineeCode }}</p>
+                <p>{{ t("detainee.charges") }}: {{ detainee.charges }}</p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
@@ -153,7 +161,9 @@
       <el-col :md="12" :span="24">
         <el-card>
           <template #header>
-            <span>Cán bộ mới</span>
+            <span
+              ><span>{{ t("dashboard.staffNew") }}</span></span
+            >
           </template>
           <el-timeline>
             <el-timeline-item
@@ -164,8 +174,8 @@
             >
               <el-card>
                 <h4>{{ member.fullName }}</h4>
-                <p>Mã: {{ member.staffCode }}</p>
-                <p>Cấp bậc: {{ member.rank }}</p>
+                <p>{{ t("staff.code") }}: {{ member.staffCode }}</p>
+                <p>{{ t("staff.rank") }}: {{ member.rank }}</p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
@@ -176,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import {
   OfficeBuilding,
   User,
@@ -195,16 +205,21 @@ import { useDetaineeStore } from "@/stores/detainee";
 import { useStaffStore } from "@/stores/staff";
 import { useIdentityStore } from "@/stores/identity";
 import { useI18n } from "vue-i18n";
+import { useBaseMixin } from "@/components/BaseMixin";
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 
 const prisonStore = usePrisonStore();
 const detaineeStore = useDetaineeStore();
 const staffStore = useStaffStore();
 const identityStore = useIdentityStore();
 
+const loading = ref(false);
+
 onMounted(async () => {
   await nextTick();
+  loading.value = true;
   await prisonStore.getTop3Recent();
   await prisonStore.count();
   await detaineeStore.getTop3Recent();
@@ -212,6 +227,7 @@ onMounted(async () => {
   await staffStore.getTop3Recent();
   await staffStore.count();
   await identityStore.count();
+  loading.value = false;
 });
 
 // const recentDetainees = computed(() => {

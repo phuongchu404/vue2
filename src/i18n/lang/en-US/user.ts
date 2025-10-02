@@ -24,6 +24,7 @@ const user: User = {
   phoneNumber: "Phone Number",
   description: "Description",
   selectDetentionCenter: "Please select detention center",
+  usernamePlaceHolder: "Enter Username",
 };
 
 export default user;

@@ -24,6 +24,7 @@ const user: User = {
   phoneNumber: "Số điện thoại",
   description: "Mô tả",
   selectDetentionCenter: "Hãy chọn trại giam",
+  usernamePlaceHolder: "Nhập tên tài khoản",
 };
 
 export default user;

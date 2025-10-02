@@ -25,31 +25,40 @@
             {{ t("option.query") }}
           </el-button>
         </el-form-item>
-        <el-form-item align="right">
+      </el-form>
+    </div>
+
+    <div class="action-card">
+      <div class="action-bar">
+        <div>
           <el-button
             type="primary"
             @click="handleAdd()"
-            :disabled="isButtonEnabled('system:role:insert')"
             :icon="Plus"
+            :disabled="isButtonEnabled('system:role:insert')"
           >
-            <span>{{ t("option.add") }}</span>
+            {{ t("common.add") }}
           </el-button>
           <el-button
             type="success"
             @click="handleSynchronizePermission()"
-            :disabled="isButtonEnabled('system:role:sync-permission')"
             :icon="Refresh"
+            :disabled="isButtonEnabled('system:role:sync-permission')"
           >
-            <span>{{ t("option.syn") }}</span>
+            {{ t("option.syn") }}
           </el-button>
-        </el-form-item>
-      </el-form>
+        </div>
+        <div class="result-info">
+          {{ t("common.total") }}: {{ roleStore.getTotal }}
+          {{ t("common.unit") }}
+        </div>
+      </div>
     </div>
 
     <el-table
       :data="roles"
       :row-class-name="tableRowClassName"
-      v-loading="ui.loading"
+      v-loading="roleStore.getLoading"
       align="center"
       border
     >
@@ -80,43 +89,72 @@
         width="230"
         :formatter="defaultTimeFormatter"
       ></el-table-column>
-      <el-table-column :label="t('common.option')" width="350">
+      <el-table-column
+        :label="t('common.option')"
+        width="200"
+        fixed="right"
+        class-name="sticky"
+      >
         <template #default="{ row }">
-          <el-button
-            type="primary"
-            @click="handleEdit(row)"
-            :disabled="isButtonEnabledByUser(row, 'system:role:update')"
-            >{{ t("option.update") }}
-          </el-button>
-          <el-button
-            type="success"
-            @click="handleAuthorize(row)"
-            :disabled="
-              isButtonEnabledByUser(row, 'system:role:assign-permission')
-            "
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('option.update')"
           >
-            {{ t("common.authorize") }}
-          </el-button>
-          <el-button
-            type="danger"
-            @click="handleDelete(row)"
-            :disabled="isButtonEnabledByUser(row, 'system:role:delete')"
-            >{{ t("option.delete") }}
-          </el-button>
+            <el-button
+              type="primary"
+              @click="handleEdit(row)"
+              :disabled="isButtonEnabledByUser(row, 'system:role:update')"
+              icon="Edit"
+            >
+            </el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('common.authorize')"
+          >
+            <el-button
+              type="success"
+              @click="handleAuthorize(row)"
+              :disabled="
+                isButtonEnabledByUser(row, 'system:role:assign-permission')
+              "
+              icon="Finished"
+            >
+            </el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            :hide-after="0"
+            effect="light"
+            :content="t('option.delete')"
+          >
+            <el-button
+              type="danger"
+              @click="handleDelete(row)"
+              :disabled="isButtonEnabledByUser(row, 'system:role:delete')"
+              icon="Delete"
+            >
+            </el-button>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="roleStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
-
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="roleStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
     <el-dialog
       :title="ui.addRecord ? t('role.add') : t('role.update')"
       v-model="ui.dialogVisible"
@@ -146,9 +184,16 @@
           <el-button @click="ui.dialogVisible = false">{{
             t("common.cancel")
           }}</el-button>
-          <el-button type="primary" @click="handleSaveOrUpdate()">{{
-            t("common.ok")
-          }}</el-button>
+          <el-button
+            type="primary"
+            @click="handleSaveOrUpdate()"
+            :disabled="
+              isButtonEnabled(
+                ui.addRecord ? 'system:role:insert' : 'system:role:update'
+              )
+            "
+            >{{ t("common.ok") }}</el-button
+          >
         </div>
       </template>
     </el-dialog>
@@ -188,9 +233,12 @@
           <el-button @click="ui.permsDialogVisible = false">{{
             t("common.cancel")
           }}</el-button>
-          <el-button type="primary" @click="handlePermsUpdate()">{{
-            t("common.ok")
-          }}</el-button>
+          <el-button
+            type="primary"
+            @click="handlePermsUpdate()"
+            :disabled="isButtonEnabled('system:role:assign-permission')"
+            >{{ t("common.ok") }}</el-button
+          >
         </div>
       </template>
     </el-dialog>
@@ -224,14 +272,13 @@ import type {
   CreateRoleRequest,
   UpdateRoleRequest,
 } from "@/types/role";
-import type {
-  UpdatePermissionByRoleIdRequest,
-  PermissionVO,
-} from "@/types/rolePermission";
+import type { UpdatePermissionByRoleIdRequest } from "@/types/rolePermission";
 import { useRoleStore } from "@/stores/role";
 import { useRolePermissionStore } from "@/stores/rolePermission";
 import { usePermissionStore } from "@/stores/permission";
 import { useBaseMixin } from "@/components/BaseMixin";
+import { useLocalePagination } from "@/composables/useLocalePagination";
+import { role } from "@/common/menu/system/role";
 
 const { t } = useI18n();
 const { isButtonEnabled } = useBaseMixin();
@@ -239,6 +286,7 @@ const appStore = useAppStore();
 const roleStore = useRoleStore();
 const rolePermissionStore = useRolePermissionStore();
 const permissionStore = usePermissionStore();
+const { localePagination } = useLocalePagination();
 
 // Refs
 const formRef = ref<FormInstance>();
@@ -370,6 +418,8 @@ const handleDelete = async (rowData: any) => {
   try {
     await ElMessageBox.confirm(t("common.deleteConfirm"), t("common.confirm"), {
       type: "warning",
+      confirmButtonText: t("common.confirm"),
+      cancelButtonText: t("el.messagebox.cancel"),
     });
     await roleStore.deleteRole(rowData.id as number);
     await loadTableData();
@@ -549,6 +599,12 @@ onMounted(async () => {
   display: flex;
   justify-content: center; /* Căn giữa ngang */
   padding: 10px 0; /* Tạo khoảng cách trên dưới */
+}
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .pagination {

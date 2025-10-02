@@ -5,6 +5,7 @@ const permission: Permission = {
   options: "Thao tác",
   description: "Mô tả",
   url: "Đường dẫn",
+  synchronizeSuccess: "Đồng bộ thành công",
 };
 
 export default permission;

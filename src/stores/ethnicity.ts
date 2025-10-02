@@ -4,6 +4,8 @@ import { EthnicityService } from "@/services/ethnicity";
 import type { Ethnicity, EthnicityState } from "@/types/ethnicity";
 import type { ServiceResult } from "@/types/common";
 
+import { t } from "@/i18n";
+
 export const useEthnicityStore = defineStore("ethnicity", {
   state: (): EthnicityState => ({
     ethnicities: undefined,
@@ -25,13 +27,15 @@ export const useEthnicityStore = defineStore("ethnicity", {
         const res: ServiceResult<Ethnicity[]> = await EthnicityService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.ethnicity.getAll"));
         }
 
         this.ethnicities = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.ethnicity.getAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

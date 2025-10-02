@@ -7,6 +7,7 @@ const staff: Staff = {
   permanentAddressSection: "Permanent Address",
   temporaryAddressSection: "Temporary Address",
   jobInfo: "Job Information",
+  text: "Staff",
 
   // Form Labels
   profileNumber: "Profile Number",

@@ -69,7 +69,9 @@ const common: Common = {
   edit: "Chỉnh sửa",
   update: "Cập nhật",
   exportUpdating: "Chức năng xuất Excel đang được phát triển!",
-  reminder: "Nhắc nhở",
+  reminder: "Xác nhận",
+  back: "Quay lại",
+  preview: "Xem trước",
 };
 
 export default common;

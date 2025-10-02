@@ -44,7 +44,7 @@ export const identity: MenuItem = {
     },
     {
       tag: "identity:detail",
-      type: "button",
+      type: "api",
       isWhiteList: false,
       name: t("option.query"),
       pattern: "/api/admin/identity-record/{id}",

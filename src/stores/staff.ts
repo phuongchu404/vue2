@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useI18n } from "vue-i18n";
+import { t } from "@/i18n";
 import { StaffService } from "@/services/staff";
 import type {
   StaffState,
@@ -11,7 +11,6 @@ import type {
   ExportStaffQuery,
 } from "@/types/staff";
 import type { ServiceResult, PagingResult } from "@/types/common";
-import { get } from "lodash";
 
 export const useStaffStore = defineStore("staff", {
   state: (): StaffState => ({
@@ -51,11 +50,11 @@ export const useStaffStore = defineStore("staff", {
 
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.staff.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.staff.noData"));
         }
 
         const {
@@ -72,7 +71,9 @@ export const useStaffStore = defineStore("staff", {
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.staff.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -87,14 +88,16 @@ export const useStaffStore = defineStore("staff", {
         const res: ServiceResult<Staff> = await StaffService.getById(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.staff.fetchDetail"));
         }
 
         const detail = res.data;
         return detail;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.staff.fetchDetail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -110,15 +113,15 @@ export const useStaffStore = defineStore("staff", {
         const res: ServiceResult<Staff> = await StaffService.create(payload);
 
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("error.staff.create"));
         }
 
         const created = res.data;
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
         return created;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message || e?.message || t("error.staff.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -137,15 +140,15 @@ export const useStaffStore = defineStore("staff", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("error.staff.update"));
         }
 
         const updated = res.data;
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
         return updated;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message || e?.message || t("error.staff.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -161,15 +164,15 @@ export const useStaffStore = defineStore("staff", {
         const res: ServiceResult<boolean> = await StaffService.delete(id);
 
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.staff.delete"));
         }
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         // if (this.lastQuery) {
         //   await this.fetchList(this.lastQuery);
         // }
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message || e?.message || t("error.staff.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -190,7 +193,9 @@ export const useStaffStore = defineStore("staff", {
         await StaffService.exportExcel(params);
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Export Excel failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.staff.exportExcel");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -204,7 +209,7 @@ export const useStaffStore = defineStore("staff", {
       try {
         const res: ServiceResult<Staff[]> = await StaffService.getTop3Recent();
         if (!res.success) {
-          throw new Error(res.message || "Fetch recent staffs failed");
+          throw new Error(res.message || t("error.staff.top3Recent"));
         } else {
           this.staffs = res.data;
         }
@@ -212,7 +217,7 @@ export const useStaffStore = defineStore("staff", {
         const msg =
           e?.response?.data?.message ||
           e?.message ||
-          "Fetch recent staffs failed";
+          t("error.staff.top3Recent");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -226,12 +231,12 @@ export const useStaffStore = defineStore("staff", {
       try {
         const res: ServiceResult<number> = await StaffService.count();
         if (!res.success) {
-          throw new Error(res.message || "Count staffs failed");
+          throw new Error(res.message || t("error.staff.count"));
         }
         this.total = res.data || 0;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Count staffs failed";
+          e?.response?.data?.message || e?.message || t("error.staff.count");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

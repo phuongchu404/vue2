@@ -71,6 +71,8 @@ const common: Common = {
   update: "Update",
   exportUpdating: "Excel export function is under development!",
   reminder: "Remind",
+  back: "Back",
+  preview: "Preview",
 };
 
 export default common;

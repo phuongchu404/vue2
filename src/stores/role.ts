@@ -10,6 +10,8 @@ import type {
 } from "@/types/role";
 import type { ServiceResult, PagingResult } from "@/types/common";
 
+import { t } from "@/i18n";
+
 export const useRoleStore = defineStore("role", {
   state: (): RoleState => ({
     roles: undefined,
@@ -48,11 +50,11 @@ export const useRoleStore = defineStore("role", {
           await RoleService.listPage(params);
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.role.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.role.noData"));
         }
         const {
           content,
@@ -68,7 +70,7 @@ export const useRoleStore = defineStore("role", {
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message || e?.message || t("error.role.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -83,13 +85,13 @@ export const useRoleStore = defineStore("role", {
         const res: ServiceResult<Role[]> = await RoleService.getAll();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.role.fetchAll"));
         }
 
         this.roles = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message || e?.message || t("error.role.fetchAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -105,13 +107,13 @@ export const useRoleStore = defineStore("role", {
         const res: ServiceResult<boolean> = await RoleService.create(payload);
         this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || "Create prison failed");
+          throw new Error(res.message || t("error.role.create"));
         }
 
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("common.insertSuccess"));
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message || e?.message || t("error.role.create");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -131,13 +133,13 @@ export const useRoleStore = defineStore("role", {
         this.success = res.success;
 
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(res.message || t("error.role.update"));
         }
 
-        ElMessage.success("Updated successfully");
+        ElMessage.success(t("common.updateSuccess"));
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message || e?.message || t("error.role.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -152,17 +154,17 @@ export const useRoleStore = defineStore("role", {
       try {
         const res: ServiceResult<boolean> = await RoleService.delete(id);
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.role.delete"));
         }
 
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
 
         if (this.lastQuery) {
           await this.listPage(this.lastQuery);
         }
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message || e?.message || t("error.role.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

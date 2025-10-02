@@ -20,7 +20,7 @@
             <input
               type="text"
               v-model="loginForm.username"
-              :placeholder="$t('UserName')"
+              :placeholder="$t('login.userId')"
               class="input-box-text"
             />
           </div>
@@ -39,7 +39,7 @@
               :type="!isEyes ? 'password' : 'text'"
               @keyup.enter="doLogin()"
               v-model="loginForm.password"
-              :placeholder="$t('Password')"
+              :placeholder="$t('login.password')"
               class="input-box-text"
             />
             <img
@@ -300,6 +300,8 @@ input:-webkit-autofill {
   text-align: center;
   cursor: pointer;
   margin-top: 50px;
+  padding-top: 8px;
+  margin-bottom: 15px;
 
   &:hover {
     background: #20a8db;

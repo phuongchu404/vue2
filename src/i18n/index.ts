@@ -1,19 +1,18 @@
 import { createI18n, type Composer } from "vue-i18n";
 import * as _ from "lodash";
-import enLocale from "./eleLang/en";
-import viLocale from "./eleLang/vi";
+// import enLocale from "./eleLang/en";
+// import viLocale from "./eleLang/vi";
 import en from "./lang/en-US";
 import vi from "./lang/vi-VN";
 
 const locales: { [key: string]: any } = {};
 
-function addLang(key: string, a: object, b: object) {
-  _.set(locales, key, _.merge({}, a, b));
+function addLang(key: string, a: object) {
+  _.set(locales, key, _.merge({}, a));
 }
 
-
-addLang("en-US", en, enLocale);
-addLang("vi-VN", vi, viLocale);
+addLang("en-US", en);
+addLang("vi-VN", vi);
 
 const browserLanguage: string =
   localStorage.getItem("LANG") || window.navigator.language;

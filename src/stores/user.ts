@@ -51,11 +51,11 @@ export const useUserStore = defineStore("user", {
         );
         // Kiểm tra success
         if (!res.success) {
-          throw new Error(res.message || "Fetch prisons failed");
+          throw new Error(res.message || t("error.user.fetchList"));
         }
 
         if (!res.data) {
-          throw new Error("No data returned from fetch prisons");
+          throw new Error(t("error.user.noData"));
         }
         const {
           content,
@@ -72,7 +72,7 @@ export const useUserStore = defineStore("user", {
         this.lastQuery = { ...params };
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prisons failed";
+          e?.response?.data?.message || e?.message || t("error.user.fetchList");
         this.error = msg;
         ElMessage.error(msg);
       } finally {
@@ -115,13 +115,13 @@ export const useUserStore = defineStore("user", {
         this.success = res.success;
 
         if (!res.success) {
-          throw new Error(res.message || t("common.updateFail"));
+          throw new Error(res.message || t("error.user.update"));
         }
 
         ElMessage.success(t("common.updateSuccess"));
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message || e?.message || t("error.user.update");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -136,13 +136,13 @@ export const useUserStore = defineStore("user", {
       try {
         const res: ServiceResult<boolean> = await UserService.delete(id);
         if (!res.success) {
-          throw new Error(res.message || "Delete prison failed");
+          throw new Error(res.message || t("error.user.delete"));
         }
-        ElMessage.success("Deleted successfully");
+        ElMessage.success(t("common.deleteSuccess"));
         // fetchList({ pageNo: 1, pageSize: 10 });
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Delete prison failed";
+          e?.response?.data?.message || e?.message || t("error.user.delete");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
@@ -159,14 +159,16 @@ export const useUserStore = defineStore("user", {
         );
         this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || t("common.insertFail"));
+          throw new Error(res.message || t("user.resetPasswordFail"));
         }
 
-        ElMessage.success(t("common.insertSuccess"));
+        ElMessage.success(t("user.resetPasswordSuccess"));
         return res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || t("common.insertFail");
+          e?.response?.data?.message ||
+          e?.message ||
+          t("user.resetPasswordFail");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

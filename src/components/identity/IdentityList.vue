@@ -39,7 +39,12 @@
           </el-col>
           <el-col :span="8">
             <el-form-item>
-              <el-button type="primary" @click="onSearch" :icon="Search">
+              <el-button
+                type="primary"
+                @click="onSearch"
+                :icon="Search"
+                :disabled="isButtonEnabled('identity:search')"
+              >
                 {{ $t("common.Search") }}
               </el-button>
               <el-button @click="onReset" :icon="Refresh">
@@ -59,6 +64,7 @@
             type="primary"
             @click="$router.push('/identity/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('identity:insert')"
           >
             {{ t("common.add") }}
           </el-button>
@@ -72,7 +78,7 @@
         </div>
         <div class="result-info">
           {{ t("common.total") }}: {{ identityStore.getTotal }}
-          {{ t("common.unit") }}
+          {{ t("identity.text") }}
         </div>
       </div>
     </div>
@@ -147,34 +153,38 @@
           {{ formatDate(scope.row.createdAt) }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="200" fixed="right">
+      <el-table-column :label="t('common.actions')" width="200" fixed="right" class-name="sticky">
         <template #default="scope">
           <el-button @click="handleView(scope.row)" :icon="View" />
           <el-button
             type="primary"
             @click="handleEdit(scope.row)"
             :icon="Edit"
+            :disabled="isButtonEnabled('identity:update')"
           />
           <el-button
             type="danger"
             @click="handleDelete(scope.row)"
             :icon="Delete"
+            :disabled="isButtonEnabled('identity:delete')"
           />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- Pagination -->
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="identityStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="identityStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
     <!-- Detail Dialog -->
     <el-dialog
       v-model="detailDialogVisible"
@@ -187,63 +197,71 @@
         <el-row :gutter="20">
           <el-col :span="14">
             <el-descriptions :column="2" border>
-              <el-descriptions-item label="Mã phạm nhân">{{
-                selectedRecord.detaineeCode
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Tên phạm nhân">{{
-                selectedRecord.detaineeName
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Tạo tại">{{
-                selectedRecord.createdPlace || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Lý do lập">{{
-                selectedRecord.reasonNote || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Ngày bắt">{{
-                formatDate(selectedRecord.arrestDate)
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Đơn vị bắt">{{
-                selectedRecord.arrestUnit || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Phân loại VT" :span="2">{{
-                selectedRecord.fpClassification || "-"
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="t('identity.detaineeId')">
+                {{ selectedRecord.detaineeCode }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.detaineeName')">
+                {{ selectedRecord.detaineeName }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.createdPlace')">
+                {{ selectedRecord.createdPlace || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.reasonNote')">
+                {{ selectedRecord.reasonNote || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.arrestDate')">
+                {{ formatDate(selectedRecord.arrestDate) }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.arrestUnit')">
+                {{ selectedRecord.arrestUnit || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="t('identity.fpClassification')"
+                :span="2"
+              >
+                {{ selectedRecord.fpClassification || "-" }}
+              </el-descriptions-item>
             </el-descriptions>
 
-            <el-divider content-position="left"
-              >Đặc điểm hình thái học</el-divider
-            >
+            <el-divider content-position="left">
+              {{ t("identity.anthropometry") }}
+            </el-divider>
             <el-descriptions
               :column="2"
               border
               v-if="selectedRecord.anthropometry"
             >
-              <el-descriptions-item label="Khuôn mặt">{{
-                selectedRecord.anthropometry.faceShape || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Chiều cao">{{
-                selectedRecord.anthropometry.heightCm
-                  ? selectedRecord.anthropometry.heightCm + " cm"
-                  : "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Sống mũi">{{
-                selectedRecord.anthropometry.noseBridge || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Nếp tai dưới">{{
-                selectedRecord.anthropometry.earLowerFold || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Dái tai" :span="2">{{
-                selectedRecord.anthropometry.earLobe || "-"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="Dấu vết riêng" :span="2">{{
-                selectedRecord.anthropometry.distinctiveMarks || "-"
-              }}</el-descriptions-item>
+              <el-descriptions-item :label="t('identity.faceShape')">
+                {{ selectedRecord.anthropometry.faceShape || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.height')">
+                {{
+                  selectedRecord.anthropometry.heightCm
+                    ? selectedRecord.anthropometry.heightCm + " cm"
+                    : "-"
+                }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.noseBridge')">
+                {{ selectedRecord.anthropometry.noseBridge || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.earLowerFold')">
+                {{ selectedRecord.anthropometry.earLowerFold || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="t('identity.earLobe')" :span="2">
+                {{ selectedRecord.anthropometry.earLobe || "-" }}
+              </el-descriptions-item>
+              <el-descriptions-item
+                :label="t('identity.distinctiveMarks')"
+                :span="2"
+              >
+                {{ selectedRecord.anthropometry.distinctiveMarks || "-" }}
+              </el-descriptions-item>
             </el-descriptions>
           </el-col>
 
           <el-col :span="10">
             <div class="photo-section">
-              <h4>Ảnh danh bản</h4>
+              <h4>{{ t("identity.photoSection") }}</h4>
               <div class="photo-grid">
                 <div
                   v-for="[key, label] in photoTypeEntries"
@@ -260,7 +278,7 @@
                     />
                     <div v-else class="no-photo">
                       <el-icon><Picture /></el-icon>
-                      <span>Chưa có ảnh</span>
+                      <span>{{ t("identity.noPhoto") }}</span>
                     </div>
                   </div>
                 </div>
@@ -271,9 +289,14 @@
       </div>
 
       <template #footer>
-        <el-button @click="detailDialogVisible = false">Đóng</el-button>
-        <el-button type="primary" @click="handleEdit(selectedRecord)"
-          >Chỉnh sửa</el-button
+        <el-button @click="detailDialogVisible = false">{{
+          $t("common.close")
+        }}</el-button>
+        <el-button
+          type="primary"
+          @click="handleEdit(selectedRecord)"
+          :disabled="isButtonEnabled('identity:update')"
+          >{{ $t("common.edit") }}</el-button
         >
       </template>
     </el-dialog>
@@ -298,6 +321,8 @@ import type { Identity, PageQuery } from "@/types/identity";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useBaseMixin } from "@/components/BaseMixin";
+import { useLocalePagination } from "@/composables/useLocalePagination";
+const { localePagination } = useLocalePagination();
 // import * as XLSX from "xlsx";
 // import { headerMap, columnWidths } from "@/excel/identity";
 
@@ -326,9 +351,9 @@ const selectedRecord = ref<Identity | null>(null);
 // const exporting = ref(false);
 
 const photoTypes = {
-  front: "Mặt trước",
-  left: "Nghiêng trái",
-  right: "Nghiêng phải",
+  front: t("identity.photoFront"),
+  left: t("identity.photoLeft"),
+  right: t("identity.photoRight"),
 };
 
 const viewToKey: Record<string, keyof typeof photoTypes> = {
@@ -487,8 +512,8 @@ const handleDelete = async (record: any) => {
       `Bạn có chắc chắn muốn xóa danh bản của "${record.detaineeName}" không?`,
       "Xác nhận xóa",
       {
-        confirmButtonText: "Xóa",
-        cancelButtonText: "Hủy",
+        confirmButtonText: t("common.confirm"),
+        cancelButtonText: t("el.messagebox.cancel"),
         type: "warning",
       }
     )

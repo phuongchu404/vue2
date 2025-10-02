@@ -5,6 +5,7 @@ const permission: Permission = {
   options: "Actions",
   description: "Description",
   url: "URL",
+  synchronizeSuccess: "Synchronize successfully",
 };
 
 export default permission;

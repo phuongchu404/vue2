@@ -35,7 +35,12 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item>
-              <el-button type="primary" @click="onSearch" :icon="Search">
+              <el-button
+                type="primary"
+                @click="onSearch"
+                :icon="Search"
+                :disabled="isButtonEnabled('department:search')"
+              >
                 {{ t("common.Search") }}
               </el-button>
               <el-button @click="onReset" :icon="Refresh">
@@ -55,12 +60,18 @@
             type="primary"
             @click="$router.push('/department/add')"
             :icon="Plus"
+            :disabled="isButtonEnabled('department:insert')"
           >
             {{ t("common.add") }}
           </el-button>
-          <el-button type="success" @click="handleExport" :icon="Download">
+          <!-- <el-button
+            type="success"
+            @click="handleExport"
+            :icon="Download"
+            :disabled="isButtonEnabled('department:search')"
+          >
             {{ t("common.export") }}
-          </el-button>
+          </el-button> -->
         </div>
         <div class="result-info">
           {{ t("common.total") }}: {{ departmentStore.getTotal }}
@@ -71,11 +82,11 @@
 
     <!-- Data Table -->
     <el-table
-        :data="departments"
-        stripe
-        border
-         v-loading="loading"
-        style="width: 100%"
+      :data="departments"
+      stripe
+      border
+      v-loading="loading"
+      style="width: 100%"
     >
       <el-table-column
         prop="id"
@@ -84,6 +95,7 @@
         align="center"
         fixed
         sortable
+        class-name="sticky"
       />
       <el-table-column
         prop="detentionCenterCode"
@@ -94,15 +106,15 @@
       <el-table-column
         prop="detentionCenterName"
         :label="$t('department.detentionCenter')"
-        width="170"
+        width="190"
         align="center"
       />
-      <el-table-column prop="code" :label="$t('department.code')" width="150" />
+      <el-table-column prop="code" :label="$t('department.code')" width="190" />
       <el-table-column
         prop="name"
         :label="$t('department.name')"
         align="center"
-        width="170"
+        width="190"
       />
       <!--      <el-table-column prop="detentionCenterId" label="Mã trại giam" width="120" />-->
       <el-table-column
@@ -117,7 +129,7 @@
       </el-table-column>
       <el-table-column
         prop="isActive"
-        label="Trạng thái"
+        :label="$t('department.status')"
         width="150"
         align="center"
       >
@@ -127,19 +139,26 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
+      <el-table-column
+        :label="$t('common.actions')"
+        width="200"
+        fixed="right"
+        class-name="sticky"
+      >
         <template #default="scope">
           <el-button @click="handleView(scope.row)" :icon="View"> </el-button>
           <el-button
             type="primary"
             @click="handleEdit(scope.row.id)"
             :icon="Edit"
+            :disabled="isButtonEnabled('department:update')"
           >
           </el-button>
           <el-button
             type="danger"
             @click="onDelete(scope.row.id)"
             :icon="Delete"
+            :disabled="isButtonEnabled('department:delete')"
           >
           </el-button>
         </template>
@@ -147,23 +166,25 @@
     </el-table>
 
     <!-- Pagination -->
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="pageSize"
-      :total="departmentStore.total"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="pageSize"
+        :total="departmentStore.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
 
     <!-- Detail Dialog -->
     <el-dialog
-        v-model="detailDialogVisible"
-        :title="t('department.detailTitle')"
-        width="60%"
-        class="dialog"
+      v-model="detailDialogVisible"
+      :title="t('department.detailTitle')"
+      width="60%"
+      class="dialog"
     >
       <div v-if="selectedDepartment" class="detail-content">
         <el-descriptions :column="2" border>
@@ -184,7 +205,11 @@
           </el-descriptions-item>
           <el-descriptions-item :label="t('department.status')">
             <el-tag :type="selectedDepartment.isActive ? 'success' : 'danger'">
-              {{ selectedDepartment.isActive ? t("prison.active") : t("prison.inactive") }}
+              {{
+                selectedDepartment.isActive
+                  ? t("prison.active")
+                  : t("prison.inactive")
+              }}
             </el-tag>
           </el-descriptions-item>
         </el-descriptions>
@@ -194,7 +219,11 @@
         <el-button @click="detailDialogVisible = false">
           {{ t("common.close") }}
         </el-button>
-        <el-button type="primary" @click="handleEdit(selectedDepartment?.id)">
+        <el-button
+          type="primary"
+          @click="handleEdit(selectedDepartment?.id)"
+          :disabled="isButtonEnabled('department:update')"
+        >
           {{ t("common.edit") }}
         </el-button>
       </template>
@@ -215,20 +244,24 @@ import {
   Download,
 } from "@element-plus/icons-vue";
 import { useI18n } from "vue-i18n";
-import type {Department, PageQuery} from "@/types/department";
+import type { Department, PageQuery } from "@/types/department";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { usePrisonStore } from "@/stores/prison.ts";
-import type {Staff} from "@/types/staff.ts";
+import type { Staff } from "@/types/staff.ts";
+import { useBaseMixin } from "@/components/BaseMixin.ts";
+import { useLocalePagination } from "@/composables/useLocalePagination.ts";
 
 const router = useRouter();
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 const detailDialogVisible = ref(false);
 const departmentStore = useDepartmentStore();
 const prisonStore = usePrisonStore();
 const { prisons } = storeToRefs(prisonStore);
 const selectedDepartment = ref<Department | null>(null);
+const { localePagination } = useLocalePagination();
 
 // table sẽ bind trực tiếp từ store
 const departments = computed(() => departmentStore.getDepartments);
@@ -249,19 +282,15 @@ const pageSize = ref(10);
 
 // fetch data
 const search = async (extra?: Partial<PageQuery>) => {
-  try {
-    await departmentStore.fetchList({
-      pageNo: page.value,
-      pageSize: pageSize.value,
-      keyword: searchForm.name || undefined,
-      detentionCenterId: searchForm.detentionCenterId
-        ? Number(searchForm.detentionCenterId)
-        : undefined,
-      ...extra,
-    } as PageQuery);
-  } catch (error) {
-    ElMessage.error(t("common.dataFail"));
-  }
+  await departmentStore.fetchList({
+    pageNo: page.value,
+    pageSize: pageSize.value,
+    keyword: searchForm.name || undefined,
+    detentionCenterId: searchForm.detentionCenterId
+      ? Number(searchForm.detentionCenterId)
+      : undefined,
+    ...extra,
+  } as PageQuery);
 };
 
 // reset
@@ -305,7 +334,11 @@ const onDelete = async (id: number) => {
   const ok = await ElMessageBox.confirm(
     t("common.deleteConfirm"),
     t("common.reminder"),
-    { type: "warning" }
+    {
+      type: "warning",
+      confirmButtonText: t("el.messagebox.confirm"), // "OK"
+      cancelButtonText: t("el.messagebox.cancel"),
+    }
   )
     .then(() => true)
     .catch(() => false);
@@ -343,6 +376,4 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
 }
-
 </style>
-

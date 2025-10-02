@@ -1,5 +1,5 @@
 <template>
-  <div class="detainee-list">
+  <div class="detainee-list" v-loading="detaineeStore.getLoading">
     <!-- Search Section -->
     <div class="search-section">
       <el-form :model="searchForm" label-width="130px" label-position="left">
@@ -58,9 +58,8 @@
             :icon="Search"
             >{{ $t("common.Search") }}</el-button
           >
-          <el-button @click="onReset" :icon="Refresh">{{
-            $t("common.reset")
-          }}
+          <el-button @click="onReset" :icon="Refresh"
+            >{{ $t("common.reset") }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -82,7 +81,6 @@
             type="success"
             @click="handleExport"
             :icon="Download"
-            v-loading.fullscreen.lock="detaineeStore.getLoading"
             :disabled="isButtonEnabled('detainee:search')"
           >
             {{ $t("common.export") }}
@@ -90,7 +88,7 @@
         </div>
         <div class="result-info">
           {{ $t("common.total") }}: {{ detaineeStore.getTotal }}
-          {{ $t("common.unit") }}
+          {{ $t("detainee.title") }}
         </div>
       </div>
     </div>
@@ -182,14 +180,14 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.actions')" width="200" fixed="right">
+      <el-table-column
+        :label="$t('common.actions')"
+        width="200"
+        fixed="right"
+        class-name="sticky"
+      >
         <template #default="scope">
-          <el-button
-            :disabled="isButtonEnabled('detainee:update')"
-            @click="handleView(scope.row)"
-            :icon="View"
-          >
-          </el-button>
+          <el-button @click="handleView(scope.row)" :icon="View"> </el-button>
           <el-button
             type="primary"
             @click="handleEdit(scope.row.id)"
@@ -209,22 +207,18 @@
     </el-table>
 
     <!-- Pagination -->
-    <el-pagination
-      v-model:current-page="page"
-      v-model:page-size="size"
-      :total="detaineeStore.getTotal"
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[10, 20, 50, 100]"
-      @size-change="onSizeChange"
-      @current-change="onPageChange"
-      class="pagination"
-      :locale="{
-        goto: t('el.pagination.goto'),
-        pagesize: t('el.pagination.pagesize'),
-        total: t('el.pagination.total'),
-        pageClassifier: t('el.pagination.pageClassifier'),
-      }"
-    />
+    <el-config-provider :locale="localePagination">
+      <el-pagination
+        v-model:current-page="page"
+        v-model:page-size="size"
+        :total="detaineeStore.getTotal"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        @size-change="onSizeChange"
+        @current-change="onPageChange"
+        class="pagination"
+      />
+    </el-config-provider>
 
     <!-- Detail Dialog -->
     <el-dialog
@@ -358,9 +352,12 @@
         <el-button @click="detailDialogVisible = false">{{
           $t("common.close")
         }}</el-button>
-        <el-button type="primary" @click="handleEdit(selectedDetainee?.id)">{{
-          $t("common.edit")
-        }}</el-button>
+        <el-button
+          type="primary"
+          @click="handleEdit(selectedDetainee?.id)"
+          :disabled="isButtonEnabled('detainee:update')"
+          >{{ $t("common.edit") }}</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -384,6 +381,7 @@ import { DetaineeStatus, Gender, Status, genderOptions } from "@/constants";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useBaseMixin } from "@/components/BaseMixin";
+import { useLocalePagination } from "@/composables/useLocalePagination";
 // import * as XLSX from "xlsx";
 // import { headerMap, columnWidths } from "@/excel/detainee";
 
@@ -391,6 +389,7 @@ const { t } = useI18n();
 const { isButtonEnabled } = useBaseMixin();
 const router = useRouter();
 const detaineeStore = useDetaineeStore();
+const { localePagination } = useLocalePagination();
 
 // Reactive data
 const detainees = ref<Detainee[]>([]);
@@ -530,54 +529,54 @@ const search = async (extra?: Partial<PageQuery>) => {
 //   };
 // }
 // const exportSelectedToExcel = async () => {
-  // if (selectedRows.value.length === 0) {
-  //   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
-  //   return;
-  // }
+// if (selectedRows.value.length === 0) {
+//   ElMessage.warning("Vui lòng chọn ít nhất một bản ghi để xuất!");
+//   return;
+// }
 
-  // exporting.value = true;
-  // try {
-  //   const keys = Object.keys(headerMap);
-  //   const rows = detainees.value.map((it: any) => toExportRow(it));
-  //
-  //   const chunkSize = 50_000;
-  //   const wb = XLSX.utils.book_new();
-  //
-  //   for (
-  //     let start = 0, part = 1;
-  //     start < rows.length;
-  //     start += chunkSize, part++
-  //   ) {
-  //     const chunk = rows.slice(start, start + chunkSize);
-  //
-  //     // matrix dữ liệu theo thứ tự keys
-  //     const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
-  //
-  //     // tạo sheet: thêm header tiếng Việt ở dòng đầu
-  //     const ws = XLSX.utils.aoa_to_sheet([
-  //       keys.map((k) => headerMap[k]),
-  //       ...dataMatrix,
-  //     ]);
-  //
-  //     (ws as any)["!cols"] = columnWidths;
-  //
-  //     XLSX.utils.book_append_sheet(wb, ws, `Phạm nhân (${part})`);
-  //   }
-  //
-  //   // tên file
-  //   const today = new Date();
-  //   const filename = `pham-nhan-${today.getFullYear()}-${(today.getMonth() + 1)
-  //     .toString()
-  //     .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
-  //
-  //   await XLSX.writeFile(wb, filename);
-  //   ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
-  // } catch (error) {
-  //   console.error("Export error:", error);
-  //   ElMessage.error("Lỗi khi xuất Excel!");
-  // } finally {
-  //   exporting.value = false;
-  // }
+// exporting.value = true;
+// try {
+//   const keys = Object.keys(headerMap);
+//   const rows = detainees.value.map((it: any) => toExportRow(it));
+//
+//   const chunkSize = 50_000;
+//   const wb = XLSX.utils.book_new();
+//
+//   for (
+//     let start = 0, part = 1;
+//     start < rows.length;
+//     start += chunkSize, part++
+//   ) {
+//     const chunk = rows.slice(start, start + chunkSize);
+//
+//     // matrix dữ liệu theo thứ tự keys
+//     const dataMatrix = chunk.map((r: any) => keys.map((k) => r[k]));
+//
+//     // tạo sheet: thêm header tiếng Việt ở dòng đầu
+//     const ws = XLSX.utils.aoa_to_sheet([
+//       keys.map((k) => headerMap[k]),
+//       ...dataMatrix,
+//     ]);
+//
+//     (ws as any)["!cols"] = columnWidths;
+//
+//     XLSX.utils.book_append_sheet(wb, ws, `Phạm nhân (${part})`);
+//   }
+//
+//   // tên file
+//   const today = new Date();
+//   const filename = `pham-nhan-${today.getFullYear()}-${(today.getMonth() + 1)
+//     .toString()
+//     .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}.xlsx`;
+//
+//   await XLSX.writeFile(wb, filename);
+//   ElMessage.success(`Xuất Excel thành công! File: ${filename}`);
+// } catch (error) {
+//   console.error("Export error:", error);
+//   ElMessage.error("Lỗi khi xuất Excel!");
+// } finally {
+//   exporting.value = false;
+// }
 // };
 
 const getStatusType = (status: any) => {
@@ -633,7 +632,11 @@ const onDelete = async (id: number) => {
   const ok = await ElMessageBox.confirm(
     t("common.deleteConfirm"),
     t("common.reminder"),
-    { type: "warning" }
+    {
+      type: "warning",
+      confirmButtonText: t("el.messagebox.confirm"), // "OK"
+      cancelButtonText: t("el.messagebox.cancel"),
+    }
   )
     .then(() => true)
     .catch(() => false);

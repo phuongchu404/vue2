@@ -13,4 +13,4 @@ export const individualFingers = [
 
 export const thumbFingers = ["RIGHT_FULL", "LEFT_FULL"];
 
-export const fourFingers = ["RIGHT_FOUR", "LEFT_FOUR"];
+export const fourFingers = ["RIGHT_FOUR", "LEFT_FOUR", "BOTH_THUMBS"];

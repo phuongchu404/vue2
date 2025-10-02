@@ -15,6 +15,8 @@ import detainee from "@/i18n/lang/vi-VN/detainee.ts";
 import department from "./vi-VN/department";
 import fingerprint from "./vi-VN/fingerprint";
 import report from "./vi-VN/report.ts";
+import dashboard from "@/i18n/lang/vi-VN/dashboard.ts";
+import el from "./vi-VN/el.ts";
 
 export default {
   route,
@@ -34,4 +36,6 @@ export default {
   department,
   fingerprint,
   report,
+  dashboard,
+  el,
 };

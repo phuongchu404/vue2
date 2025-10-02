@@ -94,6 +94,19 @@ const detainee: Detainee = {
     ward: "Select ward",
     addressDetail: "House number, street, village/hamlet...",
   },
+
+  validate: {
+    fullNameRequired: "Please enter full name",
+    fullNameInvalid: "Full name must be between 2 and 255 characters",
+    genderRequired: "Please select gender",
+    birthdayRequired: "Please select date of birth",
+    idNumberInvalid: "Invalid National ID/Identity Card number",
+    detentionDateRequired: "Please select detention date",
+    detentionCenterIdRequired: "Please select detention center",
+    statusRequired: "Please select status",
+    detentionDateInvalid: "Detention date must be after date of birth!",
+    detaineeUnder14: "Detainee must be at least 14 years old!",
+  },
 };
 
 export default detainee;

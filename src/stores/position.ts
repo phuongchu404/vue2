@@ -3,6 +3,7 @@ import { ElMessage } from "element-plus";
 import { PositionService } from "@/services/position";
 import type { Position, PositionState } from "@/types/position";
 import type { ServiceResult } from "@/types/common";
+import { t } from "@/i18n";
 
 export const usePositionStore = defineStore("position", {
   state: (): PositionState => ({
@@ -25,13 +26,15 @@ export const usePositionStore = defineStore("position", {
         const res: ServiceResult<Position[]> = await PositionService.list();
 
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(res.message || t("error.position.getAll"));
         }
 
         this.positions = res.data;
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Fetch prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.position.getAll");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

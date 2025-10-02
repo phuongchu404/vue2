@@ -27,7 +27,10 @@
                 v-model="form.detaineeCode"
                 :placeholder="t('identity.placeholder.detaineeId')"
                 filterable
+                remote
+                :remote-method="remoteSearchDetainees"
                 @change="onDetaineeChange"
+                @visible-change="onVisibleChange"
                 :disabled="isEdit"
               >
                 <el-option
@@ -144,6 +147,7 @@
                 action="#"
                 :auto-upload="false"
                 :on-change="(file) => handlePhotoChange('leftProfile', file)"
+                accept="image/*"
               >
                 <img
                   v-if="photoPreview.leftProfile"
@@ -164,6 +168,7 @@
                 action="#"
                 :auto-upload="false"
                 :on-change="(file) => handlePhotoChange('front', file)"
+                accept="image/*"
               >
                 <img
                   v-if="photoPreview.front"
@@ -186,6 +191,7 @@
                 action="#"
                 :auto-upload="false"
                 :on-change="(file) => handlePhotoChange('rightProfile', file)"
+                accept="image/*"
               >
                 <img
                   v-if="photoPreview.rightProfile"
@@ -260,7 +266,7 @@
         </el-form-item>
 
         <el-form-item class="form-actions">
-          <el-button type="primary" @click="handleSubmit" :loading="submitting">
+          <el-button type="primary" @click="handleSubmit" :loading="submitting" :disabled="isButtonEnabled(isEdit ? 'identity:update' : 'identity:insert')">
             {{ isEdit ? t("common.update") : t("common.create") }}
           </el-button>
           <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
@@ -287,8 +293,12 @@ import type {
   IdentityRecordCreateRequest,
   AnthropometryResponse,
 } from "@/types/identity";
+import {useBaseMixin} from "@/components/BaseMixin.ts";
+import {useInfiniteSelect} from "@/composables/useInfiniteSelect.ts";
+import {debounce} from "lodash";
 
 const { t } = useI18n();
+const { isButtonEnabled } = useBaseMixin();
 
 const route = useRoute();
 const router = useRouter();
@@ -299,6 +309,10 @@ const detaineeStore = useDetaineeStore();
 const formRef = ref();
 const submitting = ref(false);
 const isEdit = computed(() => !!route.params.id);
+
+const detaineePage = ref(1);
+const detaineeSize = ref(20);
+const detaineeCode = ref();
 
 const form = reactive<Partial<Identity>>({
   // IdentityRecord
@@ -337,8 +351,8 @@ const photoFiles: any = reactive({
 
 // Validation rules
 const rules = reactive({
-  detainee_id: [
-    { required: true, message: "Vui lòng chọn phạm nhân", trigger: "change" },
+  detaineeCode: [
+    { required: true, message: t("identity.validation.required.detaineeCode"), trigger: "change" },
   ],
 });
 
@@ -374,7 +388,7 @@ const handlePhotoChange = (type: any, file: any) => {
 };
 
 const handlePhotoSuccess = (type: any, file: any) => {
-  ElMessage.success(`Tải ảnh ${type} thành công!`);
+  ElMessage.success(t("identity.validation.image.successUpload1") + ` ${type} ` + t("identity.validation.image.successUpload2"));
 };
 
 const beforePhotoUpload = (file: any) => {
@@ -382,11 +396,11 @@ const beforePhotoUpload = (file: any) => {
   const isLt2M = file.size / 1024 / 1024 < 2;
 
   if (!isImage) {
-    ElMessage.error("Chỉ được tải lên file ảnh!");
+    ElMessage.error(t("identity.validation.image.notImage"));
     return false;
   }
   if (!isLt2M) {
-    ElMessage.error("Kích thước ảnh phải nhỏ hơn 2MB!");
+    ElMessage.error(t("identity.validation.image.overSize"));
     return false;
   }
   return true;
@@ -534,13 +548,37 @@ const handleReset = () => {
 };
 
 const getAllDetainees = () => {
-  detaineeStore.getAll();
+  detaineeStore.listPage({
+    pageNo: detaineePage.value,
+    pageSize: detaineeSize.value,
+    detaineeCode: detaineeCode.value
+  }, false);
 };
+
+const loadMoreDetainees = () => {
+  detaineePage.value = detaineePage.value + 1;
+  detaineeStore.listPage({
+    pageNo: detaineePage.value,
+    pageSize: detaineeSize.value,
+    detaineeCode: detaineeCode.value
+  }, true);
+};
+
+const remoteSearchDetainees = debounce(((text: string) => {
+    if (!text && !detaineeCode.value) {
+      return;
+    }
+    detaineePage.value = 1;
+    detaineeSize.value = 20;
+    detaineeCode.value = text;
+    getAllDetainees();
+  }), 300);
 
 onMounted(async () => {
   await getAllDetainees();
   loadData();
 });
+const { onVisibleChange } = useInfiniteSelect(loadMoreDetainees);
 </script>
 
 <style scoped>

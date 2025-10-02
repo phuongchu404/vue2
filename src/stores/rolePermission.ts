@@ -31,7 +31,9 @@ export const useRolePermissionStore = defineStore("rolePermission", {
           await RolePermissionService.getPermissionByRoleId(roleId);
         this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || "Fetch prison failed");
+          throw new Error(
+            res.message || t("error.rolePermission.getPermissionByRoleId")
+          );
         }
 
         this.permissions = res.data;
@@ -57,13 +59,17 @@ export const useRolePermissionStore = defineStore("rolePermission", {
           await RolePermissionService.updatePermissionByRoleId(id, payload);
         this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(
+            res.message || t("error.rolePermission.updatePermissionByRoleId")
+          );
         }
 
-        ElMessage.success("Updated successfully");
+        // ElMessage.success("Updated successfully");
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.rolePermission.updatePermissionByRoleId");
         this.error = msg;
         ElMessage.error(msg);
         throw e;

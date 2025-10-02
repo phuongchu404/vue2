@@ -7,6 +7,7 @@ const identity: Identity = {
   infoSection: "Identity Information",
   photoSection: "Identity Photos",
   anthropometry: "Anthropometric Features",
+  text: "Identity",
 
   // Search Section
   detaineeId: "Prisoner ID",
@@ -30,6 +31,18 @@ const identity: Identity = {
     earLowerFold: "Describe lower ear fold...",
     earLobe: "Describe ear lobe...",
     distinctiveMarks: "Describe distinctive marks, scars, tattoos...",
+  },
+
+  validation: {
+    required: {
+      detaineeCode: "Please enter detainee",
+    },
+    image: {
+      notImage: "Only image files are allowed!",
+      overSize: "Image size must be smaller than 2MB!",
+      successUpload1: "Upload image",
+      successUpload2: "successful!",
+    }
   },
 
   // Form Labels

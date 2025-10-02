@@ -8,14 +8,19 @@
         label-width="140px"
         @submit.prevent="handleSubmit"
       >
-        <el-divider content-position="left">Thông tin chỉ bản</el-divider>
+        <el-divider content-position="left">{{
+          t("fingerprint.form.basicInfo")
+        }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item :label="$t('fingerprint.form.detaineeCode')" prop="person_id">
+            <el-form-item
+              :label="t('fingerprint.form.detaineeCode')"
+              prop="person_id"
+            >
               <el-select
                 v-model="form.detaineeCode"
-                  :placeholder="$t('fingerprint.form.placeholder.detaineeCode')"
+                :placeholder="t('fingerprint.form.placeholder.detaineeCode')"
                 filterable
                 @change="onDetaineeChange"
                 :disabled="isEdit"
@@ -30,10 +35,10 @@
             </el-form-item>
           </el-col>
           <el-col :md="12" :span="24">
-            <el-form-item label="Tạo tại">
+            <el-form-item :label="t('fingerprint.form.createdPlace')">
               <el-input
                 v-model="form.createdPlace"
-                placeholder="Nhập nơi tạo chỉ bản..."
+                :placeholder="t('fingerprint.form.placeholder.createdPlace')"
               />
             </el-form-item>
           </el-col>
@@ -53,64 +58,109 @@
 
         <el-row :gutter="20">
           <el-col :md="12" :span="24">
-            <el-form-item label="Lý do lập">
+            <el-form-item :label="t('fingerprint.form.reasonNote')">
               <el-input
                 v-model="form.reasonNote"
-                  :placeholder="$t('fingerprint.form.placeholder.reasonNote')"
+                :placeholder="t('fingerprint.form.placeholder.reasonNote')"
               />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">{{ $t('fingerprint.section.technicalSpecs') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("fingerprint.section.technicalSpecs")
+        }}</el-divider>
 
         <el-row :gutter="20">
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('fingerprint.form.fpFormula')">
+            <el-form-item :label="t('fingerprint.form.fpFormula')">
               <el-input
-                v-model="form.fp_formula"
-                  :placeholder="$t('fingerprint.form.placeholder.fpFormula')"
+                v-model="form.fpFormula"
+                :placeholder="t('fingerprint.form.placeholder.fpFormula')"
               />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('fingerprint.form.dp')">
-              <el-input v-model="form.dp" :placeholder="$t('fingerprint.form.placeholder.dp')"/>
+            <el-form-item :label="t('fingerprint.form.dp')">
+              <el-input
+                v-model="form.dp"
+                :placeholder="t('fingerprint.form.placeholder.dp')"
+              />
             </el-form-item>
           </el-col>
           <el-col :md="8" :span="24">
-            <el-form-item :label="$t('fingerprint.form.tw')">
-              <el-input v-model="form.tw" :placeholder="$t('fingerprint.form.placeholder.tw')"/>
+            <el-form-item :label="t('fingerprint.form.tw')">
+              <el-input
+                v-model="form.tw"
+                :placeholder="t('fingerprint.form.placeholder.tw')"
+              />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider content-position="left">{{ $t('fingerprint.section.collect') }}</el-divider>
+        <el-divider content-position="left">{{
+          t("fingerprint.section.collect")
+        }}</el-divider>
 
         <div class="fingerprint-upload-section">
           <el-alert
-              :title="$t('fingerprint.collect.guideTitle')"
-              type="info"
-              :description="$t('fingerprint.collect.guideDesc')"
-              show-icon
-              :closable="false"
-              class="mb-4"
+            :title="t('fingerprint.collect.guideTitle')"
+            type="info"
+            :description="t('fingerprint.collect.guideDesc')"
+            show-icon
+            :closable="false"
+            class="mb-4"
           />
+
+          <!-- WebSocket Status Indicator -->
+          <el-alert
+            :title="
+              wsConnected
+                ? 'Thiết bị quét vân tay đã kết nối'
+                : 'Thiết bị quét vân tay chưa kết nối'
+            "
+            :type="wsConnected ? 'success' : 'warning'"
+            :closable="false"
+            show-icon
+            class="ws-status-alert"
+          >
+            <template #default>
+              <!-- <div v-if="wsConnected">
+            Nhấn vào ô vân tay và đặt ngón tay lên thiết bị để quét
+          </div> -->
+              <!-- <div v-else>
+            <span>Đang thử kết nối lại... Hoặc bạn có thể </span>
+            <el-button type="text" @click="connectWebSocket" size="small">
+              Kết nối lại
+            </el-button>
+            <span> hoặc </span>
+            <el-button type="text" size="small"> Upload từ file </el-button>
+          </div> -->
+              <div>
+                <el-button v-if="!wsConnected" @click="connectWebSocket"
+                  >Mở kết nối đến thiết bị</el-button
+                >
+                <el-button v-else @click="disconnectWebSocket(true)"
+                  >Kết nối lại</el-button
+                >
+              </div>
+            </template>
+          </el-alert>
 
           <!-- Individual Fingerprints -->
           <div class="section-title">
-            <h4>{{ $t('fingerprint.collect.individual.title') }}</h4>
+            <h4>{{ t("fingerprint.collect.individual.title") }}</h4>
           </div>
           <div class="fingerprint-grid">
             <!-- Left Hand -->
             <div class="hand-section">
-              <h4>Tay trái</h4>
+              <h4>{{ t("fingerprint.collect.leftHand") }}</h4>
               <div class="fingers-row">
                 <div
                   v-for="finger in leftHandFingers"
                   :key="finger.key"
                   class="finger-slot"
-                  @click="selectFinger(finger.key)"
+                  @click="selectFinger(finger.key, 2)"
                 >
                   <div class="finger-label">{{ finger.label }}</div>
                   <div class="finger-container">
@@ -122,7 +172,7 @@
                     />
                     <div v-else class="no-fingerprint">
                       <el-icon><Plus /></el-icon>
-                      <span>Thêm ảnh</span>
+                      <span>{{ t("fingerprint.action.addImage") }}</span>
                     </div>
                   </div>
                   <div
@@ -145,13 +195,13 @@
             </div>
             <!-- Right Hand -->
             <div class="hand-section">
-              <h4>Tay phải</h4>
+              <h4>{{ t("fingerprint.collect.rightHand") }}</h4>
               <div class="fingers-row">
                 <div
                   v-for="finger in rightHandFingers"
                   :key="finger.key"
                   class="finger-slot"
-                  @click="selectFinger(finger.key)"
+                  @click="selectFinger(finger.key, 2)"
                 >
                   <div class="finger-label">{{ finger.label }}</div>
                   <div class="finger-container">
@@ -163,7 +213,7 @@
                     />
                     <div v-else class="no-fingerprint">
                       <el-icon><Plus /></el-icon>
-                      <span>Thêm ảnh</span>
+                      <span>{{ t("fingerprint.action.addImage") }}</span>
                     </div>
                   </div>
                   <div
@@ -188,27 +238,32 @@
 
           <!-- Four Finger Slaps -->
           <div class="section-title">
-            <h4>2. Ảnh 4 ngón chụm</h4>
+            <h4>{{ t("fingerprint.collect.fourFingers.title") }}</h4>
             <p class="section-description">
-              Chụp 4 ngón tay (trừ ngón cái) ép xuống cùng lúc
+              {{ t("fingerprint.collect.fourFingers.desc") }}
             </p>
           </div>
           <div class="four-finger-section">
             <el-row :gutter="20">
-              <el-col :span="12">
+              <el-col :span="9">
                 <div class="slap-card">
-                  <h5>4 ngón chụm tay trái</h5>
-                  <div class="slap-slot" @click="selectFinger('LEFT_FOUR')">
+                  <h5>{{ t("fingerprint.collect.fourFingers.titleLeft") }}</h5>
+                  <div class="slap-slot" @click="selectFinger('LEFT_FOUR', 4)">
                     <div class="slap-container">
                       <img
                         v-if="fingerprintPreviews['LEFT_FOUR']"
                         :src="fingerprintPreviews['LEFT_FOUR']"
-                        alt="4 ngón chụm tay trái"
+                        :alt="t('fingerprint.collect.fourFingers.titleLeft')"
                         class="slap-preview"
                       />
                       <div v-else class="no-slap">
                         <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh 4 ngón chụm tay trái</span>
+                        <span
+                          >{{ t("fingerprint.action.addImage") }}
+                          {{
+                            t("fingerprint.collect.fourFingers.titleLeft")
+                          }}</span
+                        >
                       </div>
                     </div>
                     <div
@@ -229,20 +284,65 @@
                   </div>
                 </div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="6">
                 <div class="slap-card">
-                  <h5>4 ngón chụm tay phải</h5>
-                  <div class="slap-slot" @click="selectFinger('RIGHT_FOUR')">
+                  <h5>2 ngón cái cùng lúc</h5>
+                  <div
+                    class="slap-slot"
+                    @click="selectFinger('BOTH_THUMBS', 3)"
+                  >
                     <div class="slap-container">
                       <img
-                        v-if="fingerprintPreviews['RIGHT_FOUR']"
-                        :src="fingerprintPreviews['RIGHT_FOUR']"
-                        alt="4 ngón chụm tay phải"
+                        v-if="fingerprintPreviews['BOTH_THUMBS']"
+                        :src="fingerprintPreviews['BOTH_THUMBS']"
+                        alt="2 ngón cái"
                         class="slap-preview"
                       />
                       <div v-else class="no-slap">
                         <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh 4 ngón chụm tay phải</span>
+                        <span>Thêm ảnh 2 ngón cái cùng lúc</span>
+                        <small>Ép 2 ngón cái xuống cùng nhau</small>
+                      </div>
+                    </div>
+                    <div
+                      v-if="fingerprintFiles['BOTH_THUMBS']"
+                      class="slap-actions"
+                    >
+                      <el-tag size="small" type="success">
+                        {{ getFileSize(fingerprintFiles["BOTH_THUMBS"]) }}
+                      </el-tag>
+                      <el-button
+                        size="small"
+                        type="danger"
+                        @click.stop="removeFinger('BOTH_THUMBS')"
+                      >
+                        <el-icon><Delete /></el-icon>
+                      </el-button>
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col :span="9">
+                <div class="slap-card">
+                  <h5>
+                    {{ t("fingerprint.collect.fourFingers.titleRight") }}
+                  </h5>
+                  <div class="slap-slot" @click="selectFinger('RIGHT_FOUR', 4)">
+                    <div class="slap-container">
+                      <img
+                        v-if="fingerprintPreviews['RIGHT_FOUR']"
+                        :src="fingerprintPreviews['RIGHT_FOUR']"
+                        :alt="t('fingerprint.collect.fourFingers.titleRight')"
+                        class="slap-preview"
+                      />
+                      <div v-else class="no-slap">
+                        <el-icon><Plus /></el-icon>
+                        <span
+                          >{{ t("fingerprint.action.addImage") }}
+                          {{
+                            t("fingerprint.collect.fourFingers.titleRight")
+                          }}</span
+                        >
                       </div>
                     </div>
                     <div
@@ -268,27 +368,30 @@
 
           <!-- Full Hand Prints -->
           <div class="section-title">
-            <h4>3. Ảnh toàn bộ bàn tay</h4>
+            <h4>{{ t("fingerprint.collect.fullHands.title") }}</h4>
             <p class="section-description">
-              Chụp toàn bộ bàn tay bao gồm cả lòng bàn tay
+              {{ t("fingerprint.collect.fullHands.desc") }}
             </p>
           </div>
           <div class="full-hand-section">
             <el-row :gutter="20">
               <el-col :span="12">
                 <div class="hand-card">
-                  <h5>Bàn tay trái</h5>
-                  <div class="hand-slot" @click="selectFinger('LEFT_FULL')">
+                  <h5>{{ t("fingerprint.collect.fullHands.left") }}</h5>
+                  <div class="hand-slot" @click="selectFinger('LEFT_FULL', 6)">
                     <div class="hand-container">
                       <img
                         v-if="fingerprintPreviews['LEFT_FULL']"
                         :src="fingerprintPreviews['LEFT_FULL']"
-                        alt="Bàn tay trái"
+                        :alt="t('fingerprint.collect.fullHands.left')"
                         class="hand-preview"
                       />
                       <div v-else class="no-hand">
                         <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh bàn tay trái</span>
+                        <span
+                          >{{ t("fingerprint.action.addImage") }}
+                          {{ t("fingerprint.collect.fullHands.left") }}</span
+                        >
                       </div>
                     </div>
                     <div
@@ -311,18 +414,21 @@
               </el-col>
               <el-col :span="12">
                 <div class="hand-card">
-                  <h5>Bàn tay phải</h5>
-                  <div class="hand-slot" @click="selectFinger('RIGHT_FULL')">
+                  <h5>{{ t("fingerprint.collect.fullHands.right") }}</h5>
+                  <div class="hand-slot" @click="selectFinger('RIGHT_FULL', 7)">
                     <div class="hand-container">
                       <img
                         v-if="fingerprintPreviews['RIGHT_FULL']"
                         :src="fingerprintPreviews['RIGHT_FULL']"
-                        alt="Bàn tay phải"
+                        :alt="t('fingerprint.collect.fullHands.right')"
                         class="hand-preview"
                       />
                       <div v-else class="no-hand">
                         <el-icon><Plus /></el-icon>
-                        <span>Thêm ảnh bàn tay phải</span>
+                        <span
+                          >{{ t("fingerprint.action.addImage") }}
+                          {{ t("fingerprint.collect.fullHands.right") }}</span
+                        >
                       </div>
                     </div>
                     <div
@@ -365,26 +471,36 @@
         </div>
 
         <!-- Quality Assessment -->
-        <el-divider content-position="left">Đánh giá chất lượng</el-divider>
+        <el-divider content-position="left">{{
+          t("fingerprint.quality.title")
+        }}</el-divider>
 
         <div class="quality-section">
           <el-row :gutter="20">
             <el-col :span="12">
               <div class="quality-stats">
-                <h4>Thống kê vân tay</h4>
+                <h4>{{ t("fingerprint.quality.stats") }}</h4>
                 <el-descriptions :column="1" size="small" border>
-                  <el-descriptions-item label="Vân tay từng ngón">
+                  <el-descriptions-item
+                    :label="t('fingerprint.quality.individual')"
+                  >
                     <el-tag type="info"
                       >{{ getIndividualFingerprints() }}/10</el-tag
                     >
                   </el-descriptions-item>
-                  <el-descriptions-item label="Ảnh 4 ngón chụm">
-                    <el-tag type="info">{{ getFourFingerSlaps() }}/2</el-tag>
+                  <el-descriptions-item
+                    :label="t('fingerprint.quality.fourSlaps')"
+                  >
+                    <el-tag type="info"
+                      >{{ getFourFingerSlapsAndTwoThumbs() }}/3</el-tag
+                    >
                   </el-descriptions-item>
-                  <el-descriptions-item label="Ảnh toàn bộ bàn tay">
+                  <el-descriptions-item
+                    :label="t('fingerprint.quality.fullHands')"
+                  >
                     <el-tag type="info">{{ getFullHands() }}/2</el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item label="Tổng số ảnh">
+                  <el-descriptions-item :label="t('fingerprint.quality.total')">
                     <el-tag type="success"
                       >{{ getTotalFingerprints() }}/14</el-tag
                     >
@@ -394,7 +510,7 @@
             </el-col>
             <el-col :span="12">
               <div class="quality-rating">
-                <h4>Đánh giá tổng thể</h4>
+                <h4>{{ t("fingerprint.quality.overall") }}</h4>
                 <!-- <div class="overall-rating">
                   <el-rate
                     :model-value="getOverallQuality()"
@@ -410,7 +526,8 @@
                   class="completion-progress"
                 />
                 <p class="completion-text">
-                  Hoàn thành {{ getCompletionPercentage() }}%
+                  {{ t("fingerprint.quality.completed") }}
+                  {{ getCompletionPercentage() }}%
                 </p>
 
                 <!-- Completion checklist -->
@@ -421,21 +538,26 @@
                     "
                     size="small"
                   >
-                    {{ getIndividualFingerprints() === 10 ? "✓" : "○" }} 10 vân
-                    tay đơn
+                    {{ getIndividualFingerprints() === 10 ? "✓" : "○" }}
+                    {{ t("fingerprint.quality.check.individual") }}
                   </el-tag>
                   <el-tag
-                    :type="getFourFingerSlaps() === 2 ? 'success' : 'warning'"
+                    :type="
+                      getFourFingerSlapsAndTwoThumbs() === 3
+                        ? 'success'
+                        : 'warning'
+                    "
                     size="small"
                   >
-                    {{ getFourFingerSlaps() === 2 ? "✓" : "○" }} 2 ảnh 4 ngón
-                    chụm
+                    {{ getFourFingerSlapsAndTwoThumbs() === 3 ? "✓" : "○" }}
+                    {{ t("fingerprint.quality.check.fourSlaps") }}
                   </el-tag>
                   <el-tag
                     :type="getFullHands() === 2 ? 'success' : 'warning'"
                     size="small"
                   >
-                    {{ getFullHands() === 2 ? "✓" : "○" }} 2 ảnh bàn tay
+                    {{ getFullHands() === 2 ? "✓" : "○" }}
+                    {{ t("fingerprint.quality.check.fullHands") }}
                   </el-tag>
                 </div>
               </div>
@@ -450,16 +572,18 @@
             :loading="submitting"
             :disabled="getTotalFingerprints() === 0"
           >
-            {{ isEdit ? "Cập nhật" : "Tạo mới" }}
+            {{ isEdit ? t("common.update") : t("common.create") }}
           </el-button>
-          <el-button @click="handleReset">{{ $t('common.reset')}}</el-button>
-          <el-button @click="$router.go(-1)">{{ $t('common.cancel')}}</el-button>
+          <el-button @click="handleReset">{{ t("common.reset") }}</el-button>
+          <el-button @click="$router.go(-1)">{{
+            t("common.cancel")
+          }}</el-button>
           <el-button
             type="success"
             @click="handlePreview"
             v-if="getTotalFingerprints() > 0"
           >
-            {{ $t('common.preview') }}
+            {{ t("common.preview") }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -468,7 +592,7 @@
     <!-- Preview Dialog -->
     <el-dialog
       v-model="previewDialogVisible"
-      :title="$t('fingerprint.preview.title')"
+      :title="t('fingerprint.preview.title')"
       width="80%"
       class="dialog"
     >
@@ -476,24 +600,30 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <el-card>
-              <template #header>Thông tin cơ bản</template>
+              <template #header>{{
+                t("fingerprint.preview.basicInfo")
+              }}</template>
               <el-descriptions :column="1" size="small">
-                <el-descriptions-item label="Mã phạm nhân">{{
-                  form.detaineeCode
-                }}</el-descriptions-item>
-                <!-- <el-descriptions-item label="Ngày lập">{{
-                  formatDate(form.createdDate)
-                }}</el-descriptions-item> -->
-                <el-descriptions-item label="Tạo tại">{{
-                  form.createdPlace || "-"
-                }}</el-descriptions-item>
-                <el-descriptions-item label="Công thức VT">{{
-                  form.fpFormula || "-"
-                }}</el-descriptions-item>
-                <el-descriptions-item label="DP">{{
+                <el-descriptions-item
+                  :label="t('fingerprint.preview.personId')"
+                  >{{ form.detaineeCode }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  :label="t('fingerprint.preview.createdDate')"
+                  >{{ formatDate(form.createdAt) }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  :label="t('fingerprint.preview.createdPlace')"
+                  >{{ form.createdPlace || "-" }}</el-descriptions-item
+                >
+                <el-descriptions-item
+                  :label="t('fingerprint.preview.fpFormula')"
+                  >{{ form.fpFormula || "-" }}</el-descriptions-item
+                >
+                <el-descriptions-item :label="t('fingerprint.preview.dp')">{{
                   form.dp || "-"
                 }}</el-descriptions-item>
-                <el-descriptions-item label="TW">{{
+                <el-descriptions-item :label="t('fingerprint.preview.tw')">{{
                   form.tw || "-"
                 }}</el-descriptions-item>
               </el-descriptions>
@@ -501,12 +631,18 @@
           </el-col>
           <el-col :span="16">
             <el-card>
-              <template #header>Vân tay thu thập được</template>
+              <template #header>{{
+                t("fingerprint.preview.collected")
+              }}</template>
 
               <!-- Individual fingerprints -->
               <div class="preview-section">
                 <h5>
-                  Vân tay từng ngón ({{ getIndividualFingerprints() }}/10)
+                  {{
+                    t("fingerprint.preview.individual", {
+                      count: getIndividualFingerprints(),
+                    })
+                  }}
                 </h5>
                 <div class="preview-fingerprint-grid">
                   <div
@@ -534,7 +670,13 @@
 
               <!-- Four finger slaps -->
               <div class="preview-section">
-                <h5>Ảnh 4 ngón chụm ({{ getFourFingerSlaps() }}/2)</h5>
+                <h5>
+                  {{
+                    t("fingerprint.preview.fourSlaps", {
+                      count: getFourFingerSlapsAndTwoThumbs(),
+                    })
+                  }}
+                </h5>
                 <div class="preview-slap-grid">
                   <div
                     class="preview-slap-item"
@@ -542,12 +684,30 @@
                       'has-image': fingerprintPreviews['LEFT_FOUR'],
                     }"
                   >
-                    <div class="preview-slap-label">4 ngón chụm tay trái</div>
+                    <div class="preview-slap-label">
+                      {{ t("fingerprint.preview.leftFour") }}
+                    </div>
                     <div class="preview-slap-container">
                       <img
                         v-if="fingerprintPreviews['LEFT_FOUR']"
                         :src="fingerprintPreviews['LEFT_FOUR']"
-                        alt="4 ngón chụm tay trái"
+                        :alt="t('fingerprint.preview.leftFour')"
+                      />
+                      <div v-else class="preview-no-image">
+                        <el-icon><Close /></el-icon>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="preview-slap-item"
+                    :class="{ 'has-image': fingerprintPreviews['BOTH_THUMBS'] }"
+                  >
+                    <div class="preview-slap-label">2 ngón cái cùng lúc</div>
+                    <div class="preview-slap-container">
+                      <img
+                        v-if="fingerprintPreviews['BOTH_THUMBS']"
+                        :src="fingerprintPreviews['BOTH_THUMBS']"
+                        alt="2 ngón cái"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -560,12 +720,14 @@
                       'has-image': fingerprintPreviews['RIGHT_FOUR'],
                     }"
                   >
-                    <div class="preview-slap-label">4 ngón chụm tay phải</div>
+                    <div class="preview-slap-label">
+                      {{ t("fingerprint.preview.rightFour") }}
+                    </div>
                     <div class="preview-slap-container">
                       <img
                         v-if="fingerprintPreviews['RIGHT_FOUR']"
                         :src="fingerprintPreviews['RIGHT_FOUR']"
-                        alt="4 ngón chụm tay phải"
+                        :alt="t('fingerprint.preview.rightFour')"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -577,7 +739,13 @@
 
               <!-- Full hands -->
               <div class="preview-section">
-                <h5>Ảnh toàn bộ bàn tay ({{ getFullHands() }}/2)</h5>
+                <h5>
+                  {{
+                    $t("fingerprint.preview.fullHands", {
+                      count: getFullHands(),
+                    })
+                  }}
+                </h5>
                 <div class="preview-hand-grid">
                   <div
                     class="preview-hand-item"
@@ -585,12 +753,14 @@
                       'has-image': fingerprintPreviews['LEFT_FULL'],
                     }"
                   >
-                    <div class="preview-hand-label">Bàn tay trái</div>
+                    <div class="preview-hand-label">
+                      {{ t("fingerprint.preview.leftHand") }}
+                    </div>
                     <div class="preview-hand-container">
                       <img
                         v-if="fingerprintPreviews['LEFT_FULL']"
                         :src="fingerprintPreviews['LEFT_FULL']"
-                        alt="Bàn tay trái"
+                        :alt="t('fingerprint.preview.leftHand')"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -603,12 +773,14 @@
                       'has-image': fingerprintPreviews['RIGHT_FULL'],
                     }"
                   >
-                    <div class="preview-hand-label">Bàn tay phải</div>
+                    <div class="preview-hand-label">
+                      {{ t("fingerprint.preview.rightHand") }}
+                    </div>
                     <div class="preview-hand-container">
                       <img
                         v-if="fingerprintPreviews['RIGHT_FULL']"
                         :src="fingerprintPreviews['RIGHT_FULL']"
-                        alt="Bàn tay phải"
+                        :alt="t('fingerprint.preview.rightHand')"
                       />
                       <div v-else class="preview-no-image">
                         <el-icon><Close /></el-icon>
@@ -623,13 +795,15 @@
       </div>
 
       <template #footer>
-        <el-button @click="previewDialogVisible = false">Đóng</el-button>
+        <el-button @click="previewDialogVisible = false">{{
+          t("common.close")
+        }}</el-button>
         <el-button
           type="primary"
           @click="handleSubmitFromPreview"
           :loading="submitting"
         >
-          {{ isEdit ? "Cập nhật chỉ bản" : "Tạo chỉ bản" }}
+          {{ isEdit ? t("common.update") : t("common.create") }}
         </el-button>
       </template>
     </el-dialog>
@@ -637,9 +811,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { Plus, Delete, Close } from "@element-plus/icons-vue";
 import { useFingerprintStore } from "@/stores/fingerprint";
 import { useDetaineeStore } from "@/stores/detainee";
@@ -648,7 +822,9 @@ import type {
   FingerprintCardCreateRequest,
   FingerprintCardUpdateRequest,
 } from "@/types/fingerprint";
-import detainee from "@/i18n/lang/en-US/detainee";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -667,6 +843,12 @@ const currentSelectedFinger = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isEdit = computed(() => !!route.params.id);
 
+// WebSocket connection
+const ws = ref<WebSocket | null>(null);
+const wsConnected = ref(false);
+const wsUrl = "ws://127.0.0.1:7172/finger-ws";
+const repeat = ref(false);
+
 const form = reactive<Partial<FingerprintCard>>({
   detaineeCode: "",
   createdDate: "",
@@ -681,29 +863,30 @@ const form = reactive<Partial<FingerprintCard>>({
 
 // Finger positions
 const rightHandFingers = [
-  { key: "RIGHT_THUMB", label: "Cái" },
-  { key: "RIGHT_INDEX", label: "Trỏ" },
-  { key: "RIGHT_MIDDLE", label: "Giữa" },
-  { key: "RIGHT_RING", label: "Áp út" },
-  { key: "RIGHT_LITTLE", label: "Út" },
+  { key: "RIGHT_THUMB", label: t("fingerprint.fingers.thumbright") },
+  { key: "RIGHT_INDEX", label: t("fingerprint.fingers.indexright") },
+  { key: "RIGHT_MIDDLE", label: t("fingerprint.fingers.middleright") },
+  { key: "RIGHT_RING", label: t("fingerprint.fingers.ringright") },
+  { key: "RIGHT_LITTLE", label: t("fingerprint.fingers.littleright") },
 ];
 
 const leftHandFingers = [
-  { key: "LEFT_THUMB", label: "Cái" },
-  { key: "LEFT_INDEX", label: "Trỏ" },
-  { key: "LEFT_MIDDLE", label: "Giữa" },
-  { key: "LEFT_RING", label: "Áp út" },
-  { key: "LEFT_LITTLE", label: "Út" },
+  { key: "LEFT_THUMB", label: t("fingerprint.fingers.thumbleft") },
+  { key: "LEFT_INDEX", label: t("fingerprint.fingers.indexleft") },
+  { key: "LEFT_MIDDLE", label: t("fingerprint.fingers.middleleft") },
+  { key: "LEFT_RING", label: t("fingerprint.fingers.ringleft") },
+  { key: "LEFT_LITTLE", label: t("fingerprint.fingers.littleleft") },
 ];
 
 const allFingers = [...rightHandFingers, ...leftHandFingers];
 
 // Additional fingerprint types
 const additionalTypes = [
-  { key: "RIGHT_FOUR", label: "4 ngón chụm tay phải" },
-  { key: "LEFT_FOUR", label: "4 ngón chụm tay trái" },
-  { key: "RIGHT_FULL", label: "Toàn bộ bàn tay phải" },
-  { key: "LEFT_FULL", label: "Toàn bộ bàn tay trái" },
+  { key: "RIGHT_FOUR", label: t("fingerprint.preview.rightFour") },
+  { key: "LEFT_FOUR", label: t("fingerprint.preview.leftFour") },
+  { key: "BOTH_THUMBS", label: "2 ngón cái cùng lúc" },
+  { key: "RIGHT_FULL", label: t("fingerprint.preview.rightHand") },
+  { key: "LEFT_FULL", label: t("fingerprint.preview.leftHand") },
 ];
 
 const allFingerprintTypes = [...allFingers, ...additionalTypes];
@@ -711,7 +894,11 @@ const allFingerprintTypes = [...allFingers, ...additionalTypes];
 // Validation rules
 const rules = reactive({
   detaineeCode: [
-    { required: true, message: "Vui lòng chọn phạm nhân", trigger: "change" },
+    {
+      required: true,
+      message: t("fingerprint.rule.detaineeCode"),
+      trigger: "change",
+    },
   ],
   createdDate: [
     { required: true, message: "Vui lòng chọn ngày lập", trigger: "change" },
@@ -719,6 +906,108 @@ const rules = reactive({
 });
 
 // Methods
+
+function base64ToFile(
+  base64: string,
+  fileName: string,
+  mimeType = "image/bmp"
+): File {
+  const byteString = atob(base64);
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uintArray = new Uint8Array(arrayBuffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    uintArray[i] = byteString.charCodeAt(i);
+  }
+
+  const blob = new Blob([uintArray], { type: mimeType });
+  return new File([blob], fileName, { type: mimeType });
+}
+function connectWebSocket() {
+  if (ws.value && ws.value.readyState === WebSocket.OPEN) return;
+
+  ws.value = new WebSocket(wsUrl);
+
+  ws.value.onopen = () => {
+    wsConnected.value = true;
+    ElMessage.success("Đã kết nối thiết bị quét vân tay!");
+  };
+
+  ws.value.onmessage = (event) => {
+    try {
+      handleFingerprintData(JSON.parse(event.data));
+    } catch {
+      ElMessage.error("Lỗi dữ liệu từ thiết bị!");
+    }
+  };
+
+  ws.value.onerror = () => {
+    console.log("WebSocket connection error.");
+    wsConnected.value = false;
+    ElMessage.error("Lỗi kết nối thiết bị!");
+  };
+
+  ws.value.onclose = () => {
+    console.log("WebSocket connection closed.");
+    wsConnected.value = false;
+
+    if (repeat.value) {
+      ElMessage.warning("Kết nội lại thiết bị sau 2s...");
+      setTimeout(connectWebSocket, 2000);
+    }
+  };
+}
+
+function disconnectWebSocket(isRepeat: any) {
+  ws.value?.close();
+  ws.value = null;
+  wsConnected.value = false;
+  repeat.value = isRepeat;
+}
+
+function handleFingerprintData(data: any) {
+  console.log("data", data);
+  if (!currentSelectedFinger.value) {
+    return ElMessage.warning("Vui lòng chọn vị trí ngón tay trước!");
+  }
+
+  // if (data.status !== 0) {
+  //   return ElMessage.error(`Lỗi quét vân tay! Status: ${data.status}`);
+  // }
+
+  // if (data.quality < 3) {
+  //   ElMessage.warning(
+  //     `Chất lượng thấp (${data.quality}/10). Vui lòng quét lại!`
+  //   );
+  // }
+
+  if (data.image) {
+    try {
+      const imageData = `data:image/bmp;base64,${data.image}`;
+      fingerprintPreviews[currentSelectedFinger.value] = imageData;
+
+      if (data.status === 2) {
+        const file = base64ToFile(
+          data.image,
+          `${currentSelectedFinger.value}.bmp`
+        );
+        fingerprintFiles[currentSelectedFinger.value] = file;
+        currentSelectedFinger.value = null;
+        repeat.value = true;
+      }
+
+      // ElMessage.success(
+      //   `Đã quét ${getFingerLabel(currentSelectedFinger.value)} - Chất lượng: ${
+      //     data.quality
+      //   }/10`
+      // );
+    } catch (error) {
+      console.error(error);
+      ElMessage.error("Lỗi xử lý ảnh vân tay!");
+    } finally {
+    }
+  }
+}
 const getAllDetainees = () => {
   detaineeStore.getAll();
 };
@@ -731,11 +1020,34 @@ const onDetaineeChange = (value: any) => {
     ElMessage.success(`Đã chọn phạm nhân: ${detainee.fullName}`);
   }
 };
+const selectFinger = (fingerKey: any, type: any) => {
+  if (!wsConnected.value) {
+    ElMessage.error("Chưa kết nối với thiết bị quét vân tay!");
+    return;
+  }
 
-const selectFinger = (fingerKey: string) => {
   currentSelectedFinger.value = fingerKey;
-  fileInput.value?.click();
+  console.log("type", type);
+  ElMessage.info(
+    `Đã chọn ${getFingerLabel(
+      fingerKey
+    )}. Vui lòng đặt ngón tay lên thiết bị quét...`
+  );
+
+  // Gửi yêu cầu quét vân tay qua WebSocket
+  if (ws.value && ws.value.readyState === WebSocket.OPEN) {
+    ws.value.send(
+      JSON.stringify(
+        type // Minimum quality level
+      )
+    );
+  }
 };
+
+// const selectFinger = (fingerKey: string) => {
+//   currentSelectedFinger.value = fingerKey;
+//   fileInput.value?.click();
+// };
 
 const handleFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -765,21 +1077,24 @@ const validateFile = (file: any) => {
     "image/jpeg",
     "image/png",
     "image/bmp",
-    "application/octet-stream",
+    "image/gif",
+    "image/webp",
   ];
+  const isWSQ = file.name.toLowerCase().endsWith(".wsq");
   const maxSize = 5 * 1024 * 1024; // 5MB
 
-  if (
-    !validTypes.includes(file.type) &&
-    !file.name.toLowerCase().endsWith(".wsq")
-  ) {
-    ElMessage.error("Chỉ hỗ trợ file ảnh (JPG, PNG, BMP) hoặc WSQ!");
+  if (!validTypes.includes(file.type) && !isWSQ) {
+    ElMessage.error("Chỉ hỗ trợ file ảnh (JPG, PNG, BMP, GIF, WebP) hoặc WSQ!");
     return false;
   }
 
   if (file.size > maxSize) {
     ElMessage.error("File không được lớn hơn 5MB!");
     return false;
+  }
+
+  if (file.size < 1024) {
+    ElMessage.warning("File quá nhỏ, có thể không đủ chất lượng!");
   }
 
   return true;
@@ -797,28 +1112,40 @@ const getFingerLabel = (fingerKey: any) => {
   return finger ? finger.label : fingerKey;
 };
 
-const getFileSize = (file: any) => {
-  console.log("file", file);
+// const getFileSize = (file: any) => {
+//   console.log("file", file);
+//   if (!file) return "";
+
+//   // Nếu là File (tải từ input)
+//   if (file instanceof File) {
+//     const size = file.size;
+//     if (size < 1024) return `${size}B`;
+//     if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+//     return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
+//   }
+
+//   // Nếu là object từ backend (không có size)
+//   if (file.size) {
+//     const size = file.size;
+//     if (size < 1024) return `${size}B`;
+//     if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+//     return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
+//   }
+
+//   // Trường hợp không có size → hiển thị tên ảnh hoặc chuỗi trống
+//   return "";
+// };
+
+const getFileSize = (file: any): string => {
   if (!file) return "";
 
-  // Nếu là File (tải từ input)
-  if (file instanceof File) {
-    const size = file.size;
-    if (size < 1024) return `${size}B`;
-    if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
-    return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
-  }
+  // Lấy size nếu có
+  const size = file instanceof File ? file.size : file?.size;
+  if (!size) return "";
 
-  // Nếu là object từ backend (không có size)
-  if (file.size) {
-    const size = file.size;
-    if (size < 1024) return `${size}B`;
-    if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
-    return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
-  }
-
-  // Trường hợp không có size → hiển thị tên ảnh hoặc chuỗi trống
-  return "";
+  if (size < 1024) return `${size}B`;
+  if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+  return `${Math.round((size / (1024 * 1024)) * 10) / 10}MB`;
 };
 
 const getTotalFingerprints = () => {
@@ -829,10 +1156,11 @@ const getIndividualFingerprints = () => {
   return allFingers.filter((finger) => fingerprintFiles[finger.key]).length;
 };
 
-const getFourFingerSlaps = () => {
+const getFourFingerSlapsAndTwoThumbs = () => {
   let count = 0;
   if (fingerprintFiles["RIGHT_FOUR"]) count++;
   if (fingerprintFiles["LEFT_FOUR"]) count++;
+  if (fingerprintFiles["BOTH_THUMBS"]) count++;
   return count;
 };
 
@@ -840,6 +1168,7 @@ const getFullHands = () => {
   let count = 0;
   if (fingerprintFiles["RIGHT_FULL"]) count++;
   if (fingerprintFiles["LEFT_FULL"]) count++;
+
   return count;
 };
 
@@ -869,7 +1198,7 @@ const getOverallQuality = () => {
 };
 
 const getCompletionPercentage = () => {
-  return Math.round((getTotalFingerprints() / 14) * 100);
+  return Math.round((getTotalFingerprints() / 15) * 100);
 };
 
 const getProgressColor = () => {
@@ -1016,6 +1345,12 @@ const formatDate = (dateStr: any) => {
 onMounted(async () => {
   await getAllDetainees();
   await loadData();
+  if (!isEdit.value) {
+    connectWebSocket();
+  }
+});
+onUnmounted(() => {
+  disconnectWebSocket(false);
 });
 </script>
 <style scoped>
@@ -1094,7 +1429,7 @@ onMounted(async () => {
 }
 
 .finger-container {
-  height: 120px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1140,11 +1475,13 @@ onMounted(async () => {
 
 /* Four finger slap styles */
 .four-finger-section,
+.two-thumbs-section,
 .full-hand-section {
   margin: 20px 0;
 }
 
 .slap-card,
+.thumbs-card,
 .hand-card {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -1161,6 +1498,7 @@ onMounted(async () => {
 }
 
 .slap-slot,
+.thumbs-slot,
 .hand-slot {
   border: 2px dashed #ddd;
   border-radius: 8px;
@@ -1170,6 +1508,7 @@ onMounted(async () => {
 }
 
 .slap-slot:hover,
+.thumbs-slot:hover,
 .hand-slot:hover {
   border-color: #409eff;
   background-color: rgba(64, 158, 255, 0.05);
@@ -1178,6 +1517,14 @@ onMounted(async () => {
 .slap-container,
 .hand-container {
   height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.thumbs-container {
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1327,11 +1674,16 @@ onMounted(async () => {
   color: #ccc;
 }
 
-.preview-slap-grid,
+.preview-slap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
 .preview-hand-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+  gap: 12px;
 }
 
 .preview-slap-item,

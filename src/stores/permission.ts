@@ -3,6 +3,8 @@ import { ElMessage, ElNotification } from "element-plus";
 import { PermissionService } from "@/services/permission";
 import type { ServiceResult } from "@/types/common";
 
+import { t } from "@/i18n";
+
 export const usePermissionStore = defineStore("permission", {
   state: () => ({
     permissions: [] as string[],
@@ -20,13 +22,15 @@ export const usePermissionStore = defineStore("permission", {
         );
 
         if (!res.success) {
-          throw new Error(res.message || "synchronize failed");
+          throw new Error(res.message || t("error.permission.synchronize"));
         }
 
-        ElMessage.success("Created successfully");
+        ElMessage.success(t("permission.synchronizeSuccess"));
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.permission.synchronize");
         ElMessage.error(msg);
         // ElNotification.error(msg);
         throw e;
@@ -39,13 +43,15 @@ export const usePermissionStore = defineStore("permission", {
           await PermissionService.getAllMenus();
 
         if (!res.success) {
-          throw new Error(res.message || "synchronize failed");
+          throw new Error(res.message || t("error.permission.getAllMenus"));
         }
 
         this.permissions = res.data as string[];
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Create prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.permission.getAllMenus");
         ElMessage.error(msg);
         // ElNotification.error(msg);
         throw e;

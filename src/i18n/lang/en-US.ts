@@ -14,7 +14,9 @@ import identity from "./en-US/identity";
 import detainee from "./en-US/detainee";
 import department from "./en-US/department.ts";
 import fingerprint from "./en-US/fingerprint";
-import report from "@/i18n/lang/en-US/report.ts"
+import report from "@/i18n/lang/en-US/report.ts";
+import dashboard from "@/i18n/lang/en-US/dashboard.ts";
+import el from "./en-US/el";
 
 export default {
   route,
@@ -34,4 +36,6 @@ export default {
   department,
   fingerprint,
   report,
+  dashboard,
+  el,
 };

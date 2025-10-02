@@ -20,6 +20,13 @@ export default {
         notes: "Enter notes",
     },
 
+    validation: {
+        required: {
+            name: "Please enter department name",
+            detentionCenterId: "Please select prison",
+        }
+    },
+
     message: {
         createSuccess: "Department created successfully",
         updateSuccess: "Department updated successfully",

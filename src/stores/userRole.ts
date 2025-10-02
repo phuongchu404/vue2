@@ -27,13 +27,17 @@ export const useUserRoleStore = defineStore("userRole", {
           await UserRoleService.updateRoleByUserId(id, payload);
         this.success = res.success;
         if (!res.success) {
-          throw new Error(res.message || "Update prison failed");
+          throw new Error(
+            res.message || t("error.userRole.updateRoleByUserId")
+          );
         }
 
         ElMessage.success(t("common.updateSuccess"));
       } catch (e: any) {
         const msg =
-          e?.response?.data?.message || e?.message || "Update prison failed";
+          e?.response?.data?.message ||
+          e?.message ||
+          t("error.userRole.updateRoleByUserId");
         this.error = msg;
         ElMessage.error(msg);
         throw e;
